@@ -1,0 +1,88 @@
+Generate a valid Obsidian Bases (.base) YAML file.
+
+Context you are given:
+- title
+- folder
+- root_dir (outputs/<folder>/<title>/)
+
+CRITICAL CONCEPTS (READ THIS FIRST):
+- Obsidian Bases is a VIEW DEFINITION system, NOT a data storage format
+- The .base file defines HOW to view existing markdown files, NOT the data itself
+- Data is automatically read from markdown frontmatter properties in the sourced files
+- NEVER include a "data:" section with hardcoded values
+- The "rows" displayed in the view are the markdown files found in the sources directory
+- This is like a saved database query, not a database table
+
+**CRITICAL: Path Resolution in Obsidian Bases**
+- sources paths are relative to the VAULT ROOT, not the .base file location
+- Using "./" will scan the entire vault root, which is usually not what you want
+- ALWAYS use the full path from vault root: "outputs/<folder>/<title>/"
+- ALWAYS add file.inFolder() filter as a safety measure to restrict scope
+
+**CRITICAL: File Format**
+- Output MUST be YAML format, NOT JSON
+- Do NOT use { } brackets, [ ] arrays, or "key": "value" JSON syntax
+- Use YAML syntax with proper indentation and colons
+- Do NOT include JSON-specific fields like "version", "type", "sources" (as array)
+
+Hard Requirements:
+- sources MUST be exactly (relative to VAULT ROOT):
+  outputs/<folder>/<title>/
+- Non-markdown files MUST be excluded
+- Define at least one view of type "table"
+- The view's "order" MUST include at least 6 column specifications
+- MUST include file.inFolder() filter to ensure only files from the target directory are shown
+
+Recommended Columns (for the view's "order" section):
+- file.name
+- file.path
+- tags
+- category
+- created
+- modified
+
+STRICTLY FORBIDDEN:
+- DO NOT include a "data:" section
+- DO NOT hardcode data values
+- DO NOT manually create records or entries
+- DO NOT treat this as a data storage file
+- DO NOT use "./" as the sources path (it scans the entire vault)
+- DO NOT output JSON format (must be YAML)
+- DO NOT use "version", "type" fields at the top level
+
+Rules:
+- The base will only show markdown files from this case directory
+- Do NOT include markdown text or explanations
+- Output ONLY valid .base YAML
+- All data comes from the frontmatter of markdown files in the sources directory
+
+Required Output Format:
+```yaml
+sources: |
+  include: outputs/<folder>/<title>/
+  exclude:
+    - "*.json"
+
+filters:
+  and:
+    - 'file.ext == "md"'
+    - file.inFolder("outputs/<folder>/<title>")
+
+properties:
+  category:
+    displayName: 分类
+  created:
+    displayName: 创建时间
+  modified:
+    displayName: 修改时间
+
+views:
+  - type: table
+    name: 文件列表
+    order:
+      - file.name
+      - tags
+      - category
+      - created
+      - modified
+```

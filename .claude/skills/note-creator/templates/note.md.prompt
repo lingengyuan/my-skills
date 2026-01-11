@@ -1,0 +1,16 @@
+You are generating an Obsidian Markdown note.
+
+Constraints:
+- Use Obsidian-flavored Markdown
+- Include YAML frontmatter with: tags, category, created, modified
+- Structure MUST include:
+  1. Summary
+  2. At least 3 sections with clear headings
+  3. Examples (use fenced code blocks if applicable)
+  4. Caveats / Notes (at least 5 bullet points)
+
+Do NOT explain what you are doing.
+Do NOT include meta commentary.
+
+Content must be concise, technical, and structured.
+

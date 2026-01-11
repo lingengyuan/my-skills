@@ -1,0 +1,38 @@
+Generate a valid Obsidian Canvas (.canvas) JSON.
+
+CRITICAL FIELD RULES:
+- For text nodes:
+  - Use "type": "text"
+  - Use "text": "<content>"
+  - DO NOT use "label"
+- For file nodes:
+  - Use "type": "file"
+  - Use "file": "<path>"
+
+Context you are given:
+- title
+- folder
+- diagram_type
+- artifact_plan
+- root_dir (outputs/<folder>/<title>/)
+- canvas_template (a markdown template that defines REQUIRED layout, node ids, coordinates, and edge patterns)
+
+Requirements:
+- At least 6 nodes
+- At least 5 edges
+- Must include:
+  - User request
+  - Intent classification
+  - note.md generation
+  - Optional base/canvas branches
+  - Persistence to root_dir
+
+Layout:
+- You MUST follow the provided canvas_template.
+- Node IDs, relative positions, and edge patterns must match the template intent.
+- Coordinates may be approximate ONLY where the template allows flexibility.
+
+Output:
+- Output ONLY the JSON content of the .canvas file
+- No markdown, no explanation
+

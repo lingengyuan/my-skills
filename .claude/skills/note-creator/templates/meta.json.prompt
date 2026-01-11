@@ -1,0 +1,123 @@
+{
+  "schema_version": "3.0",
+  "id": "nc_20260109_40_tools_docker_common_cmds",
+  "stable_key": "40-工具脚本::Docker 常用命令",
+  "title": "Docker 常用命令",
+  "folder": "40-工具脚本",
+
+  "diagram_type": "artifact",
+
+  "artifact_plan": ["md", "base"],
+  "tags": ["docker", "运维", "命令", "容器"],
+
+  "properties": {
+    "category": "容器技术",
+    "created": "2026-01-09",
+    "modified": "2026-01-09",
+    "source": "user_prompt"
+  },
+
+  "paths": {
+    "root_dir": "outputs/40-工具脚本/Docker 常用命令/",
+    "note": "outputs/40-工具脚本/Docker 常用命令/note.md",
+    "canvas": null,
+    "base": "outputs/40-工具脚本/Docker 常用命令/table.base",
+    "meta": "outputs/40-工具脚本/Docker 常用命令/meta.json"
+  },
+
+  "revision": {
+    "number": 1,
+    "mode": "overwrite",
+    "previous_meta": null,
+    "previous_outputs": null
+  },
+
+  "update": {
+    "intent": "create",
+    "strategy": "overwrite",
+    "reason": "no previous note found for stable_key",
+    "change_summary": [
+      "Created note.md with structured sections and examples",
+      "Created table.base for filterable command catalog"
+    ],
+    "input_fingerprint": {
+      "user_prompt_sha256": "TO_FILL",
+      "context_files": []
+    },
+    "output_fingerprint": {
+      "note_md_sha256": "TO_FILL",
+      "base_sha256": "TO_FILL",
+      "canvas_sha256": null
+    }
+  },
+
+  "indexing": {
+    "enabled": false,
+    "targets": [
+      {
+        "type": "folder_index",
+        "path": "outputs/40-工具脚本/index.md",
+        "mode": "append",
+        "status": "pending"
+      }
+    ],
+    "links": {
+      "canonical_link": "[[outputs/40-工具脚本/Docker 常用命令/note]]",
+      "base_link": "[[outputs/40-工具脚本/Docker 常用命令/table.base]]",
+      "canvas_link": null
+    }
+  },
+
+  "provenance": {
+    "generated_by": {
+      "orchestrator": ".claude/skills/note-creator/SKILL.md",
+      "dependencies": [
+        ".claude/skills/obsidian-markdown/SKILL.md",
+        ".claude/skills/obsidian-bases/SKILL.md",
+        ".claude/skills/json-canvas/SKILL.md"
+      ]
+    },
+    "templates": {
+      "note_md_prompt": ".claude/skills/note-creator/templates/note.md.prompt",
+      "base_prompt": ".claude/skills/note-creator/templates/base.prompt",
+      "canvas_prompt": ".claude/skills/note-creator/templates/canvas.prompt",
+      "meta_json_prompt": ".claude/skills/note-creator/templates/meta.json.prompt"
+    },
+    "run": {
+      "timestamp": "2026-01-09T08:18:00+08:00",
+      "environment": {
+        "host": "local_or_ssh",
+        "vault": "OBSIDIAN",
+        "workspace": "."
+      }
+    }
+  },
+
+  "bootstrap": {
+    "self_describe": {
+      "enabled": true,
+      "recommended_prompts": [
+        "为本条笔记生成一张知识结构图（canvas），要求节点包含：概览、分类、关键命令组、注意事项。",
+        "为本目录生成一个 bases 视图（base），按 tags/category/created 筛选并展示摘要。"
+      ]
+    },
+    "autogen_next": [
+      {
+        "artifact": "canvas",
+        "condition": "missing_canvas",
+        "prompt_hint": "generate a canvas that explains the note structure and workflow"
+      }
+    ]
+  },
+
+  "history": [
+    {
+      "revision": 1,
+      "timestamp": "2026-01-09T08:18:00+08:00",
+      "intent": "create",
+      "strategy": "overwrite",
+      "note": "initial creation"
+    }
+  ]
+}
+

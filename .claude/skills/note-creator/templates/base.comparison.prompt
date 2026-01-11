@@ -1,0 +1,55 @@
+生成一个 Obsidian Base（table.base），用于"对比表"。
+
+## 关键约束（必须严格遵守）：
+1. **文件格式必须是 YAML，不是 JSON**
+2. **使用 filters、properties、views 三个顶级键**
+3. **过滤条件使用 file.inFolder() 和 file.ext == "md" 语法**
+4. **不要使用 sources、version、type 等 JSON 特有的字段**
+
+## 文件结构模板：
+
+```yaml
+filters:
+  and:
+    - file.inFolder("outputs/{{folder}}/{{title}}/compare")
+    - 'file.ext == "md"'
+    - 'item_type == "skill"'
+
+properties:
+  name:
+    displayName: 名称
+  item_type:
+    displayName: 类型
+  输入:
+    displayName: 输入
+  输出:
+    displayName: 输出
+  定位:
+    displayName: 定位
+  产物:
+    displayName: 产物
+  边界:
+    displayName: 边界
+
+views:
+  - type: table
+    name: Skills Comparison
+    order:
+      - name
+      - item_type
+      - 输入
+      - 输出
+      - 定位
+      - 产物
+      - 边界
+```
+
+## 过滤条件说明：
+- file.inFolder("outputs/{{folder}}/{{title}}/compare") - 限制在 compare 目录
+- file.ext == "md" - 只包含 markdown 文件
+- item_type == "skill" - 只包含 item_type 为 skill 的文件
+
+## 列配置说明：
+- 使用 properties 定义每列的显示名称
+- 使用 views.order 定义列的显示顺序
+- 列包括：name, item_type, 输入, 输出, 定位, 产物, 边界

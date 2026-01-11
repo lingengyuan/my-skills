@@ -1,0 +1,72 @@
+# Canvas Flowchart Template
+
+Generate a consistent, vertical flowchart canvas with the following specifications:
+
+## Layout Rules (STRICT - Must Follow)
+
+### Positioning
+- **Center X**: 500 (always center nodes horizontally)
+- **Y Spacing**: 150px between nodes
+- **Node Width**: 300px (standard), 200px (small), 400px (wide)
+- **Node Height**: Auto based on content (minimum 80px)
+
+### Node Types by Color
+- **Color 1 (Red)**: Critical/Warning nodes (CWD, errors)
+- **Color 2 (Orange)**: Optional/Conditional elements
+- **Color 3 (Yellow)**: Processing/Decision nodes
+- **Color 4 (Green)**: Required/Mandatory steps
+- **Color 5 (Cyan)**: Output/Result nodes
+- **Color 6 (Purple)**: Input/Start nodes
+
+### Standard Flow Structure
+```
+Node 1 (Input) at Y=0
+    ↓
+Node 2 (Process) at Y=150
+    ↓
+Node 3 (Decision) at Y=300
+    ↓
+Node 4 (Branch) at Y=450 (multiple nodes side-by-side)
+    ↓
+Node 5 (Output) at Y=700
+```
+
+### Branching Layout
+- Left branch: X=200
+- Center branch: X=500
+- Right branch: X=800
+- Horizontal spacing: 300px between branches
+
+### Edge Labels
+- Use labels for conditional edges: "yes", "no", "if X", "always"
+- Position labels near the target node
+
+## Text Formatting
+- Use Markdown in node text
+- **Bold** for emphasis
+- Use ## for node title
+- Use bullet points for lists
+
+## Required Node Structure
+Each node MUST have:
+```json
+{
+  "id": "unique-id",
+  "type": "text",
+  "x": <centered>,
+  "y": <calculated>,
+  "width": 300,
+  "height": <auto>,
+  "text": "<markdown content>",
+  "color": "<1-6>"
+}
+```
+
+## Consistency Rules
+1. Always use the same node IDs for the same process steps
+2. Maintain consistent color coding
+3. Use fixed spacing
+4. Center-align the main flow
+5. Side branches at fixed X positions (200, 500, 800)
+
+Output ONLY valid JSON canvas.
