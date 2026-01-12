@@ -1,304 +1,186 @@
-# My Skills - Claude Code Skills Framework
+# WeChat Article Archiver Skills
 
-A framework for creating and managing Claude Code skills focused on content generation and Obsidian ecosystem integration.
+微信公众号文章归档到知识库的完整解决方案，使用 v2 版本实现更好的格式保留和统一的目录结构。
 
-## Overview
+## 🚀 快速开始
 
-This project implements an **orchestrator pattern** where the `note-creator` skill acts as the main coordinator, delegating content generation tasks to specialized format-specific skills. The framework produces structured content artifacts including Markdown notes, visual diagrams, and database-like tables.
-
-### Architecture
-
-```
-wechat-archiver (wrapper)
-    ├── wechat2md          (WeChat article fetcher)
-    └── note-creator       (orchestrator)
-            ├── obsidian-markdown  (Markdown notes with YAML frontmatter)
-            ├── json-canvas        (Visual diagrams and canvases)
-            └── obsidian-bases     (Database-like table views)
-```
-
-## Skills
-
-### note-creator (Orchestrator)
-
-The main entry point for content generation. It:
-
-1. Classifies user intent using a strict JSON schema
-2. Selects destination folder from a predefined whitelist
-3. Determines which artifact types to generate (markdown, canvas, base)
-4. Delegates to specialized format skills
-5. Writes all artifacts to disk following a strict output contract
-
-**Usage:**
-```bash
-Skill(note-creator)
-```
-
-### obsidian-markdown
-
-Generates Obsidian Flavored Markdown including:
-- YAML frontmatter with properties
-- Wikilinks and embeds
-- Callouts and code blocks
-- Tags and metadata
-
-### json-canvas
-
-Creates JSON Canvas files (`.canvas`) for visual diagrams including:
-- Sequence diagrams
-- Flowcharts
-- Architecture diagrams
-- Artifact relationship diagrams
-
-### obsidian-bases
-
-Generates Obsidian Base files (`.base`) with:
-- Multiple view types (table, cards, list)
-- Filters and formulas
-- Property configurations
-- Comparison tables
-
-### wechat2md
-
-Utility for converting WeChat articles to local Markdown:
-- Downloads article content from `mp.weixin.qq.com`
-- Downloads all images and converts to local references
-- Outputs to `./outputs/` with organized image directories
-
-**Usage:**
-```bash
-python3 .claude/skills/wechat2md/tools/wechat2md.py "<URL>"
-```
-
-### wechat-archiver
-
-Wrapper skill that combines wechat2md and note-creator for automated WeChat article archiving:
-- Fetches WeChat articles using wechat2md
-- Automatically calls note-creator to generate structured notes
-- Consolidates all artifacts (article.md, note.md, diagram.canvas, table.base) in a single directory
-- Implements idempotency checks to avoid regenerating content
-- Supports automatic detection of canvas/base generation based on article keywords
-
-**Usage:**
-```bash
-/wechat-archiver article_url=https://mp.weixin.qq.com/s/xxxxx
-```
-
-**Features:**
-- Unified asset directory with all files
-- Content hashing for idempotency
-- Smart artifact plan (canvas/base) based on content analysis
-- Comparison mode for articles comparing tools/technologies
-
-## Installation
-
-### Prerequisites
-
-- Python 3.8+
-- Claude Code CLI
-
-### Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd my-skills
-```
-
-2. Create and activate virtual environment:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install beautifulsoup4
-```
-
-4. Configure permissions in `.claude/settings.local.json` (already configured)
-
-## Output Structure
-
-All generated content follows this structure (relative to current working directory):
-
-```
-outputs/<folder>/<title>/
-  ├── note.md          (required)
-  ├── diagram.canvas   (optional)
-  ├── table.base       (optional)
-  ├── meta.json        (required)
-  └── compare/         (optional - for comparison tables)
-```
-
-**Note:** `outputs/` and `images/` directories contain generated artifacts and are **not tracked in git**. These are process outputs that should be regenerated as needed. The `.gitignore` file is configured to exclude these directories.
-
-### Folder Whitelist
-
-Content is organized into these folders:
-
-- `00-Inbox` - Unclassified or temporary content
-- `10-项目` - Project-specific notes and documentation
-- `20-阅读笔记` - Reading notes, article summaries
-- `30-方法论` - Methods, frameworks, comparisons, best practices
-- `40-工具脚本` - Actual executable scripts and tools
-- `50-运维排障` - Troubleshooting guides and debugging notes
-- `60-数据与表` - Database schemas and data models
-- `90-归档` - Deprecated or completed content
-
-## Usage Examples
-
-### Create a Note with Diagram
+### 1. 安装依赖
 
 ```bash
-# Invoke the skill
-Skill(note-creator)
-
-# Provide a prompt like:
-"Create a note explaining how the note-creator orchestrator works"
+pip install -r .claude/skills/wechat2md/requirements.txt --break-system-packages
 ```
 
-This generates:
-- `note.md` - Detailed markdown with sections
-- `diagram.canvas` - Visual sequence diagram
-- `meta.json` - Metadata about the generated content
-
-### Create a Comparison Table
+### 2. 基本使用
 
 ```bash
-Skill(note-creator)
-
-# Prompt:
-"Compare obsidian-markdown, json-canvas, and obsidian-bases skills"
+# 使用 v2 版本抓取文章
+python .claude/skills/wechat2md/tools/wechat2md_v2.py "https://mp.weixin.qq.com/s/your-article-url"
 ```
 
-This generates:
-- `note.md` - Comparison overview
-- `compare/*.md` - Individual item files
-- `table.base` - Queryable comparison table
-- `meta.json` - Metadata
+### 3. 查看结果
 
-### Convert WeChat Article
+生成的文件会保存在 `outputs/<folder>/<slug>/` 目录下：
+- `article.md` - 原始文章
+- `images/` - 图片目录（如有）
+- `meta.json` - 元数据
+
+## 📁 项目结构
+
+| 目录/文件 | 说明 |
+|---------|------|
+| `.claude/skills/wechat2md/` | 微信文章转 Markdown（v2 ✨） |
+| `.claude/skills/wechat-archiver/` | 文章归档到知识库（v2 ✨） |
+| `.claude/skills/note-creator/` | 生成结构化笔记 |
+| `CLAUDE.md` | 项目指南 |
+| `SKILLS_AUDIT.md` | Skills 审计报告 |
+| `WECHAT2MD_OPTIMIZATION.md` | v2 优化总结 |
+
+## 💡 主要功能
+
+### wechat2md v2
+- ✅ 使用 markdownify 库（95% 格式保留）
+- ✅ 统一的目录结构（article.md + images/ + meta.json）
+- ✅ asset_id 唯一标识（SHA1 of URL）
+- ✅ 自动清理空图片目录
+- ✅ 完整的元数据记录
+
+### wechat-archiver v2
+- ✅ 调用 wechat2md v2 抓取文章
+- ✅ 自动生成结构化笔记
+- ✅ 可选生成架构图和对比表
+- ✅ 幂等性控制（相同 URL 不重复）
+- ✅ 统一的资产目录管理
+
+## 📖 使用方法
+
+### 方法一：直接使用 wechat2md v2
 
 ```bash
-python3 .claude/skills/wechat2md/tools/wechat2md.py "https://mp.weixin.qq.com/s/xxxxx"
+# 基本用法
+python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL"
+
+# 指定输出文件夹
+python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL" --target-folder "20-阅读笔记"
+
+# 自定义 slug
+python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL" --slug "my-article"
 ```
 
-This downloads:
-- Article content as Markdown in `./outputs/<title>/<title>.md`
-- All images in `./images/<title>/001.jpg`, `002.png`, etc.
-
-## Development
-
-### Adding New Skills
-
-1. Create skill directory under `.claude/skills/<skill-name>/`
-2. Add `SKILL.md` specification following the established pattern
-3. Define input/output contracts
-4. Create templates in `templates/` subdirectory
-5. Add examples in `examples/` subdirectory
-6. Update `.claude/settings.local.json` with permissions
-
-### File Structure
-
+**输出结构**：
 ```
-.claude/skills/
-├── note-creator/              # Main orchestrator
-│   ├── SKILL.md               # Main specification
-│   ├── rules/                 # Classification and contracts
-│   ├── templates/             # Prompt templates
-│   └── examples/              # Usage examples
-├── obsidian-markdown/         # Markdown generation
-│   └── SKILL.md
-├── json-canvas/               # Canvas/diagram generation
-│   └── SKILL.md
-├── obsidian-bases/            # Base/table generation
-│   └── SKILL.md
-├── wechat-archiver/           # WeChat article archiver wrapper
-│   ├── SKILL.md
-│   ├── rules/                 # Classification rules
-│   ├── tools/
-│   │   └── wechat_archiver.py
-│   └── templates/
-└── wechat2md/                 # WeChat article fetcher
-    ├── SKILL.md
-    └── tools/
-        └── wechat2md.py
+outputs/20-阅读笔记/文章标题-abc123/
+  ├── article.md      # 原始文章
+  ├── images/         # 图片（如有）
+  └── meta.json       # 元数据
 ```
 
-## Key Concepts
+### 方法二：使用 wechat-archiver v2
 
-### Process Artifacts
-
-Generated content in `outputs/` and `images/` directories are **process artifacts**:
-- These are not tracked in git (see `.gitignore`)
-- They should be regenerated as needed using the skills
-- The framework focuses on the generation process, not the outputs
-- Source of truth is the skill definitions and templates, not the generated files
-
-This approach ensures:
-- Git repository stays small and focused
-- Skills remain reproducible
-- Content can be regenerated with improvements to the skills
-- No manual editing of generated artifacts (should be regenerated)
-
-### Mandatory File Writing
-
-All skills **MUST** write generated content to disk. Generating content without writing files is considered a FAILURE.
-
-### Strict Classification Schema
-
-The orchestrator uses a strict JSON schema for intent classification including:
-- Title and folder selection
-- Diagram type determination
-- Artifact planning (md, canvas, base)
-- Tag generation (3-8 tags)
-- Property metadata
-
-### Canvas Node Format
-
-Text nodes in JSON Canvas must use:
-- `"type": "text"`
-- `"text": "<content>"`
-- **NEVER** `"label"` (reserved for groups only)
-
-### Comparison Mode
-
-For comparison tables:
-- Set `base_mode: "comparison"` in classification
-- Create individual `.md` files in `compare/` subdirectory
-- Scope Base sources to `compare/` directory only
-
-## Configuration
-
-Skills are configured in `.claude/settings.local.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(note-creator)",
-      "Skill(json-canvas)",
-      "Bash(mkdir:*)",
-      "Bash(echo:*)",
-      "Bash(python3:*)",
-      "Bash(cat:*)"
-    ]
-  }
-}
+```bash
+python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py "URL" --canvas auto --base auto
 ```
 
-## Dependencies
+**输出结构**：
+```
+outputs/20-阅读笔记/文章标题-abc123/
+  ├── article.md      # 原始文章
+  ├── note.md         # 结构化笔记
+  ├── diagram.canvas  # 可选：架构图
+  ├── table.base      # 可选：对比表
+  ├── images/         # 图片（如有）
+  └── meta.json       # 统一元数据
+```
 
-- **Python 3.8+**
-- **beautifulsoup4** - For wechat2md HTML parsing
+### 方法三：通过 Claude Skill（推荐）
 
-## License
+在 Claude Code 中：
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+# 归档文章
+/wechat-archiver article_url="https://mp.weixin.qq.com/s/xxxxx"
 
-Copyright (c) 2026 Hugh Lin
+# 生成结构化笔记
+/note-creator "为这篇文章生成笔记"
+```
 
-## Contributing
+## 📂 输出结构
 
-Contributions are welcome! Please follow the established patterns when adding new skills or modifying existing ones.
+```
+outputs/
+├── 00-Inbox/
+├── 10-项目/
+├── 20-阅读笔记/
+│   └── 文章标题-abc123/
+│       ├── article.md      # 原始文章
+│       ├── note.md         # 结构化笔记（可选）
+│       ├── diagram.canvas  # 架构图（可选）
+│       ├── table.base      # 对比表（可选）
+│       ├── images/         # 图片
+│       │   ├── 001.jpg
+│       │   └── 002.png
+│       └── meta.json       # 元数据
+├── 30-方法论/
+└── 90-归档/
+```
+
+## 🎨 v2 版本改进
+
+| 特性 | v1 | v2 |
+|------|----|----|
+| Markdown 转换 | 自定义解析器（70%） | markdownify（95%） |
+| 目录结构 | 分散（outputs/ + images/） | 统一目录 |
+| 唯一标识 | 日期前缀（重复问题） | asset_id（SHA1） |
+| 元数据 | ❌ | ✅ 完整 meta.json |
+| 图片路径 | `../images/<title>/` | `images/`（相对） |
+| 幂等性 | ❌ | ✅ content_hash |
+
+详细对比见：`.claude/skills/wechat2md/V2_UPGRADE.md`
+
+## 🔧 技术栈
+
+- **requests** - HTTP 请求
+- **BeautifulSoup4** - HTML 解析
+- **markdownify** - HTML 转 Markdown（v2 新增）
+- **lxml** - XML/HTML 解析器
+
+## ⚠️ 注意事项
+
+1. **仅供个人学习和备份使用**
+2. **尊重原作者版权**
+3. **不用于商业用途**
+4. **部分文章可能需要登录才能查看**
+5. **图片可能有防盗链保护**
+
+## 🐛 常见问题
+
+**Q: markdownify 未安装？**
+```bash
+pip install markdownify lxml --break-system-packages
+```
+
+**Q: 图片路径错误？**
+- v2.1 已修复图片路径问题
+- 确保使用最新版本
+
+**Q: 抓取失败？**
+- 检查 URL 是否为 `mp.weixin.qq.com` 域名
+- 确保是公开可访问的文章
+- 检查网络连接
+
+## 📚 更多文档
+
+- `SKILL.md` - 技能使用指南
+- `CLAUDE.md` - 项目详细指南
+- `SKILLS_AUDIT.md` - Skills 审计报告
+- `WECHAT2MD_OPTIMIZATION.md` - v2 优化总结
+- `.claude/skills/wechat2md/V2_UPGRADE.md` - v2 升级指南
+
+## 🔗 相关资源
+
+- [Claude Code 文档](https://code.claude.com/docs/en/skills)
+- [Markdown 语法指南](https://www.markdownguide.org/)
+- [markdownify 文档](https://github.com/matthewwithanm/markdownify)
+
+## 📄 许可证
+
+MIT License - 仅供学习和个人使用，请遵守相关法律法规和平台规则。

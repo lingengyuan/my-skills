@@ -11,6 +11,8 @@ This directory contains detailed postmortem reports for incidents and bugs disco
 | POSTMORTEM-2026-003 | [wechat2md Windows Subprocess Encoding Error](./POSTMORTEM-2026-003-wechat2md-encoding.md) | P1 - High | ✅ Resolved | 2026-01-12 |
 | POSTMORTEM-2026-004 | [Overly Broad Base Auto-Detection Rules](./POSTMORTEM-2026-004-overbroad-base-detection.md) | P2 - Medium | ✅ Resolved | 2026-01-12 |
 | POSTMORTEM-2026-005 | [Duplicate Article Ingestion Due to Slug Collision](./POSTMORTEM-2026-005-duplicate-ingestion.md) | P2 - Medium | ⏳ Partially Resolved | 2026-01-12 |
+| POSTMORTEM-2026-006 | [wechat2md v2 Image Path Error](./POSTMORTEM-2026-006-image-path-error.md) | P1 - High | ✅ Resolved | 2026-01-12 |
+| POSTMORTEM-2026-006 | [wechat2md v2 Image Path Error](./POSTMORTEM-2026-006-image-path-error.md) | P1 - High | ✅ Resolved | 2026-01-12 |
 
 ## Severity Levels
 
