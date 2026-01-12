@@ -14,7 +14,8 @@ __pycache__/
 *.so
 .Python
 
-# Output directories
+# Output directories (process artifacts, not tracked in git)
+# These contain generated content from note-creator and wechat2md skills
 outputs/
 images/
 

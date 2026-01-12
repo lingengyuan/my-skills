@@ -9,10 +9,12 @@ This project implements an **orchestrator pattern** where the `note-creator` ski
 ### Architecture
 
 ```
-note-creator (orchestrator)
-    ├── obsidian-markdown  (Markdown notes with YAML frontmatter)
-    ├── json-canvas        (Visual diagrams and canvases)
-    └── obsidian-bases     (Database-like table views)
+wechat-archiver (wrapper)
+    ├── wechat2md          (WeChat article fetcher)
+    └── note-creator       (orchestrator)
+            ├── obsidian-markdown  (Markdown notes with YAML frontmatter)
+            ├── json-canvas        (Visual diagrams and canvases)
+            └── obsidian-bases     (Database-like table views)
 ```
 
 ## Skills
@@ -68,6 +70,26 @@ Utility for converting WeChat articles to local Markdown:
 python3 .claude/skills/wechat2md/tools/wechat2md.py "<URL>"
 ```
 
+### wechat-archiver
+
+Wrapper skill that combines wechat2md and note-creator for automated WeChat article archiving:
+- Fetches WeChat articles using wechat2md
+- Automatically calls note-creator to generate structured notes
+- Consolidates all artifacts (article.md, note.md, diagram.canvas, table.base) in a single directory
+- Implements idempotency checks to avoid regenerating content
+- Supports automatic detection of canvas/base generation based on article keywords
+
+**Usage:**
+```bash
+/wechat-archiver article_url=https://mp.weixin.qq.com/s/xxxxx
+```
+
+**Features:**
+- Unified asset directory with all files
+- Content hashing for idempotency
+- Smart artifact plan (canvas/base) based on content analysis
+- Comparison mode for articles comparing tools/technologies
+
 ## Installation
 
 ### Prerequisites
@@ -108,6 +130,8 @@ outputs/<folder>/<title>/
   ├── meta.json        (required)
   └── compare/         (optional - for comparison tables)
 ```
+
+**Note:** `outputs/` and `images/` directories contain generated artifacts and are **not tracked in git**. These are process outputs that should be regenerated as needed. The `.gitignore` file is configured to exclude these directories.
 
 ### Folder Whitelist
 
@@ -179,24 +203,44 @@ This downloads:
 
 ```
 .claude/skills/
-├── note-creator/
-│   ├── SKILL.md           # Main specification
-│   ├── rules/             # Classification and contracts
-│   ├── templates/         # Prompt templates
-│   └── examples/          # Usage examples
-├── obsidian-markdown/
+├── note-creator/              # Main orchestrator
+│   ├── SKILL.md               # Main specification
+│   ├── rules/                 # Classification and contracts
+│   ├── templates/             # Prompt templates
+│   └── examples/              # Usage examples
+├── obsidian-markdown/         # Markdown generation
 │   └── SKILL.md
-├── json-canvas/
+├── json-canvas/               # Canvas/diagram generation
 │   └── SKILL.md
-├── obsidian-bases/
+├── obsidian-bases/            # Base/table generation
 │   └── SKILL.md
-└── wechat2md/
+├── wechat-archiver/           # WeChat article archiver wrapper
+│   ├── SKILL.md
+│   ├── rules/                 # Classification rules
+│   ├── tools/
+│   │   └── wechat_archiver.py
+│   └── templates/
+└── wechat2md/                 # WeChat article fetcher
     ├── SKILL.md
     └── tools/
         └── wechat2md.py
 ```
 
 ## Key Concepts
+
+### Process Artifacts
+
+Generated content in `outputs/` and `images/` directories are **process artifacts**:
+- These are not tracked in git (see `.gitignore`)
+- They should be regenerated as needed using the skills
+- The framework focuses on the generation process, not the outputs
+- Source of truth is the skill definitions and templates, not the generated files
+
+This approach ensures:
+- Git repository stays small and focused
+- Skills remain reproducible
+- Content can be regenerated with improvements to the skills
+- No manual editing of generated artifacts (should be regenerated)
 
 ### Mandatory File Writing
 

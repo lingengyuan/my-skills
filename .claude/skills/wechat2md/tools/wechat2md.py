@@ -82,7 +82,7 @@ def fetch_html_with_curl(url: str, timeout_s: int = 30) -> str:
         url,
     ]
 
-    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='ignore')
     if proc.returncode != 0:
         raise RuntimeError(f"curl failed ({proc.returncode}): {proc.stderr.strip()}")
     if not proc.stdout.strip():
