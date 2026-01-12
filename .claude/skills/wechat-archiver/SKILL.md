@@ -128,6 +128,11 @@ cp "${temp_md_path}" "${asset_dir}/article.md"
 # 复制图片文件夹
 cp -r "${temp_images_dir}" "${asset_dir}/images/"
 
+# CRITICAL: Fix image paths in article.md
+# wechat2md generates images with ./images/ prefix (portable relative path)
+# After copying images to same directory as article.md, links work correctly
+# No path replacement needed!
+
 # 清理临时目录
 rm -rf "outputs/<title>/"  # wechat2md 的临时输出
 ```

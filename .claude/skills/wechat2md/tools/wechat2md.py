@@ -681,13 +681,10 @@ def main() -> int:
         ensure_dir(outputs_root)
         ensure_dir(images_dir)
 
-        # md is in outputs/<title>/, so image prefix is ../../images/<title>/
-        md_image_prefix = f"../../images/{urllib.parse.quote(title)}/"
-        # IMPORTANT: We used quote() for safety in markdown links when title has spaces.
-        # But the actual filesystem folder uses the raw sanitized title; spaces are ok.
-        # To keep relative links correct, we should NOT percent-encode path segments for local.
-        # So we will not encode; use raw.
-        md_image_prefix = f"../../images/{title}/"
+        # IMPORTANT: Use ./images/ prefix for portability
+        # When wechat-archiver moves files to asset directory, images will be in same directory
+        # Using ./images/ ensures links work regardless of final location
+        md_image_prefix = "./images/"
 
         rewritten_html, manifest = download_images_and_rewrite_html(
             js_inner_html=js_inner_html,

@@ -19,17 +19,17 @@ Obsidian uses a combination of Markdown flavors:
 - [LaTeX](https://www.latex-project.org/) for math
 - Obsidian-specific extensions (wikilinks, callouts, embeds, etc.)
 
-## Basic Formatting
+## Quick Reference
 
-### Paragraphs and Line Breaks
+### Text Formatting
 
 ```markdown
-This is a paragraph.
-
-This is another paragraph (blank line between creates separate paragraphs).
-
-For a line break within a paragraph, add two spaces at the end  
-or use Shift+Enter.
+**Bold** or __Bold__
+*Italic* or _Italic_
+***Bold + Italic***
+~~Strikethrough~~
+==Highlight==
+`Inline code`
 ```
 
 ### Headings
@@ -38,588 +38,253 @@ or use Shift+Enter.
 # Heading 1
 ## Heading 2
 ### Heading 3
-#### Heading 4
-##### Heading 5
-###### Heading 6
 ```
 
-### Text Formatting
+### Links
 
-| Style | Syntax | Example | Output |
-|-------|--------|---------|--------|
-| Bold | `**text**` or `__text__` | `**Bold**` | **Bold** |
-| Italic | `*text*` or `_text_` | `*Italic*` | *Italic* |
-| Bold + Italic | `***text***` | `***Both***` | ***Both*** |
-| Strikethrough | `~~text~~` | `~~Striked~~` | ~~Striked~~ |
-| Highlight | `==text==` | `==Highlighted==` | ==Highlighted== |
-| Inline code | `` `code` `` | `` `code` `` | `code` |
-
-### Escaping Formatting
-
-Use backslash to escape special characters:
-```markdown
-\*This won't be italic\*
-\#This won't be a heading
-1\. This won't be a list item
-```
-
-Common characters to escape: `\*`, `\_`, `\#`, `` \` ``, `\|`, `\~`
-
-## Internal Links (Wikilinks)
-
-### Basic Links
-
+**Wikilinks** (Obsidian-specific):
 ```markdown
 [[Note Name]]
-[[Note Name.md]]
 [[Note Name|Display Text]]
-```
-
-### Link to Headings
-
-```markdown
 [[Note Name#Heading]]
-[[Note Name#Heading|Custom Text]]
-[[#Heading in same note]]
-[[##Search all headings in vault]]
-```
-
-### Link to Blocks
-
-```markdown
 [[Note Name#^block-id]]
-[[Note Name#^block-id|Custom Text]]
 ```
 
-Define a block ID by adding `^block-id` at the end of a paragraph:
+**Markdown links**:
 ```markdown
-This is a paragraph that can be linked to. ^my-block-id
-```
-
-For lists and quotes, add the block ID on a separate line:
-```markdown
-> This is a quote
-> With multiple lines
-
-^quote-id
-```
-
-### Search Links
-
-```markdown
-[[##heading]]     Search for headings containing "heading"
-[[^^block]]       Search for blocks containing "block"
-```
-
-## Markdown-Style Links
-
-```markdown
-[Display Text](Note%20Name.md)
-[Display Text](Note%20Name.md#Heading)
+[Display Text](note.md)
 [Display Text](https://example.com)
-[Note](obsidian://open?vault=VaultName&file=Note.md)
 ```
 
-Note: Spaces must be URL-encoded as `%20` in Markdown links.
-
-## Embeds
-
-### Embed Notes
+### Embeds
 
 ```markdown
-![[Note Name]]
-![[Note Name#Heading]]
-![[Note Name#^block-id]]
+![[Note Name]]              # Embed note
+![[image.png]]              # Embed image
+![[image.png|300]]          # Resize
+![[document.pdf#page=3]]    # PDF page
 ```
 
-### Embed Images
-
-```markdown
-![[image.png]]
-![[image.png|640x480]]    Width x Height
-![[image.png|300]]        Width only (maintains aspect ratio)
-```
-
-### External Images
-
-```markdown
-![Alt text](https://example.com/image.png)
-![Alt text|300](https://example.com/image.png)
-```
-
-### Embed Audio
-
-```markdown
-![[audio.mp3]]
-![[audio.ogg]]
-```
-
-### Embed PDF
-
-```markdown
-![[document.pdf]]
-![[document.pdf#page=3]]
-![[document.pdf#height=400]]
-```
-
-### Embed Lists
-
-```markdown
-![[Note#^list-id]]
-```
-
-Where the list has been defined with a block ID:
-```markdown
-- Item 1
-- Item 2
-- Item 3
-
-^list-id
-```
-
-### Embed Search Results
-
-````markdown
-```query
-tag:#project status:done
-```
-````
-
-## Callouts
-
-### Basic Callout
+### Callouts
 
 ```markdown
 > [!note]
-> This is a note callout.
+> Note content
 
-> [!info] Custom Title
-> This callout has a custom title.
-
-> [!tip] Title Only
+> [!warning] Custom Title
+> Warning content
 ```
 
-### Foldable Callouts
+Supported types: `note`, `info`, `tip`, `success`, `question`, `warning`, `failure`, `danger`, `bug`, `example`, `quote`, `important`, `hint`, `caution`, `missing`, `summary`, `help`
+
+### Lists
 
 ```markdown
-> [!faq]- Collapsed by default
-> This content is hidden until expanded.
+- Unordered list item
+- Another item
 
-> [!faq]+ Expanded by default
-> This content is visible but can be collapsed.
-```
+1. Ordered list
+2. Another item
 
-### Nested Callouts
-
-```markdown
-> [!question] Outer callout
-> > [!note] Inner callout
-> > Nested content
-```
-
-### Supported Callout Types
-
-| Type | Aliases | Description |
-|------|---------|-------------|
-| `note` | - | Blue, pencil icon |
-| `abstract` | `summary`, `tldr` | Teal, clipboard icon |
-| `info` | - | Blue, info icon |
-| `todo` | - | Blue, checkbox icon |
-| `tip` | `hint`, `important` | Cyan, flame icon |
-| `success` | `check`, `done` | Green, checkmark icon |
-| `question` | `help`, `faq` | Yellow, question mark |
-| `warning` | `caution`, `attention` | Orange, warning icon |
-| `failure` | `fail`, `missing` | Red, X icon |
-| `danger` | `error` | Red, zap icon |
-| `bug` | - | Red, bug icon |
-| `example` | - | Purple, list icon |
-| `quote` | `cite` | Gray, quote icon |
-
-### Custom Callouts (CSS)
-
-```css
-.callout[data-callout="custom-type"] {
-  --callout-color: 255, 0, 0;
-  --callout-icon: lucide-alert-circle;
-}
-```
-
-## Lists
-
-### Unordered Lists
-
-```markdown
-- Item 1
-- Item 2
-  - Nested item
-  - Another nested
-- Item 3
-
-* Also works with asterisks
-+ Or plus signs
-```
-
-### Ordered Lists
-
-```markdown
-1. First item
-2. Second item
-   1. Nested numbered
-   2. Another nested
-3. Third item
-
-1) Alternative syntax
-2) With parentheses
-```
-
-### Task Lists
-
-```markdown
-- [ ] Incomplete task
+- [ ] Task
 - [x] Completed task
-- [ ] Task with sub-tasks
-  - [ ] Subtask 1
-  - [x] Subtask 2
-```
-
-## Quotes
-
-```markdown
-> This is a blockquote.
-> It can span multiple lines.
->
-> And include multiple paragraphs.
->
-> > Nested quotes work too.
-```
-
-## Code
-
-### Inline Code
-
-```markdown
-Use `backticks` for inline code.
-Use double backticks for ``code with a ` backtick inside``.
 ```
 
 ### Code Blocks
 
 ````markdown
-```
-Plain code block
-```
-
-```javascript
-// Syntax highlighted code block
-function hello() {
-  console.log("Hello, world!");
-}
-```
-
 ```python
-# Python example
-def greet(name):
-    print(f"Hello, {name}!")
+def hello():
+    print("Hello")
 ```
 ````
 
-### Nesting Code Blocks
-
-Use more backticks or tildes for the outer block:
-
-`````markdown
-````markdown
-Here's how to create a code block:
-```js
-console.log("Hello")
-```
-````
-`````
-
-## Tables
+### Tables
 
 ```markdown
-| Header 1 | Header 2 | Header 3 |
-|----------|----------|----------|
-| Cell 1   | Cell 2   | Cell 3   |
-| Cell 4   | Cell 5   | Cell 6   |
-```
-
-### Alignment
-
-```markdown
-| Left     | Center   | Right    |
-|:---------|:--------:|---------:|
-| Left     | Center   | Right    |
-```
-
-### Using Pipes in Tables
-
-Escape pipes with backslash:
-```markdown
-| Column 1 | Column 2 |
+| Header 1 | Header 2 |
 |----------|----------|
-| [[Link\|Display]] | ![[Image\|100]] |
+| Cell 1   | Cell 2   |
+| Cell 3   | Cell 4   |
 ```
 
-## Math (LaTeX)
-
-### Inline Math
+### Math (LaTeX)
 
 ```markdown
-This is inline math: $e^{i\pi} + 1 = 0$
-```
+Inline math: $E = mc^2$
 
-### Block Math
-
-```markdown
+Block math:
 $$
-\begin{vmatrix}
-a & b \\
-c & d
-\end{vmatrix} = ad - bc
+\sum_{i=0}^n i^2 = \frac{n(n+1)(2n+1)}{6}
 $$
 ```
 
-### Common Math Syntax
-
-```markdown
-$x^2$              Superscript
-$x_i$              Subscript
-$\frac{a}{b}$      Fraction
-$\sqrt{x}$         Square root
-$\sum_{i=1}^{n}$   Summation
-$\int_a^b$         Integral
-$\alpha, \beta$    Greek letters
-```
-
-## Diagrams (Mermaid)
+### Diagrams (Mermaid)
 
 ````markdown
 ```mermaid
-graph TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[Do this]
-    B -->|No| D[Do that]
-    C --> E[End]
-    D --> E
+graph LR
+    A[Start] --> B[End]
 ```
 ````
-
-### Sequence Diagrams
-
-````markdown
-```mermaid
-sequenceDiagram
-    Alice->>Bob: Hello Bob
-    Bob-->>Alice: Hi Alice
-```
-````
-
-### Linking in Diagrams
-
-````markdown
-```mermaid
-graph TD
-    A[Biology]
-    B[Chemistry]
-    A --> B
-    class A,B internal-link;
-```
-````
-
-## Footnotes
-
-```markdown
-This sentence has a footnote[^1].
-
-[^1]: This is the footnote content.
-
-You can also use named footnotes[^note].
-
-[^note]: Named footnotes still appear as numbers.
-
-Inline footnotes are also supported.^[This is an inline footnote.]
-```
-
-## Comments
-
-```markdown
-This is visible %%but this is hidden%% text.
-
-%%
-This entire block is hidden.
-It won't appear in reading view.
-%%
-```
-
-## Horizontal Rules
-
-```markdown
----
-***
-___
-- - -
-* * *
-```
 
 ## Properties (Frontmatter)
 
-Properties use YAML frontmatter at the start of a note:
+### Basic Structure
 
 ```yaml
 ---
-title: My Note Title
-date: 2024-01-15
-tags:
-  - project
-  - important
-aliases:
-  - My Note
-  - Alternative Name
-cssclasses:
-  - custom-class
-status: in-progress
-rating: 4.5
-completed: false
-due: 2024-02-01T14:30:00
+key: value
+another_key: another value
+list:
+  - item1
+  - item2
+---
+
+Content here...
+```
+
+### Common Property Types
+
+```yaml
+---
+# Text
+title: "My Note"
+author: John Doe
+
+# Lists
+tags: [tag1, tag2, tag3]
+categories:
+  - category1
+  - category2
+
+# Numbers
+priority: 1
+count: 100
+
+# Dates
+created: 2024-01-12
+modified: 2024-01-12
+due_date: 2024-12-31
+
+# Booleans
+done: false
+important: true
 ---
 ```
 
-### Property Types
+### Property Queries
 
-| Type | Example |
-|------|---------|
-| Text | `title: My Title` |
-| Number | `rating: 4.5` |
-| Checkbox | `completed: true` |
-| Date | `date: 2024-01-15` |
-| Date & Time | `due: 2024-01-15T14:30:00` |
-| List | `tags: [one, two]` or YAML list |
-| Links | `related: "[[Other Note]]"` |
+Dataview plugin can query properties:
 
-### Default Properties
-
-- `tags` - Note tags
-- `aliases` - Alternative names for the note
-- `cssclasses` - CSS classes applied to the note
+```markdown
+```dataview
+TABLE file.name, priority, due_date
+FROM #task
+WHERE !done
+SORT priority ASC
+```
+```
 
 ## Tags
 
-```markdown
-#tag
-#nested/tag
-#tag-with-dashes
-#tag_with_underscores
+### Tag Syntax
 
-In frontmatter:
----
-tags:
-  - tag1
-  - nested/tag2
----
+```markdown
+#tag          # Top of file for global tag
+#nested/tag   # Nested tag
+#multi/word/tag  # Multiple levels
+
+Inline in sentence: #this-is-a-tag
 ```
 
-Tags can contain:
-- Letters (any language)
-- Numbers (not as first character)
-- Underscores `_`
-- Hyphens `-`
-- Forward slashes `/` (for nesting)
-
-## HTML Content
-
-Obsidian supports HTML within Markdown:
+### Tag Search
 
 ```markdown
-<div class="custom-container">
-  <span style="color: red;">Colored text</span>
-</div>
-
-<details>
-  <summary>Click to expand</summary>
-  Hidden content here.
-</details>
-
-<kbd>Ctrl</kbd> + <kbd>C</kbd>
+[[#tag]]              # Search for tag
+tag:#project          # In properties
 ```
 
 ## Complete Example
 
-````markdown
+```markdown
 ---
-title: Project Alpha
-date: 2024-01-15
-tags:
-  - project
-  - active
+title: "Project Overview"
+tags: [project, active]
+created: 2024-01-12
 status: in-progress
-priority: high
+priority: 1
 ---
 
-# Project Alpha
+# Project Overview
 
-## Overview
+This document describes the [[Main Project]] architecture.
 
-This project aims to [[improve workflow]] using modern techniques.
+## Goals
 
-> [!important] Key Deadline
-> The first milestone is due on ==January 30th==.
+- [ ] Design database schema
+- [x] Create API endpoints
+- [ ] Implement frontend
 
-## Tasks
-
-- [x] Initial planning
-- [x] Resource allocation
-- [ ] Development phase
-  - [ ] Backend implementation
-  - [ ] Frontend design
-- [ ] Testing
-- [ ] Deployment
-
-## Technical Notes
-
-The main algorithm uses the formula $O(n \log n)$ for sorting.
-
-```python
-def process_data(items):
-    return sorted(items, key=lambda x: x.priority)
-```
+> [!important]
+> Remember to update the [[Dependencies]] before deployment.
 
 ## Architecture
 
 ```mermaid
-graph LR
-    A[Input] --> B[Process]
-    B --> C[Output]
+graph TD
+    A[Client] --> B[API]
+    B --> C[Database]
     B --> D[Cache]
 ```
 
-## Related Documents
+## Related Files
 
-- ![[Meeting Notes 2024-01-10#Decisions]]
-- [[Budget Allocation|Budget]]
-- [[Team Members]]
+- [[Design Docs/UI Mockups]]
+- [[API Reference]]
+- ![Architecture Diagram](images/architecture.png)
 
-## References
+## Notes
 
-For more details, see the official documentation[^1].
+See also #project/planning for timeline details.
+```
 
-[^1]: https://example.com/docs
+## Validation Rules
 
-%%
-Internal notes:
-- Review with team on Friday
-- Consider alternative approaches
-%%
-````
+### Required Structure
+- Valid Markdown syntax
+- Proper YAML frontmatter (if properties used)
+- Correct wikilink syntax: `[[Note Name]]`
 
-## References
+### Common Mistakes
+- ❌ Using wrong link syntax in wikilinks: `[[note.md]]` (use `[[note]]`)
+- ❌ Missing closing code fence: ```` ``` ````
+- ❌ Invalid YAML indentation (must use spaces, not tabs)
+- ❌ Unclosed callout blocks
 
-- [Basic formatting syntax](https://help.obsidian.md/syntax)
-- [Advanced formatting syntax](https://help.obsidian.md/advanced-syntax)
-- [Obsidian Flavored Markdown](https://help.obsidian.md/obsidian-flavored-markdown)
-- [Internal links](https://help.obsidian.md/links)
-- [Embed files](https://help.obsidian.md/embeds)
-- [Callouts](https://help.obsidian.md/callouts)
-- [Properties](https://help.obsidian.md/properties)
+### Best Practices
+1. Use wikilinks for internal notes: `[[Note]]`
+2. Use markdown links for external URLs: `[text](url)`
+3. Add frontmatter properties for metadata
+4. Use tags for organization
+5. Use callouts for important notes
 
+## Important Notes
+
+1. **Wikilinks**: Don't include `.md` extension in wikilinks
+2. **Images**: Use `![[image.png]]` for embedded, `![]()` for external
+3. **Math**: Use `$` for inline, `$$` for block
+4. **Code blocks**: Always specify language for syntax highlighting
+5. **Properties**: YAML must be at the very top of the file
+
+## Detailed Documentation
+
+For complete syntax reference and examples, see **REFERENCE.md**:
+- All Markdown formatting options
+- Advanced link techniques
+- All callout types and styling
+- Code block syntax highlighting
+- Mermaid diagram types
+- Dataview query syntax
+- HTML content and embeds
+- Footnotes and comments
