@@ -1,186 +1,418 @@
-# WeChat Article Archiver Skills
+# Claude Skills Development Framework
 
-微信公众号文章归档到知识库的完整解决方案，使用 v2 版本实现更好的格式保留和统一的目录结构。
+[English](#english) | [简体中文](#简体中文)
 
-## 🚀 快速开始
+---
 
-### 1. 安装依赖
+<a name="english"></a>
+## English
 
-```bash
-pip install -r .claude/skills/wechat2md/requirements.txt --break-system-packages
-```
+### Overview
 
-### 2. 基本使用
+A comprehensive framework for developing Claude Code Skills with integrated Obsidian ecosystem support. This project implements an orchestrator pattern where `note-creator` delegates to specialized format-specific skills.
 
-```bash
-# 使用 v2 版本抓取文章
-python .claude/skills/wechat2md/tools/wechat2md_v2.py "https://mp.weixin.qq.com/s/your-article-url"
-```
-
-### 3. 查看结果
-
-生成的文件会保存在 `outputs/<folder>/<slug>/` 目录下：
-- `article.md` - 原始文章
-- `images/` - 图片目录（如有）
-- `meta.json` - 元数据
-
-## 📁 项目结构
-
-| 目录/文件 | 说明 |
-|---------|------|
-| `.claude/skills/wechat2md/` | 微信文章转 Markdown（v2 ✨） |
-| `.claude/skills/wechat-archiver/` | 文章归档到知识库（v2 ✨） |
-| `.claude/skills/note-creator/` | 生成结构化笔记 |
-| `CLAUDE.md` | 项目指南 |
-| `SKILLS_AUDIT.md` | Skills 审计报告 |
-| `WECHAT2MD_OPTIMIZATION.md` | v2 优化总结 |
-
-## 💡 主要功能
-
-### wechat2md v2
-- ✅ 使用 markdownify 库（95% 格式保留）
-- ✅ 统一的目录结构（article.md + images/ + meta.json）
-- ✅ asset_id 唯一标识（SHA1 of URL）
-- ✅ 自动清理空图片目录
-- ✅ 完整的元数据记录
-
-### wechat-archiver v2
-- ✅ 调用 wechat2md v2 抓取文章
-- ✅ 自动生成结构化笔记
-- ✅ 可选生成架构图和对比表
-- ✅ 幂等性控制（相同 URL 不重复）
-- ✅ 统一的资产目录管理
-
-## 📖 使用方法
-
-### 方法一：直接使用 wechat2md v2
+### 🚀 Quick Start
 
 ```bash
-# 基本用法
-python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL"
+# Clone the repository
+git clone https://github.com/lingengyuan/my-skills.git
+cd my-skills
 
-# 指定输出文件夹
-python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL" --target-folder "20-阅读笔记"
+# Install dependencies
+pip install -r .claude/skills/wechat2md/requirements.txt
 
-# 自定义 slug
-python .claude/skills/wechat2md/tools/wechat2md_v2.py "URL" --slug "my-article"
+# Archive a WeChat article
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 ```
 
-**输出结构**：
-```
-outputs/20-阅读笔记/文章标题-abc123/
-  ├── article.md      # 原始文章
-  ├── images/         # 图片（如有）
-  └── meta.json       # 元数据
-```
+### 📁 Project Structure
 
-### 方法二：使用 wechat-archiver v2
+| Directory/File | Description |
+|----------------|-------------|
+| `.claude/skills/` | Claude Skills definitions |
+| ├── `note-creator/` | Orchestrator for structured note generation |
+| ├── `obsidian-markdown/` | Markdown generation with YAML frontmatter |
+| ├── `json-canvas/` | Visual diagram/canvas generation |
+| ├── `obsidian-bases/` | Database-like table view generation |
+| ├── `wechat-archiver/` | WeChat article archiving workflow |
+| ├── `wechat2md/` | WeChat article to Markdown converter |
+| └── `sync_to_github/` | Automated git commit and push |
+| `.postmortem/` | Postmortem reports for incidents and bugs |
+| `CLAUDE.md` | Project development guidelines |
+| `README.md` | This file |
+
+### 🎯 Key Features
+
+#### Note Generation System
+- **Orchestrator Pattern**: `note-creator` classifies intent and delegates to format skills
+- **Multi-Format Output**: Markdown, Canvas diagrams, Base tables
+- **Intelligent Classification**: Auto-detects content type and generates appropriate artifacts
+- **Folder Organization**: Whitelist-based folder system for structured knowledge base
+
+#### WeChat Article Archiving
+- **WeChat Article to Markdown**: Convert articles with local images
+- **Structured Notes**: Auto-generate summaries, key points, and metadata
+- **Idempotent**: Same URL won't create duplicates
+- **Unified Directory**: All artifacts in single asset directory
+
+#### Quality Assurance
+- **Postmortem Reports**: Detailed analysis of 6 resolved incidents
+- **Transparent Development**: Public documentation of issues and fixes
+- **Continuous Improvement**: Learning from mistakes to prevent recurrence
+
+### 📖 Usage Examples
+
+#### Archive WeChat Article
 
 ```bash
-python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py "URL" --canvas auto --base auto
+# Using Claude Skill
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
+
+# Output directory: outputs/20-阅读笔记/YYYYMMDD-slug-abcdef/
+# - article.md       # Original article
+# - note.md          # Structured notes
+# - images/          # Downloaded images
+# - meta.json        # Metadata
 ```
 
-**输出结构**：
-```
-outputs/20-阅读笔记/文章标题-abc123/
-  ├── article.md      # 原始文章
-  ├── note.md         # 结构化笔记
-  ├── diagram.canvas  # 可选：架构图
-  ├── table.base      # 可选：对比表
-  ├── images/         # 图片（如有）
-  └── meta.json       # 统一元数据
-```
-
-### 方法三：通过 Claude Skill（推荐）
-
-在 Claude Code 中：
+#### Create Comparison Table
 
 ```bash
-# 归档文章
-/wechat-archiver article_url="https://mp.weixin.qq.com/s/xxxxx"
+# Using note-creator
+Skill(note-creator, "Compare Obsidian Skills: markdown, canvas, and base")
 
-# 生成结构化笔记
-/note-creator "为这篇文章生成笔记"
+# Output: outputs/30-方法论/obsidian-skills-comparison-*/
+# - note.md          # Comparison article
+# - table.base       # Comparison table
+# - compare/         # Individual item files
 ```
 
-## 📂 输出结构
+#### Generate Technical Diagram
+
+```bash
+# Create architecture diagram
+Skill(note-creator, "Create architecture diagram for note-creator workflow")
+
+# Output: outputs/30-方法论/*/diagram.canvas
+```
+
+### 🛠️ Skills Reference
+
+#### Core Skills
+
+1. **note-creator** (Orchestrator)
+   - Classifies user intent
+   - Delegates to format skills
+   - Writes all artifacts to disk
+   - Location: `.claude/skills/note-creator/SKILL.md`
+
+2. **obsidian-markdown**
+   - Generates valid Obsidian Flavored Markdown
+   - Includes YAML frontmatter, tags, wikilinks
+   - Location: `.claude/skills/obsidian-markdown/SKILL.md`
+
+3. **json-canvas**
+   - Creates visual diagrams in Obsidian Canvas format
+   - Supports flowcharts, sequences, architectures
+   - Location: `.claude/skills/json-canvas/SKILL.md`
+
+4. **obsidian-bases**
+   - Generates database-like table views
+   - Supports comparison mode with auto-generated rows
+   - Location: `.claude/skills/obsidian-bases/SKILL.md`
+
+#### Utility Skills
+
+5. **wechat-archiver**
+   - Orchestrates WeChat article archiving
+   - Combines wechat2md + note-creator
+   - Manages asset directories and metadata
+   - Location: `.claude/skills/wechat-archiver/SKILL.md`
+
+6. **wechat2md**
+   - Converts WeChat articles to Markdown
+   - Downloads all images locally
+   - Preserves formatting with markdownify
+   - Location: `.claude/skills/wechat2md/SKILL.md`
+
+7. **sync_to_github**
+   - Automated git workflow
+   - AI-generated commit messages
+   - Optional push to remote
+   - Location: `.claude/skills/sync_to_github/SKILL.md`
+
+### 📊 Output Structure
 
 ```
 outputs/
-├── 00-Inbox/
-├── 10-项目/
-├── 20-阅读笔记/
-│   └── 文章标题-abc123/
-│       ├── article.md      # 原始文章
-│       ├── note.md         # 结构化笔记（可选）
-│       ├── diagram.canvas  # 架构图（可选）
-│       ├── table.base      # 对比表（可选）
-│       ├── images/         # 图片
-│       │   ├── 001.jpg
-│       │   └── 002.png
-│       └── meta.json       # 元数据
-├── 30-方法论/
-└── 90-归档/
+├── 00-Inbox/           # Unclassified/temporary
+├── 10-项目/            # Project-specific notes
+├── 20-阅读笔记/         # Reading notes, article summaries
+├── 30-方法论/          # Methods, comparisons, frameworks
+├── 40-工具脚本/         # Actual executable scripts/tools
+├── 50-运维排障/         # Troubleshooting, debugging
+├── 60-数据与表/         # Database schemas, data models
+└── 90-归档/            # Deprecated/completed
 ```
 
-## 🎨 v2 版本改进
+### 🔒 Security & Privacy
 
-| 特性 | v1 | v2 |
-|------|----|----|
-| Markdown 转换 | 自定义解析器（70%） | markdownify（95%） |
-| 目录结构 | 分散（outputs/ + images/） | 统一目录 |
-| 唯一标识 | 日期前缀（重复问题） | asset_id（SHA1） |
-| 元数据 | ❌ | ✅ 完整 meta.json |
-| 图片路径 | `../images/<title>/` | `images/`（相对） |
-| 幂等性 | ❌ | ✅ content_hash |
+- ✅ No hardcoded credentials in repository
+- ✅ `.gitignore` properly configured
+- ✅ Local settings excluded (`.claude/settings.local.json`)
+- ✅ Obsidian configs excluded from history
+- ✅ Postmortem reports publicly shared
 
-详细对比见：`.claude/skills/wechat2md/V2_UPGRADE.md`
+### 📚 Documentation
 
-## 🔧 技术栈
+- **`CLAUDE.md`** - Project development guidelines
+- **`.postmortem/README.md`** - Postmortem reports index
+- **`.claude/skills/*/SKILL.md`** - Individual skill documentation
+- **`.claude/skills/*/REFERENCE.md`** - Technical references
 
-- **requests** - HTTP 请求
-- **BeautifulSoup4** - HTML 解析
-- **markdownify** - HTML 转 Markdown（v2 新增）
-- **lxml** - XML/HTML 解析器
+### 🐛 Known Issues
 
-## ⚠️ 注意事项
+See [`.postmortem/README.md`](.postmortem/README.md) for detailed reports:
+- POSTMORTEM-2026-001: Base filters failure (P0) ✅ Resolved
+- POSTMORTEM-2026-002: Base path resolution (P0) ✅ Resolved
+- POSTMORTEM-2026-003: Windows encoding (P1) ✅ Resolved
+- POSTMORTEM-2026-004: Overbroad detection (P2) ✅ Resolved
+- POSTMORTEM-2026-005: Duplicate ingestion (P2) ⏳ Partially Resolved
+- POSTMORTEM-2026-006: Image path error (P1) ✅ Resolved
 
-1. **仅供个人学习和备份使用**
-2. **尊重原作者版权**
-3. **不用于商业用途**
-4. **部分文章可能需要登录才能查看**
-5. **图片可能有防盗链保护**
+### 🔗 Related Resources
 
-## 🐛 常见问题
+- [Claude Code Documentation](https://code.claude.com/docs)
+- [Obsidian Plugin Docs](https://docs.obsidian.md/)
+- [JSON Canvas Spec](https://github.com/obsidianmd/jsoncanvas)
 
-**Q: markdownify 未安装？**
+### 📄 License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+<a name="简体中文"></a>
+## 简体中文
+
+### 概述
+
+Claude Code Skills 开发框架，集成了 Obsidian 生态系统支持。项目采用编排器模式，`note-creator` 负责分类意图并委托给专门的格式化技能。
+
+### 🚀 快速开始
+
 ```bash
-pip install markdownify lxml --break-system-packages
+# 克隆仓库
+git clone https://github.com/lingengyuan/my-skills.git
+cd my-skills
+
+# 安装依赖
+pip install -r .claude/skills/wechat2md/requirements.txt
+
+# 归档微信文章
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 ```
 
-**Q: 图片路径错误？**
-- v2.1 已修复图片路径问题
-- 确保使用最新版本
+### 📁 项目结构
 
-**Q: 抓取失败？**
-- 检查 URL 是否为 `mp.weixin.qq.com` 域名
-- 确保是公开可访问的文章
-- 检查网络连接
+| 目录/文件 | 说明 |
+|---------|------|
+| `.claude/skills/` | Claude Skills 定义 |
+| ├── `note-creator/` | 结构化笔记生成的编排器 |
+| ├── `obsidian-markdown/` | Markdown 生成（含 YAML frontmatter） |
+| ├── `json-canvas/` | 可视化图表/Canvas 生成 |
+| ├── `obsidian-bases/` | 数据库式表格视图生成 |
+| ├── `wechat-archiver/` | 微信文章归档工作流 |
+| ├── `wechat2md/` | 微信文章转 Markdown 转换器 |
+| └── `sync_to_github/` | 自动提交和推送 |
+| `.postmortem/` | 事故和 Bug 的详细分析报告 |
+| `CLAUDE.md` | 项目开发指南 |
+| `README.md` | 本文件 |
 
-## 📚 更多文档
+### 🎯 核心功能
 
-- `SKILL.md` - 技能使用指南
-- `CLAUDE.md` - 项目详细指南
-- `SKILLS_AUDIT.md` - Skills 审计报告
-- `WECHAT2MD_OPTIMIZATION.md` - v2 优化总结
-- `.claude/skills/wechat2md/V2_UPGRADE.md` - v2 升级指南
+#### 笔记生成系统
+- **编排器模式**：`note-creator` 分类意图并委托给格式技能
+- **多格式输出**：Markdown、Canvas 图表、Base 表格
+- **智能分类**：自动检测内容类型并生成适当的产物
+- **文件夹组织**：基于白名单的文件夹系统，构建结构化知识库
 
-## 🔗 相关资源
+#### 微信文章归档
+- **微信文章转 Markdown**：转换文章并下载本地图片
+- **结构化笔记**：自动生成摘要、要点和元数据
+- **幂等性**：相同 URL 不会创建重复内容
+- **统一目录**：所有产物集中在单一资产目录
 
-- [Claude Code 文档](https://code.claude.com/docs/en/skills)
-- [Markdown 语法指南](https://www.markdownguide.org/)
-- [markdownify 文档](https://github.com/matthewwithanm/markdownify)
+#### 质量保证
+- **事后分析报告**：6 个已解决问题的详细分析
+- **透明开发**：公开记录问题和修复过程
+- **持续改进**：从错误中学习，防止再次发生
 
-## 📄 许可证
+### 📖 使用示例
 
-MIT License - 仅供学习和个人使用，请遵守相关法律法规和平台规则。
+#### 归档微信文章
+
+```bash
+# 使用 Claude Skill
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
+
+# 输出目录：outputs/20-阅读笔记/YYYYMMDD-slug-abcdef/
+# - article.md       # 原始文章
+# - note.md          # 结构化笔记
+# - images/          # 下载的图片
+# - meta.json        # 元数据
+```
+
+#### 创建对比表格
+
+```bash
+# 使用 note-creator
+Skill(note-creator, "对比 Obsidian Skills: markdown, canvas, 和 base")
+
+# 输出：outputs/30-方法论/obsidian-skills-comparison-*/
+# - note.md          # 对比文章
+# - table.base       # 对比表格
+# - compare/         # 各项的独立文件
+```
+
+#### 生成技术图表
+
+```bash
+# 创建架构图
+Skill(note-creator, "创建 note-creator 工作流的架构图")
+
+# 输出：outputs/30-方法论/*/diagram.canvas
+```
+
+### 🛠️ Skills 参考
+
+#### 核心 Skills
+
+1. **note-creator**（编排器）
+   - 分类用户意图
+   - 委托给格式技能
+   - 将所有产物写入磁盘
+   - 位置：`.claude/skills/note-creator/SKILL.md`
+
+2. **obsidian-markdown**
+   - 生成有效的 Obsidian Flavored Markdown
+   - 包含 YAML frontmatter、标签、wikilinks
+   - 位置：`.claude/skills/obsidian-markdown/SKILL.md`
+
+3. **json-canvas**
+   - 创建 Obsidian Canvas 格式的可视化图表
+   - 支持流程图、时序图、架构图
+   - 位置：`.claude/skills/json-canvas/SKILL.md`
+
+4. **obsidian-bases**
+   - 生成数据库式表格视图
+   - 支持对比模式和自动生成的行
+   - 位置：`.claude/skills/obsidian-bases/SKILL.md`
+
+#### 工具 Skills
+
+5. **wechat-archiver**
+   - 编排微信文章归档流程
+   - 结合 wechat2md + note-creator
+   - 管理资产目录和元数据
+   - 位置：`.claude/skills/wechat-archiver/SKILL.md`
+
+6. **wechat2md**
+   - 将微信文章转换为 Markdown
+   - 下载所有图片到本地
+   - 使用 markdownify 保留格式
+   - 位置：`.claude/skills/wechat2md/SKILL.md`
+
+7. **sync_to_github**
+   - 自动化 git 工作流
+   - AI 生成的提交信息
+   - 可选推送到远程
+   - 位置：`.claude/skills/sync_to_github/SKILL.md`
+
+### 📊 输出结构
+
+```
+outputs/
+├── 00-Inbox/           # 未分类/临时
+├── 10-项目/            # 项目特定笔记
+├── 20-阅读笔记/         # 阅读笔记、文章摘要
+├── 30-方法论/          # 方法、对比、框架
+├── 40-工具脚本/         # 实际可执行的脚本/工具
+├── 50-运维排障/         # 故障排查、调试
+├── 60-数据与表/         # 数据库架构、数据模型
+└── 90-归档/            # 已弃用/已完成
+```
+
+### 🔒 安全与隐私
+
+- ✅ 仓库中无硬编码凭证
+- ✅ `.gitignore` 正确配置
+- ✅ 本地设置已排除（`.claude/settings.local.json`）
+- ✅ Obsidian 配置已从历史中清除
+- ✅ 事后分析报告公开分享
+
+### 📚 文档
+
+- **`CLAUDE.md`** - 项目开发指南
+- **`.postmortem/README.md`** - 事后分析报告索引
+- **`.claude/skills/*/SKILL.md`** - 各个技能的文档
+- **`.claude/skills/*/REFERENCE.md`** - 技术参考
+
+### 🐛 已知问题
+
+详见 [`.postmortem/README.md`](.postmortem/README.md)：
+- POSTMORTEM-2026-001: Base 过滤器失败（P0）✅ 已解决
+- POSTMORTEM-2026-002: Base 路径解析（P0）✅ 已解决
+- POSTMORTEM-2026-003: Windows 编码（P1）✅ 已解决
+- POSTMORTEM-2026-004: 过度检测（P2）✅ 已解决
+- POSTMORTEM-2026-005: 重复摄取（P2）⏳ 部分解决
+- POSTMORTEM-2026-006: 图片路径错误（P1）✅ 已解决
+
+### 🔗 相关资源
+
+- [Claude Code 文档](https://code.claude.com/docs)
+- [Obsidian 插件文档](https://docs.obsidian.md/)
+- [JSON Canvas 规范](https://github.com/obsidianmd/jsoncanvas)
+
+### 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Development Guidelines
+
+- Follow the patterns in existing skills
+- Update documentation for new features
+- Add postmortem reports for bugs
+- Test on multiple platforms (Windows, macOS, Linux)
+
+### Postmortem Process
+
+When you encounter or fix a bug:
+1. Document it in `.postmortem/POSTMORTEM-YYYY-NNN-title.md`
+2. Follow the existing report structure
+3. Update `.postmortem/README.md` statistics
+4. Commit with descriptive message
+
+---
+
+## 📝 Changelog
+
+### 2026-01-12
+- ✅ Add postmortem reports (6 incidents)
+- ✅ Clean .obsidian/ from git history
+- ✅ Fix image path handling in wechat2md
+- ✅ Update skill documentation
+- ✅ Add REFERENCE.md files for format skills
+
+### Previous Changes
+See git log for detailed history: `git log --oneline`
+
+---
+
+**Made with ❤️ by [lingengyuan](https://github.com/lingengyuan) and [Claude Code](https://code.claude.com)**
