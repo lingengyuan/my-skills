@@ -1,3 +1,15 @@
+---
+name: note-creator
+description: Orchestrates creation of structured Obsidian notes with markdown, canvas diagrams, and table bases. Use when users ask to create notes, save knowledge, or document concepts in their Obsidian vault. Delegates to specialized format skills.
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Skill
+  - Glob
+  - Bash(mkdir:*, echo:*, cat:*)
+---
+
 # note-creator (Orchestrator Skill)
 
 ## Purpose

@@ -1,3 +1,15 @@
+---
+name: wechat-archiver
+description: Archives WeChat Official Account articles to knowledge base with auto-generated structured notes. Use when users provide WeChat article URLs (mp.weixin.qq.com) or mention archiving/saving WeChat articles. Combines wechat2md scraper and note-creator for complete workflow.
+allowed-tools:
+  - Bash(python3:*, mkdir:*, cp:*, rm:*, cat:*)
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Skill
+---
+
 # wechat-archiver (Wrapper Skill)
 
 ## Purpose
