@@ -20,10 +20,25 @@ cd my-skills
 
 # Install dependencies
 pip install -r .claude/skills/wechat2md/requirements.txt
+pip install -r .claude/skills/zimage-core/requirements.txt
 
 # Archive a WeChat article
 Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
+
+# Generate manga-style image (requires API token, see below)
+"Convert this photo to Hojo manga style"
 ```
+
+#### Z-Image API Setup (Optional)
+
+To use `zimage-api` skill, you need a Replicate API token:
+
+1. Sign up at [Replicate](https://replicate.com/)
+2. Get your API token from [Account Settings](https://replicate.com/account/api-tokens)
+3. Create `.env` file in project root:
+   ```env
+   REPLICATE_API_TOKEN=r8_your_token_here
+   ```
 
 ### 📁 Project Structure
 
@@ -36,7 +51,10 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 | ├── `obsidian-bases/` | Database-like table view generation |
 | ├── `wechat-archiver/` | WeChat article archiving workflow |
 | ├── `wechat2md/` | WeChat article to Markdown converter |
-| └── `sync_to_github/` | Automated git commit and push |
+| ├── `sync_to_github/` | Automated git commit and push |
+| ├── `zimage-api/` | Manga style image generation (Cloud API) |
+| ├── `zimage-local/` | Manga style image generation (Local ComfyUI) |
+| └── `zimage-core/` | Shared core module for Z-Image skills |
 | `.postmortem/` | Postmortem reports for incidents and bugs |
 | `CLAUDE.md` | Project development guidelines |
 | `README.md` | This file |
@@ -96,6 +114,20 @@ Skill(note-creator, "Create architecture diagram for note-creator workflow")
 # Output: outputs/30-方法论/*/diagram.canvas
 ```
 
+#### Generate Manga-Style Image
+
+```bash
+# Let Claude Code analyze and convert an image
+"Convert this photo to Hojo Tsukasa manga style"
+"Turn input/photo.jpg into Urushihara Satoshi anime style"
+
+# Or provide prompts directly
+cd .claude/skills/zimage-local
+python generate.py "1girl, solo, glasses, smile, portrait" hojo
+
+# Output: outputs/zimage/zimage_hojo_local_*.png
+```
+
 ### 🛠️ Skills Reference
 
 #### Core Skills
@@ -140,6 +172,22 @@ Skill(note-creator, "Create architecture diagram for note-creator workflow")
    - AI-generated commit messages
    - Optional push to remote
    - Location: `.claude/skills/sync_to_github/SKILL.md`
+
+#### Image Generation Skills
+
+8. **zimage-api**
+   - Generate manga-style images using Replicate cloud API
+   - Supports Hojo Tsukasa (B&W manga) and Urushihara Satoshi (90s anime) styles
+   - Claude Code analyzes images and generates prompts automatically
+   - No local GPU required
+   - Location: `.claude/skills/zimage-api/SKILL.md`
+
+9. **zimage-local**
+   - Generate manga-style images using local ComfyUI
+   - Same style support as API version
+   - **Completely free** - no API costs
+   - Requires local GPU (4GB+ VRAM)
+   - Location: `.claude/skills/zimage-local/SKILL.md`
 
 ### 📊 Output Structure
 
@@ -208,10 +256,27 @@ cd my-skills
 
 # 安装依赖
 pip install -r .claude/skills/wechat2md/requirements.txt
+pip install -r .claude/skills/zimage-core/requirements.txt
 
 # 归档微信文章
 Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
+
+# 生成漫画风格图像（需要配置 API Token，见下方）
+"帮我把这张照片转成北条司风格"
 ```
+
+#### Z-Image API 配置（可选）
+
+使用 `zimage-api` 需要 Replicate API Token：
+
+1. 在 [Replicate](https://replicate.com/) 注册账号
+2. 从 [账户设置](https://replicate.com/account/api-tokens) 获取 API Token
+3. 在项目根目录创建 `.env` 文件：
+   ```env
+   REPLICATE_API_TOKEN=r8_your_token_here
+   ```
+
+**注意：** `zimage-local` 使用本地 ComfyUI，完全免费，无需 API Token。
 
 ### 📁 项目结构
 
@@ -224,7 +289,10 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 | ├── `obsidian-bases/` | 数据库式表格视图生成 |
 | ├── `wechat-archiver/` | 微信文章归档工作流 |
 | ├── `wechat2md/` | 微信文章转 Markdown 转换器 |
-| └── `sync_to_github/` | 自动提交和推送 |
+| ├── `sync_to_github/` | 自动提交和推送 |
+| ├── `zimage-api/` | 漫画风格图像生成（云端 API） |
+| ├── `zimage-local/` | 漫画风格图像生成（本地 ComfyUI） |
+| └── `zimage-core/` | Z-Image 共享核心模块 |
 | `.postmortem/` | 事故和 Bug 的详细分析报告 |
 | `CLAUDE.md` | 项目开发指南 |
 | `README.md` | 本文件 |
@@ -284,6 +352,20 @@ Skill(note-creator, "创建 note-creator 工作流的架构图")
 # 输出：outputs/30-方法论/*/diagram.canvas
 ```
 
+#### 生成漫画风格图像
+
+```bash
+# 让 Claude Code 分析并转换图片
+"帮我把这张照片转成北条司风格"
+"把 input/photo.jpg 转成漆原智志风格"
+
+# 或直接提供提示词
+cd .claude/skills/zimage-local
+python generate.py "1girl, solo, glasses, smile, portrait" hojo
+
+# 输出：outputs/zimage/zimage_hojo_local_*.png
+```
+
 ### 🛠️ Skills 参考
 
 #### 核心 Skills
@@ -328,6 +410,22 @@ Skill(note-creator, "创建 note-creator 工作流的架构图")
    - AI 生成的提交信息
    - 可选推送到远程
    - 位置：`.claude/skills/sync_to_github/SKILL.md`
+
+#### 图像生成 Skills
+
+8. **zimage-api**
+   - 使用 Replicate 云端 API 生成漫画风格图像
+   - 支持北条司风格（黑白漫画）和漆原智志风格（90年代动漫）
+   - Claude Code 自动分析图片并生成提示词
+   - 无需本地 GPU
+   - 位置：`.claude/skills/zimage-api/SKILL.md`
+
+9. **zimage-local**
+   - 使用本地 ComfyUI 生成漫画风格图像
+   - 与 API 版支持相同的风格
+   - **完全免费** - 无 API 费用
+   - 需要本地 GPU（4GB+ 显存）
+   - 位置：`.claude/skills/zimage-local/SKILL.md`
 
 ### 📊 输出结构
 
@@ -402,6 +500,14 @@ When you encounter or fix a bug:
 ---
 
 ## 📝 Changelog
+
+### 2026-01-16
+- Add Z-Image skills for manga-style image generation
+  - `zimage-api`: Cloud-based generation via Replicate API
+  - `zimage-local`: Local generation via ComfyUI
+  - `zimage-core`: Shared core modules
+- Support Hojo Tsukasa (B&W manga) and Urushihara Satoshi (90s anime) styles
+- Claude Code directly analyzes images - no extra API costs
 
 ### 2026-01-12
 - ✅ Add postmortem reports (6 incidents)
