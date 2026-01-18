@@ -174,6 +174,7 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 5. **wechat-archiver**
    - Orchestrates WeChat article archiving
    - Combines wechat2md + note-creator
+   - Batch processing with progress bar and ETA
    - Manages asset directories and metadata
    - Location: `.claude/skills/wechat-archiver/SKILL.md`
 
@@ -182,6 +183,8 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - Downloads all images to self-contained output directory
    - Proper paragraph separation and code block formatting
    - Converts inline styles to native Markdown syntax
+   - Auto-fix plain text URLs to markdown links
+   - Auto-detect code language for syntax highlighting
    - Location: `.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -429,6 +432,7 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 5. **wechat-archiver**
    - 编排微信文章归档流程
    - 结合 wechat2md + note-creator
+   - 批量处理支持进度条和预计剩余时间
    - 管理资产目录和元数据
    - 位置：`.claude/skills/wechat-archiver/SKILL.md`
 
@@ -437,6 +441,8 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - 下载所有图片到自包含输出目录
    - 正确的段落分隔和代码块格式
    - 将内联样式转换为原生 Markdown 语法
+   - 自动修复纯文本 URL 为 Markdown 链接
+   - 自动检测代码语言用于语法高亮
    - 位置：`.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -540,11 +546,15 @@ When you encounter or fix a bug:
   - Extract URLs from markdown files (plain URLs, links, task lists)
   - Auto-mark processed URLs as `[x]` in source file
   - Checkpoint support for resuming interrupted batches
+  - Progress bar with percentage and ETA display
 - **wechat2md**: Major format quality improvements
   - Proper paragraph separation for nested sections
   - Code blocks with correct line breaks
   - Convert inline styles to native Markdown syntax
   - Self-contained output (images in article subdirectory)
+  - Auto-fix plain text URLs to markdown links (`地址→github.com` → `[地址](https://github.com)`)
+  - Auto-detect code language for syntax highlighting (Python, JS, Go, Rust, C/C++, etc.)
+- **tests**: Add 40 unit tests for wechat2md (all passing)
 
 ### 2026-01-16
 - Add Z-Image skills for manga-style image generation
