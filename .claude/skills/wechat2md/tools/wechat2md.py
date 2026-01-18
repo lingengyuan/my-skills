@@ -586,7 +586,9 @@ def html_to_markdown(js_html: str) -> str:
             code = code.replace('\r\n', '\n').replace('\r', '\n')
             code = code.strip("\n")
             if code:
-                emit("```")
+                # Detect code language for syntax highlighting
+                lang = detect_code_language(code)
+                emit(f"```{lang}")
                 for line in code.split("\n"):
                     emit(line)
                 emit("```")
@@ -707,11 +709,128 @@ def html_to_markdown(js_html: str) -> str:
     return "\n".join(cleaned).strip() + "\n"
 
 
+def fix_plain_text_urls(text: str) -> str:
+    """Convert plain text URLs to proper markdown links.
+
+    Patterns handled:
+    - "地址：github.com/xxx" → "[地址](https://github.com/xxx)"
+    - "GitHub 地址→github.com/xxx" → "[GitHub 地址](https://github.com/xxx)"
+    - Plain URLs like "github.com/xxx" → "[github.com/xxx](https://github.com/xxx)"
+    """
+    import re
+
+    # Pattern 1: "XXX地址→URL" or "XXX地址：URL" (Chinese colon or arrow)
+    def replace_labeled_url(match):
+        label = match.group(1).strip()
+        url = match.group(2).strip()
+        # Add https:// if missing
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        return f"[{label}]({url})"
+
+    # Match: label (including spaces, ending with 地址) followed by → or ： and then a URL
+    # Use word boundary or start of line/space before the label
+    text = re.sub(
+        r'((?:[\w\s]*?)地址)\s*[→：:]\s*((?:https?://)?(?:github\.com|gitee\.com|gitlab\.com|bitbucket\.org)[^\s\)）\]<]*)',
+        replace_labeled_url,
+        text
+    )
+
+    # Pattern 2: Standalone URLs without protocol at line start or after space
+    def add_protocol(match):
+        prefix = match.group(1)
+        url = match.group(2)
+        return f"{prefix}[{url}](https://{url})"
+
+    # Match standalone domain URLs (not already in markdown link format)
+    text = re.sub(
+        r'(^|(?<=[>\s]))((github\.com|gitee\.com|gitlab\.com|bitbucket\.org)/[^\s\)）\]<]+)',
+        add_protocol,
+        text,
+        flags=re.MULTILINE
+    )
+
+    return text
+
+
+def detect_code_language(code: str) -> str:
+    """Detect programming language from code content.
+
+    Returns language identifier for markdown code fence, or empty string if unknown.
+    """
+    code_lower = code.lower().strip()
+    lines = code.split('\n')
+    first_line = lines[0].strip() if lines else ""
+
+    # Shell/Bash indicators
+    if first_line.startswith('$') or first_line.startswith('#!'):
+        return "bash"
+    if any(cmd in code for cmd in ['apt-get', 'npm install', 'pip install', 'git clone', 'docker ', 'kubectl ']):
+        return "bash"
+
+    # Python indicators
+    if 'import ' in code or 'def ' in code or 'print(' in code:
+        if 'from __future__' in code or 'import numpy' in code or 'import pandas' in code:
+            return "python"
+        if re.search(r'\bdef\s+\w+\s*\(', code):
+            return "python"
+
+    # Rust indicators (check before JavaScript because both use 'let')
+    if 'fn main()' in code or 'let mut ' in code or '-> Result<' in code or 'println!' in code:
+        return "rust"
+
+    # Go indicators
+    if 'package main' in code or 'func ' in code or 'import "' in code:
+        return "go"
+
+    # Java indicators
+    if 'public class' in code or 'public static void main' in code:
+        return "java"
+
+    # JavaScript/TypeScript indicators
+    if 'const ' in code or 'let ' in code or 'function ' in code or '=>' in code:
+        if 'interface ' in code or ': string' in code or ': number' in code:
+            return "typescript"
+        return "javascript"
+
+    # C/C++ indicators
+    if '#include' in code:
+        if '<iostream>' in code or 'std::' in code or '::' in code:
+            return "cpp"
+        return "c"
+
+    # SQL indicators
+    if re.search(r'\b(SELECT|INSERT|UPDATE|DELETE|CREATE TABLE)\b', code, re.IGNORECASE):
+        return "sql"
+
+    # JSON indicators
+    if code_lower.startswith('{') and code_lower.rstrip().endswith('}'):
+        if '"' in code and ':' in code:
+            return "json"
+
+    # YAML indicators
+    if re.search(r'^\w+:\s*\n', code) or re.search(r'^\s*-\s+\w+:', code, re.MULTILINE):
+        return "yaml"
+
+    # HTML/XML indicators
+    if re.search(r'<\w+[^>]*>', code) and re.search(r'</\w+>', code):
+        return "html"
+
+    # CSS indicators
+    if re.search(r'[.#]\w+\s*\{', code) or re.search(r'@media\s', code):
+        return "css"
+
+    return ""
+
+
 def build_md_document(
     title: str,
     body_md: str,
     image_manifest: List[ImageItem],
 ) -> str:
+    # Fix plain text URLs before building document
+    body_md = fix_plain_text_urls(body_md)
+
     parts: List[str] = []
     parts.append(f"# {title}")
     parts.append("")

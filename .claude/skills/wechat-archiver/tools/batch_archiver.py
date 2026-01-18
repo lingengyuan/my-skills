@@ -317,12 +317,30 @@ def batch_archive(
     print(f"Batch Archive: Processing {total} URLs")
     print(f"{'='*60}\n")
 
+    start_time = datetime.now()
+
     for i, info in enumerate(urls_to_process, 1):
         url = info['url']
         title = info['title'] or '(no title)'
 
-        print(f"[{i}/{total}] Processing: {title[:40]}...")
-        print(f"         URL: {url[:50]}...")
+        # Calculate progress
+        percent = (i / total) * 100
+        bar_width = 20
+        filled = int(bar_width * i / total)
+        bar = '█' * filled + '░' * (bar_width - filled)
+
+        # Estimate remaining time
+        elapsed = (datetime.now() - start_time).total_seconds()
+        if i > 1:
+            avg_per_item = elapsed / (i - 1)
+            remaining = avg_per_item * (total - i + 1)
+            eta = f"ETA: {int(remaining // 60)}m {int(remaining % 60)}s"
+        else:
+            eta = "ETA: calculating..."
+
+        print(f"\n[{bar}] {percent:5.1f}% ({i}/{total}) {eta}")
+        print(f"  Title: {title[:50]}{'...' if len(title) > 50 else ''}")
+        print(f"  URL:   {url[:60]}{'...' if len(url) > 60 else ''}")
 
         try:
             result = run_single_archive(url, cwd, folder, force)
@@ -330,9 +348,9 @@ def batch_archive(
             if result['success']:
                 processed_count += 1
                 status = 'success'
-                print(f"         Status: SUCCESS")
+                print(f"  Status: ✓ SUCCESS")
                 if result['asset_dir']:
-                    print(f"         Output: {result['asset_dir']}")
+                    print(f"  Output: {result['asset_dir']}")
 
                 # Update checkpoint
                 checkpoint['processed_urls'][info['normalized_url']] = {
@@ -348,8 +366,8 @@ def batch_archive(
             else:
                 failed_count += 1
                 status = 'failed'
-                print(f"         Status: FAILED")
-                print(f"         Error: {result['stderr'][:100]}...")
+                print(f"  Status: ✗ FAILED")
+                print(f"  Error:  {result['stderr'][:80]}...")
 
                 checkpoint['processed_urls'][info['normalized_url']] = {
                     'status': 'failed',
@@ -366,7 +384,7 @@ def batch_archive(
 
         except Exception as e:
             failed_count += 1
-            print(f"         Status: ERROR - {e}")
+            print(f"  Status: ✗ ERROR - {e}")
 
             checkpoint['processed_urls'][info['normalized_url']] = {
                 'status': 'error',
@@ -383,7 +401,6 @@ def batch_archive(
 
         # Save checkpoint after each URL
         save_checkpoint(checkpoint_path, checkpoint)
-        print()
 
     # Save updated content if mark_done
     if mark_done and processed_count > 0:
@@ -392,13 +409,17 @@ def batch_archive(
         print(f"[INFO] Updated {inbox_path} with {processed_count} marked items")
 
     # Summary
+    total_elapsed = (datetime.now() - start_time).total_seconds()
+    elapsed_str = f"{int(total_elapsed // 60)}m {int(total_elapsed % 60)}s"
+
     print(f"\n{'='*60}")
-    print(f"Batch Archive Complete")
+    print(f"  Batch Archive Complete")
     print(f"{'='*60}")
     print(f"  Total URLs found:    {len(url_infos)}")
-    print(f"  Processed:           {processed_count}")
-    print(f"  Failed:              {failed_count}")
+    print(f"  Processed:           {processed_count} ✓")
+    print(f"  Failed:              {failed_count} {'✗' if failed_count > 0 else ''}")
     print(f"  Already done:        {len(url_infos) - total}")
+    print(f"  Total time:          {elapsed_str}")
     print(f"{'='*60}")
 
     return {
