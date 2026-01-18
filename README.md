@@ -70,8 +70,9 @@ To use `zimage-api` skill, you need a Replicate API token:
 #### WeChat Article Archiving
 - **WeChat Article to Markdown**: Convert articles with local images
 - **Structured Notes**: Auto-generate summaries, key points, and metadata
+- **Batch Processing**: Process multiple URLs from inbox.md file
 - **Idempotent**: Same URL won't create duplicates
-- **Unified Directory**: All artifacts in single asset directory
+- **Self-Contained Output**: Article and images in single portable directory
 
 #### Quality Assurance
 - **Postmortem Reports**: Detailed analysis of 6 resolved incidents
@@ -91,6 +92,21 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 # - note.md          # Structured notes
 # - images/          # Downloaded images
 # - meta.json        # Metadata
+```
+
+#### Batch Archive from inbox.md
+
+```bash
+# Create inbox.md with WeChat URLs (one per line)
+# Supports formats: plain URLs, markdown links, task lists
+- [ ] https://mp.weixin.qq.com/s/article1
+- [x] https://mp.weixin.qq.com/s/already-processed  # Will be skipped
+- [ ] https://mp.weixin.qq.com/s/article2
+
+# Run batch archiver
+Skill(wechat-archiver, args="--batch inbox.md")
+
+# URLs are automatically marked as [x] after processing
 ```
 
 #### Create Comparison Table
@@ -162,9 +178,10 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - Location: `.claude/skills/wechat-archiver/SKILL.md`
 
 6. **wechat2md**
-   - Converts WeChat articles to Markdown
-   - Downloads all images locally
-   - Preserves formatting with markdownify
+   - Converts WeChat articles to clean Markdown
+   - Downloads all images to self-contained output directory
+   - Proper paragraph separation and code block formatting
+   - Converts inline styles to native Markdown syntax
    - Location: `.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -308,8 +325,9 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 #### 微信文章归档
 - **微信文章转 Markdown**：转换文章并下载本地图片
 - **结构化笔记**：自动生成摘要、要点和元数据
+- **批量处理**：从 inbox.md 文件批量处理多个 URL
 - **幂等性**：相同 URL 不会创建重复内容
-- **统一目录**：所有产物集中在单一资产目录
+- **自包含输出**：文章和图片在单一可移植目录中
 
 #### 质量保证
 - **事后分析报告**：6 个已解决问题的详细分析
@@ -329,6 +347,21 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 # - note.md          # 结构化笔记
 # - images/          # 下载的图片
 # - meta.json        # 元数据
+```
+
+#### 从 inbox.md 批量归档
+
+```bash
+# 创建包含微信 URL 的 inbox.md（每行一个）
+# 支持格式：纯 URL、markdown 链接、任务列表
+- [ ] https://mp.weixin.qq.com/s/article1
+- [x] https://mp.weixin.qq.com/s/已处理  # 将被跳过
+- [ ] https://mp.weixin.qq.com/s/article2
+
+# 运行批量归档
+Skill(wechat-archiver, args="--batch inbox.md")
+
+# 处理后 URL 会自动标记为 [x]
 ```
 
 #### 创建对比表格
@@ -400,9 +433,10 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - 位置：`.claude/skills/wechat-archiver/SKILL.md`
 
 6. **wechat2md**
-   - 将微信文章转换为 Markdown
-   - 下载所有图片到本地
-   - 使用 markdownify 保留格式
+   - 将微信文章转换为干净的 Markdown
+   - 下载所有图片到自包含输出目录
+   - 正确的段落分隔和代码块格式
+   - 将内联样式转换为原生 Markdown 语法
    - 位置：`.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -500,6 +534,17 @@ When you encounter or fix a bug:
 ---
 
 ## 📝 Changelog
+
+### 2026-01-18
+- **wechat-archiver**: Add batch processing from inbox.md
+  - Extract URLs from markdown files (plain URLs, links, task lists)
+  - Auto-mark processed URLs as `[x]` in source file
+  - Checkpoint support for resuming interrupted batches
+- **wechat2md**: Major format quality improvements
+  - Proper paragraph separation for nested sections
+  - Code blocks with correct line breaks
+  - Convert inline styles to native Markdown syntax
+  - Self-contained output (images in article subdirectory)
 
 ### 2026-01-16
 - Add Z-Image skills for manga-style image generation

@@ -255,9 +255,8 @@ def _download_binary(url: str, referer: str, timeout_s: int = 30, retries: int =
 
 def download_images_and_rewrite_html(
     js_inner_html: str,
-    article_title: str,
     article_url: str,
-    images_root: Path,
+    images_dir: Path,
     md_image_prefix: str,
 ) -> Tuple[str, List[ImageItem]]:
     """Download all images found in正文 HTML and rewrite <img> tags into placeholders.
@@ -267,8 +266,7 @@ def download_images_and_rewrite_html(
     soup = BeautifulSoup(js_inner_html, "html.parser")
     imgs = soup.find_all("img")
 
-    article_dir = images_root / article_title
-    ensure_dir(article_dir)
+    ensure_dir(images_dir)
 
     manifest: List[ImageItem] = []
 
@@ -303,7 +301,7 @@ def download_images_and_rewrite_html(
 
         ext = _guess_ext_from_url(original_url)
         local_filename = f"{idx_str}.{ext or 'jpg'}"
-        local_path = article_dir / local_filename
+        local_path = images_dir / local_filename
 
         ok = True
         err = None
@@ -314,7 +312,7 @@ def download_images_and_rewrite_html(
             inferred = _ext_from_content_type(ct or "")
             if ext is None and inferred is not None:
                 local_filename = f"{idx_str}.{inferred}"
-                local_path = article_dir / local_filename
+                local_path = images_dir / local_filename
 
             # Write (overwrite)
             with open(local_path, "wb") as f:
@@ -477,19 +475,27 @@ def html_to_markdown(js_html: str) -> str:
             return text
 
         if name == "span":
-            style = _style_keep(node.get("style") or "")
+            style = node.get("style") or ""
             inner = "".join(convert_inline(c) for c in node.children)
-            if style and inner.strip():
-                # Keep as HTML for better visual parity
-                return f"<span style=\"{style}\">{inner}</span>"
+            # Check for bold/italic in style
+            style_lower = style.lower()
+            if "font-weight" in style_lower and ("bold" in style_lower or "700" in style_lower or "800" in style_lower or "900" in style_lower):
+                inner = inner.strip()
+                if inner:
+                    return f"**{inner}**"
+            if "font-style" in style_lower and "italic" in style_lower:
+                inner = inner.strip()
+                if inner:
+                    return f"*{inner}*"
+            # For other styles, just return the text (don't keep HTML)
             return inner
 
         if name == "wechat2md-img":
             src = (node.get("src") or "").strip()
             alt = (node.get("alt") or "").strip()
             if alt:
-                return f"![{alt}]({src})"
-            return f"![]({src})"
+                return f"\n\n![{alt}]({src})\n\n"
+            return f"\n\n![]({src})\n\n"
 
         # default: inline flatten
         return "".join(convert_inline(c) for c in node.children)
@@ -565,24 +571,92 @@ def html_to_markdown(js_html: str) -> str:
             return
 
         if name == "pre":
-            code = node.get_text("\n", strip=False)
+            # Extract code text, converting <br> tags to newlines
+            def extract_code_text(n) -> str:
+                if isinstance(n, NavigableString):
+                    return str(n)
+                if not isinstance(n, Tag):
+                    return ""
+                if n.name.lower() == "br":
+                    return "\n"
+                return "".join(extract_code_text(c) for c in n.children)
+
+            code = extract_code_text(node)
+            # Normalize line endings
+            code = code.replace('\r\n', '\n').replace('\r', '\n')
             code = code.strip("\n")
-            emit("```")
-            emit(code)
-            emit("```")
-            emit()
+            if code:
+                emit("```")
+                for line in code.split("\n"):
+                    emit(line)
+                emit("```")
+                emit()
             return
 
         if name in {"p", "div", "section"}:
+            # Check if this block contains only an image
+            children = [c for c in node.children if not (isinstance(c, NavigableString) and not str(c).strip())]
+            if len(children) == 1:
+                child = children[0]
+                if isinstance(child, Tag) and child.name.lower() == "wechat2md-img":
+                    # Standalone image in block
+                    md = convert_inline(child)
+                    if md:
+                        emit(md)
+                        emit()
+                    return
+
             # Caption heuristic
             if _is_caption_p(node):
                 text = _collapse_ws("".join(convert_inline(c) for c in node.children))
                 if text:
-                    emit(f"<div style=\"text-align:center; font-size:0.9em;\">{text}</div>")
+                    # Use italic for captions instead of HTML
+                    emit(f"*{text}*")
                     emit()
                 return
 
-            # Regular paragraph-like block
+            # Check if this block contains nested block elements
+            # If so, process children as blocks instead of inline
+            block_tags = {"p", "div", "section", "ul", "ol", "pre", "blockquote", "h1", "h2", "h3", "hr", "wechat2md-img"}
+            has_block_children = any(
+                isinstance(c, Tag) and c.name.lower() in block_tags
+                for c in node.children
+            )
+
+            if has_block_children:
+                # Process mixed content: inline content before/between/after block elements
+                inline_buffer = []
+                for c in node.children:
+                    if isinstance(c, Tag) and c.name.lower() in block_tags:
+                        # Flush any accumulated inline content
+                        if inline_buffer:
+                            inline_text = "".join(inline_buffer)
+                            inline_text = inline_text.replace("\xa0", " ")
+                            inline_text = re.sub(r"[ \t]+", " ", inline_text)
+                            inline_lines = [l.strip() for l in inline_text.split("\n")]
+                            inline_lines = [l for l in inline_lines if l]
+                            if inline_lines:
+                                emit("\n".join(inline_lines))
+                                emit()
+                            inline_buffer = []
+                        # Process the block child
+                        convert_block(c)
+                    else:
+                        # Accumulate inline content
+                        inline_buffer.append(convert_inline(c))
+                # Flush remaining inline content
+                if inline_buffer:
+                    inline_text = "".join(inline_buffer)
+                    inline_text = inline_text.replace("\xa0", " ")
+                    inline_text = re.sub(r"[ \t]+", " ", inline_text)
+                    inline_lines = [l.strip() for l in inline_text.split("\n")]
+                    inline_lines = [l for l in inline_lines if l]
+                    if inline_lines:
+                        emit("\n".join(inline_lines))
+                        emit()
+                return
+
+            # Regular paragraph-like block (no nested block elements)
             inner = "".join(convert_inline(c) for c in node.children)
             # Normalize NBSP and whitespace
             inner = inner.replace("\xa0", " ")
@@ -675,22 +749,19 @@ def main() -> int:
 
         cwd = Path.cwd()
         outputs_root = cwd / "outputs" / title
-        images_root = cwd / "images"
-        images_dir = images_root / title
+        images_dir = outputs_root / "images"
 
         ensure_dir(outputs_root)
         ensure_dir(images_dir)
 
-        # IMPORTANT: Use ./images/ prefix for portability
-        # When wechat-archiver moves files to asset directory, images will be in same directory
-        # Using ./images/ ensures links work regardless of final location
+        # Images are stored in ./images/ subdirectory of the output folder
+        # This makes the article self-contained and portable
         md_image_prefix = "./images/"
 
         rewritten_html, manifest = download_images_and_rewrite_html(
             js_inner_html=js_inner_html,
-            article_title=title,
             article_url=url,
-            images_root=images_root,
+            images_dir=images_dir,
             md_image_prefix=md_image_prefix,
         )
 

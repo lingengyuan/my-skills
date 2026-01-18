@@ -37,6 +37,8 @@ allowed-tools:
 ---
 
 ## Inputs
+
+### 单篇模式
 - `article_url` (必填): 微信公众号文章 URL (mp.weixin.qq.com)
 - `target_folder` (可选): 目标文件夹，默认 `20-阅读笔记`
 - `force` (可选, bool): 强制重新生成笔记，默认 false
@@ -48,6 +50,15 @@ allowed-tools:
   - `auto`: 根据关键词规则自动判断
   - `on`: 总是生成
   - `off`: 不生成
+
+### 批量模式
+- `inbox_file` (必填): 包含微信文章链接的 markdown 文件路径
+- `target_folder` (可选): 目标文件夹，默认 `20-阅读笔记`
+- `dry_run` (可选, bool): 预览模式，不实际处理
+- `force` (可选, bool): 强制重新处理已完成的 URL
+- `mark_done` (可选, bool): 处理后标记源文件，默认 true
+
+详见 `references/batch-processing.md`
 
 ---
 
@@ -352,6 +363,26 @@ Action:
   3. 覆盖 note.md / diagram.canvas / table.base
   4. 更新 meta.json
 Output: "🔄 已更新笔记"
+```
+
+### Example 4: 批量处理 inbox.md
+```bash
+User: "把 inbox.md 里的微信文章都归档一下"
+Action:
+  1. 读取 inbox.md，提取所有 mp.weixin.qq.com 链接
+  2. 去重并过滤已处理的 URL
+  3. 逐个调用 wechat_archiver 处理
+  4. 更新 inbox.md 标记已完成项
+Output: "✅ 批量归档完成：处理 5 篇，跳过 2 篇，失败 0 篇"
+```
+
+**批量处理命令**：
+```bash
+# 预览
+python3 .claude/skills/wechat-archiver/tools/batch_archiver.py --inbox inbox.md --dry-run
+
+# 执行
+python3 .claude/skills/wechat-archiver/tools/batch_archiver.py --inbox inbox.md
 ```
 
 ---

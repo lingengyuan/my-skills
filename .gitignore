@@ -149,3 +149,7 @@ desktop.ini
 
 # obsidian
 .obsidian/
+
+# Batch processing checkpoints and user inbox
+.batch_checkpoint_*.json
+inbox.md
