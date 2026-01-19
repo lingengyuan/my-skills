@@ -5,13 +5,13 @@
 Deterministic pipeline:
 1) Fetch HTML (curl)
 2) Extract title + #js_content inner HTML
-3) Download all images to ./images/<title>/001.<ext>...
+3) Download all images to output directory
 4) Convert正文HTML to Markdown (structure-first, keep key inline styles as HTML)
-5) Write Markdown to ./outputs/<title>/<title>.md
+5) Write Markdown with optional YAML frontmatter
 
-Output contract (relative to CWD):
-- Markdown: ./outputs/<title>/<title>.md
-- Images:   ./images/<title>/001.<ext> ... (3-digit, order in DOM)
+Output contract (configurable via config.json):
+- Default (v1 behavior): ./outputs/<title>/<title>.md, ./outputs/<title>/images/
+- With config: ./outputs/<folder>/<slug>/article.md, etc.
 - Create missing dirs, overwrite existing files.
 
 Usage:
@@ -20,11 +20,13 @@ Usage:
 Notes:
 - If an image download fails, Markdown keeps the original URL and a failure list is appended
   near the top.
+- Configuration is loaded from .claude/skills/wechat2md/config.json if present.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -35,11 +37,22 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from datetime import datetime
 from html import unescape
 from pathlib import Path
-from typing import Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from bs4 import BeautifulSoup, NavigableString, Tag
+
+# Import configuration modules - handle both direct execution and module import
+try:
+    from .config import load_config, Wechat2mdConfig
+    from .path_builder import PathBuilder, sanitize_title
+    from .frontmatter import FrontmatterGenerator
+except ImportError:
+    from config import load_config, Wechat2mdConfig
+    from path_builder import PathBuilder, sanitize_title
+    from frontmatter import FrontmatterGenerator
 
 
 UA = (
@@ -117,17 +130,7 @@ _ILLEGAL_FS_CHARS = re.compile(r"[\\/:*?\"<>|]+")
 _WHITESPACE = re.compile(r"\s+")
 
 
-def sanitize_title(title: str, max_len: int = 80) -> str:
-    t = unescape(title)
-    t = t.strip()
-    t = _ILLEGAL_FS_CHARS.sub("-", t)
-    t = _WHITESPACE.sub(" ", t).strip()
-    t = t.strip(".")  # avoid weird trailing dot names
-    if not t:
-        t = "wechat_article"
-    if len(t) > max_len:
-        t = t[:max_len].rstrip()
-    return t
+# sanitize_title is imported from path_builder module
 
 
 def extract_js_content_inner_html(html: str) -> str:
@@ -850,6 +853,64 @@ def build_md_document(
     return "\n".join(parts).rstrip() + "\n"
 
 
+def extract_author(html: str) -> Optional[str]:
+    """Extract author from HTML using meta tags."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Try meta author tag
+    author_meta = soup.find("meta", attrs={"name": "author"})
+    if author_meta and author_meta.get("content"):
+        return author_meta["content"].strip()
+
+    # Try og:article:author
+    og_author = soup.find("meta", attrs={"property": "og:article:author"})
+    if og_author and og_author.get("content"):
+        return og_author["content"].strip()
+
+    # Try finding author in page content (WeChat specific)
+    author_elem = soup.find(id="js_name")
+    if author_elem:
+        return author_elem.get_text(strip=True)
+
+    return None
+
+
+def write_meta_json(
+    output_dir: Path,
+    title: str,
+    url: str,
+    author: Optional[str],
+    created: datetime,
+    config: Wechat2mdConfig,
+) -> Optional[Path]:
+    """Write meta.json if enabled in config.
+
+    Returns:
+        Path to meta.json if written, None otherwise.
+    """
+    if not config.meta.enabled:
+        return None
+
+    meta: Dict[str, Any] = {
+        "title": title,
+        "source_url": url,
+        "created": created.isoformat(),
+        "folder": config.folder.default,
+    }
+
+    if author:
+        meta["author"] = author
+
+    if config.tags.default_tags:
+        meta["tags"] = config.tags.default_tags
+
+    meta_path = output_dir / "meta.json"
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    return meta_path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Convert WeChat article to Markdown with local images")
     parser.add_argument("url", help="WeChat article URL (mp.weixin.qq.com)")
@@ -861,21 +922,33 @@ def main() -> int:
         return 2
 
     try:
+        # Load configuration
+        config = load_config()
+        path_builder = PathBuilder(config)
+        frontmatter_gen = FrontmatterGenerator(config)
+
+        # Fetch and parse HTML
         html = fetch_html_with_curl(url)
         raw_title = extract_title(html)
-        title = sanitize_title(raw_title)
+        title = sanitize_title(raw_title, config.slug.max_length)
+        author = extract_author(html)
         js_inner_html = extract_js_content_inner_html(html)
 
+        # Current timestamp
+        created = datetime.now()
         cwd = Path.cwd()
-        outputs_root = cwd / "outputs" / title
-        images_dir = outputs_root / "images"
+
+        # Build output paths using configuration
+        outputs_root = path_builder.build_output_path(raw_title, url, created, cwd)
+        images_dirname = path_builder.get_images_dirname()
+        images_dir = outputs_root / images_dirname
+        article_filename = path_builder.build_article_filename(raw_title)
 
         ensure_dir(outputs_root)
         ensure_dir(images_dir)
 
-        # Images are stored in ./images/ subdirectory of the output folder
-        # This makes the article self-contained and portable
-        md_image_prefix = "./images/"
+        # Images prefix for markdown links
+        md_image_prefix = f"./{images_dirname}/"
 
         rewritten_html, manifest = download_images_and_rewrite_html(
             js_inner_html=js_inner_html,
@@ -885,14 +958,34 @@ def main() -> int:
         )
 
         body_md = html_to_markdown(rewritten_html)
+
+        # Generate frontmatter if enabled
+        frontmatter = frontmatter_gen.generate(
+            title=title,
+            author=author,
+            source_url=url,
+            created=created,
+        )
+
+        # Build full document
         full_md = build_md_document(title=title, body_md=body_md, image_manifest=manifest)
 
-        md_path = outputs_root / f"{title}.md"
+        # Prepend frontmatter if generated
+        if frontmatter:
+            full_md = frontmatter + full_md
+
+        md_path = outputs_root / article_filename
         with open(md_path, "w", encoding="utf-8") as f:
             f.write(full_md)
 
+        # Write meta.json if enabled
+        meta_path = write_meta_json(outputs_root, title, url, author, created, config)
+
+        # Output results
         print(str(md_path))
         print(str(images_dir))
+        if meta_path:
+            print(str(meta_path))
         return 0
 
     except Exception as e:

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "output": {
+    "base_dir": "outputs",
+    "path_template": "{base_dir}/{folder}/{slug}",
+    "article_filename": "article.md",
+    "images_dirname": "images"
+  },
+  "slug": {
+    "format": "date-title-hash",
+    "max_length": 80
+  },
+  "frontmatter": {
+    "enabled": true,
+    "include_fields": ["title", "author", "created", "source", "tags"]
+  },
+  "folder": {
+    "default": "20-阅读笔记",
+    "whitelist": [
+      "00-Inbox",
+      "10-项目",
+      "20-阅读笔记",
+      "30-方法论",
+      "40-工具脚本",
+      "50-运维排障",
+      "60-数据与表",
+      "90-归档"
+    ],
+    "enforce_whitelist": true
+  },
+  "tags": {
+    "default_tags": ["微信文章", "阅读笔记"],
+    "max_count": 8
+  },
+  "meta": {
+    "enabled": true
+  }
+}

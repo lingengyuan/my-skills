@@ -171,20 +171,23 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 
 #### Utility Skills
 
-5. **wechat-archiver**
-   - Orchestrates WeChat article archiving
-   - Combines wechat2md + note-creator
-   - Batch processing with progress bar and ETA
+5. **wechat-archiver** (Orchestrator)
+   - Orchestrates WeChat article archiving workflow
+   - Calls **wechat2md** for HTML → Markdown conversion
+   - Calls **note-creator** for structured note generation
+   - Batch processing from inbox.md with progress bar and ETA
    - Manages asset directories and metadata
    - Location: `.claude/skills/wechat-archiver/SKILL.md`
 
-6. **wechat2md**
+6. **wechat2md** (Called by wechat-archiver)
    - Converts WeChat articles to clean Markdown
    - Downloads all images to self-contained output directory
+   - **Knowledge Base Integration**: Configurable output paths, frontmatter, and metadata
    - Proper paragraph separation and code block formatting
    - Converts inline styles to native Markdown syntax
    - Auto-fix plain text URLs to markdown links
    - Auto-detect code language for syntax highlighting
+   - **Backward Compatible**: v1 behavior without config, enhanced features with config.json
    - Location: `.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -429,20 +432,23 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 
 #### 工具 Skills
 
-5. **wechat-archiver**
-   - 编排微信文章归档流程
-   - 结合 wechat2md + note-creator
-   - 批量处理支持进度条和预计剩余时间
+5. **wechat-archiver**（编排器）
+   - 编排微信文章归档的完整工作流
+   - 调用 **wechat2md** 进行 HTML → Markdown 转换
+   - 调用 **note-creator** 生成结构化笔记
+   - 支持从 inbox.md 批量处理，带进度条和预计剩余时间
    - 管理资产目录和元数据
    - 位置：`.claude/skills/wechat-archiver/SKILL.md`
 
-6. **wechat2md**
+6. **wechat2md**（被 wechat-archiver 调用）
    - 将微信文章转换为干净的 Markdown
    - 下载所有图片到自包含输出目录
+   - **知识库集成**：可配置输出路径、frontmatter 和元数据
    - 正确的段落分隔和代码块格式
    - 将内联样式转换为原生 Markdown 语法
    - 自动修复纯文本 URL 为 Markdown 链接
    - 自动检测代码语言用于语法高亮
+   - **向后兼容**：无配置时保持 v1 行为，有 config.json 时启用增强功能
    - 位置：`.claude/skills/wechat2md/SKILL.md`
 
 7. **sync_to_github**
@@ -540,6 +546,18 @@ When you encounter or fix a bug:
 ---
 
 ## 📝 Changelog
+
+### 2026-01-19
+- **wechat2md**: Add knowledge base configuration system
+  - **Configurable output paths**: Custom folder structure with template variables
+  - **Slug generation**: Support `title`, `date-title`, and `date-title-hash` formats
+  - **YAML frontmatter**: Optional frontmatter with configurable fields (title, author, created, source, tags)
+  - **Meta.json generation**: Optional metadata file for knowledge base integration
+  - **Tag management**: Default tags, deduplication, and max count limits
+  - **Folder whitelist**: Optional validation for knowledge base folder structure
+  - **Backward compatible**: v1 behavior without config.json, enhanced features with configuration
+  - **Comprehensive testing**: 107 unit, integration, and E2E tests (100% pass rate)
+  - See `.claude/skills/wechat2md/TEST_REPORT.md` for detailed test results
 
 ### 2026-01-18
 - **wechat-archiver**: Add batch processing from inbox.md

@@ -11,10 +11,116 @@
 - 图片处理为必选：必须下载正文中所有图片，并在 Markdown 中改写为本地相对路径。
 
 ## 输出契约（以运行时当前目录为根目录）
+
+### 默认输出（v1 行为，无配置文件时）
 - Markdown：`./outputs/<文章名称>/<文章名称>.md`
-- 图片：`./images/<文章名称>/001.<ext>`（从 001 开始，按正文出现顺序递增，三位补零）
-- 若 `outputs/`、`outputs/<文章名称>/`、`images/`、`images/<文章名称>/` 不存在：必须新建。
-- 若存在同名 Markdown 或同名图片文件：必须覆盖。
+- 图片：`./outputs/<文章名称>/images/001.<ext>`（从 001 开始，按正文出现顺序递增，三位补零）
+
+### 配置后输出（有 config.json 时）
+- Markdown：`./outputs/<folder>/<slug>/article.md`（带 YAML frontmatter）
+- 图片：`./outputs/<folder>/<slug>/images/`
+- 元数据：`./outputs/<folder>/<slug>/meta.json`
+
+## 配置系统
+
+### 配置文件位置
+`.claude/skills/wechat2md/config.json`
+
+### 默认配置（v1 兼容）
+无配置文件时，使用以下默认行为：
+```json
+{
+  "schema_version": "1.0",
+  "output": {
+    "base_dir": "outputs",
+    "path_template": "{base_dir}/{title}",
+    "article_filename": "{title}.md",
+    "images_dirname": "images"
+  },
+  "slug": {
+    "format": "title",
+    "max_length": 80
+  },
+  "frontmatter": {
+    "enabled": false
+  },
+  "folder": {
+    "default": null,
+    "enforce_whitelist": false
+  },
+  "tags": {
+    "default_tags": []
+  },
+  "meta": {
+    "enabled": false
+  }
+}
+```
+
+### 知识库适配配置（示例）
+复制 `config.example.json` 为 `config.json` 以启用知识库适配：
+```json
+{
+  "schema_version": "1.0",
+  "output": {
+    "base_dir": "outputs",
+    "path_template": "{base_dir}/{folder}/{slug}",
+    "article_filename": "article.md"
+  },
+  "slug": {
+    "format": "date-title-hash",
+    "max_length": 80
+  },
+  "frontmatter": {
+    "enabled": true,
+    "include_fields": ["title", "author", "created", "source", "tags"]
+  },
+  "folder": {
+    "default": "20-阅读笔记",
+    "whitelist": ["00-Inbox", "10-项目", "20-阅读笔记", "30-方法论",
+                  "40-工具脚本", "50-运维排障", "60-数据与表", "90-归档"],
+    "enforce_whitelist": true
+  },
+  "tags": {
+    "default_tags": ["微信文章", "阅读笔记"],
+    "max_count": 8
+  },
+  "meta": {
+    "enabled": true
+  }
+}
+```
+
+### 配置项说明
+
+#### output
+- `base_dir`: 输出根目录（默认 `outputs`）
+- `path_template`: 路径模板，支持变量 `{base_dir}`, `{title}`, `{slug}`, `{folder}`
+- `article_filename`: 文章文件名模板，支持 `{title}`
+- `images_dirname`: 图片子目录名（默认 `images`）
+
+#### slug
+- `format`: slug 格式
+  - `title`: 仅标题（默认）
+  - `date-title`: `YYYYMMDD-标题`
+  - `date-title-hash`: `YYYYMMDD-标题-abcdef`（6 位 URL 哈希）
+- `max_length`: 最大长度（默认 80）
+
+#### frontmatter
+- `enabled`: 是否生成 YAML frontmatter
+- `include_fields`: 包含的字段列表（`title`, `author`, `created`, `source`, `tags`）
+
+#### folder
+- `default`: 默认文件夹
+- `whitelist`: 文件夹白名单
+- `enforce_whitelist`: 是否强制白名单验证
+
+#### tags
+- `default_tags`: 默认标签列表
+- `max_count`: 最大标签数
+
+#### meta
+- `enabled`: 是否生成 meta.json
 
 ## 执行方式
 当用户提供 URL 后，运行：
@@ -23,16 +129,15 @@
 python3 .claude/skills/wechat2md/tools/wechat2md.py "<URL>"
 ```
 
-脚本会根据文章标题自动生成输出目录与文件。
+脚本会根据文章标题和配置自动生成输出目录与文件。
 
 ## 失败策略
 - 若抓取失败或未能提取正文（#js_content），应返回错误原因。
 - 若个别图片下载失败：
   - Markdown 中对该图片保留原始 URL（不阻断整体生成）
-  - 在 Markdown 顶部生成一个 “图片下载失败列表” 区块（包含序号与 URL）
-- 若 `outputs/`、`outputs/<文章名称>/`、`images/`、`images/<文章名称>/` 不存在，则创建。
-- 若存在同名文件（Markdown 或图片），直接覆盖。
-- Markdown 中图片引用使用相对路径：`![](../../images/<文章名称>/001.<ext>)`
+  - 在 Markdown 顶部生成一个 "图片下载失败列表" 区块（包含序号与 URL）
+- 若目录不存在，则创建。
+- 若存在同名文件，直接覆盖。
 
 ## 执行
 - 从用户输入中提取 URL（允许句子中混杂其它文字）。
@@ -41,10 +146,16 @@ python3 .claude/skills/wechat2md/tools/wechat2md.py "<URL>"
 - 运行完成后：
   - 输出生成的 Markdown 路径
   - 输出图片目录路径
+  - 输出 meta.json 路径（如果启用）
 
 ## 失败处理
 - 如果抓取失败或无法提取正文 `#js_content`，明确报错并退出（非静默失败）。
 - 如果个别图片下载失败：
   - Markdown 中该图片保留原始 URL（不阻断整篇文章生成）
-  - 在 Markdown 顶部附加“下载失败图片列表”
-  - 在 Markdown 顶部追加“图片下载失败列表”。
+  - 在 Markdown 顶部追加"图片下载失败列表"。
+- 如果配置文件格式错误，打印警告并使用默认配置。
+
+## 测试
+```bash
+python3 -m pytest .claude/skills/wechat2md/tests/ -v
+```
