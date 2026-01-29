@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""wechat2md: Convert a WeChat Official Account article to Markdown with local images.
+"""wechat2md: Convert WeChat Official Account articles to Markdown with local images.
 
-Deterministic pipeline:
+Supports two modes:
+1) Single article: Download a single WeChat article
+2) Album/collection: Download all articles from a WeChat "专题" (album)
+
+Deterministic pipeline for single articles:
 1) Fetch HTML (curl)
 2) Extract title + #js_content inner HTML
 3) Download all images to output directory
@@ -12,15 +16,24 @@ Deterministic pipeline:
 Output contract (configurable via config.json):
 - Default (v1 behavior): ./outputs/<title>/<title>.md, ./outputs/<title>/images/
 - With config: ./outputs/<folder>/<slug>/article.md, etc.
+- Albums: ./outputs/<folder>/<album-name>/_index.md + numbered article directories
 - Create missing dirs, overwrite existing files.
 
 Usage:
+  # Single article
   python3 wechat2md.py "https://mp.weixin.qq.com/s/xxxxxxxx"
+
+  # Album (auto-detected)
+  python3 wechat2md.py "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=...&album_id=..."
+
+  # Explicit album mode
+  python3 wechat2md.py --album "https://..."
 
 Notes:
 - If an image download fails, Markdown keeps the original URL and a failure list is appended
   near the top.
 - Configuration is loaded from .claude/skills/wechat2md/config.json if present.
+- Albums skip inaccessible articles and continue downloading others.
 """
 
 from __future__ import annotations
@@ -49,10 +62,12 @@ try:
     from .config import load_config, Wechat2mdConfig
     from .path_builder import PathBuilder, sanitize_title
     from .frontmatter import FrontmatterGenerator
+    from .album import is_album_url, download_album_main
 except ImportError:
     from config import load_config, Wechat2mdConfig
     from path_builder import PathBuilder, sanitize_title
     from frontmatter import FrontmatterGenerator
+    from album import is_album_url, download_album_main
 
 
 UA = (
@@ -912,8 +927,15 @@ def write_meta_json(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Convert WeChat article to Markdown with local images")
-    parser.add_argument("url", help="WeChat article URL (mp.weixin.qq.com)")
+    parser = argparse.ArgumentParser(
+        description="Convert WeChat article or album to Markdown with local images"
+    )
+    parser.add_argument("url", help="WeChat article or album URL (mp.weixin.qq.com)")
+    parser.add_argument(
+        "--album",
+        action="store_true",
+        help="Force album mode (auto-detected if URL contains /mp/appmsgalbum)"
+    )
     args = parser.parse_args()
 
     url = args.url.strip()
@@ -921,6 +943,11 @@ def main() -> int:
         print("ERROR: empty URL", file=sys.stderr)
         return 2
 
+    # Detect and dispatch based on URL type or --album flag
+    if args.album or is_album_url(url):
+        return download_album_main(url)
+
+    # Single article mode (existing behavior)
     try:
         # Load configuration
         config = load_config()

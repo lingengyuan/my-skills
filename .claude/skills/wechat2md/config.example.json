@@ -34,5 +34,11 @@
   },
   "meta": {
     "enabled": true
+  },
+  "album": {
+    "delay_seconds": 1.0,
+    "max_articles": 0,
+    "generate_index": true,
+    "index_filename": "_index.md"
   }
 }

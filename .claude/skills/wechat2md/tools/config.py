@@ -51,6 +51,12 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     },
     "meta": {
         "enabled": False
+    },
+    "album": {
+        "delay_seconds": 1.0,
+        "max_articles": 0,
+        "generate_index": True,
+        "index_filename": "_index.md"
     }
 }
 
@@ -103,6 +109,15 @@ class MetaConfig:
 
 
 @dataclass
+class AlbumConfig:
+    """Configuration for album/collection downloads."""
+    delay_seconds: float = 1.0      # Delay between article downloads
+    max_articles: int = 0           # 0 = no limit
+    generate_index: bool = True     # Generate _index.md
+    index_filename: str = "_index.md"
+
+
+@dataclass
 class Wechat2mdConfig:
     """Main configuration class for wechat2md."""
     schema_version: str = "1.0"
@@ -112,6 +127,7 @@ class Wechat2mdConfig:
     folder: FolderConfig = field(default_factory=FolderConfig)
     tags: TagsConfig = field(default_factory=TagsConfig)
     meta: MetaConfig = field(default_factory=MetaConfig)
+    album: AlbumConfig = field(default_factory=AlbumConfig)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Wechat2mdConfig":
@@ -148,6 +164,12 @@ class Wechat2mdConfig:
             ),
             meta=MetaConfig(
                 enabled=data.get("meta", {}).get("enabled", False),
+            ),
+            album=AlbumConfig(
+                delay_seconds=data.get("album", {}).get("delay_seconds", 1.0),
+                max_articles=data.get("album", {}).get("max_articles", 0),
+                generate_index=data.get("album", {}).get("generate_index", True),
+                index_filename=data.get("album", {}).get("index_filename", "_index.md"),
             ),
         )
 

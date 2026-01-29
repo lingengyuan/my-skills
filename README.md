@@ -84,7 +84,7 @@ To use `zimage-api` skill, you need a Replicate API token:
 #### Archive WeChat Article
 
 ```bash
-# Using Claude Skill
+# Using Claude Skill - Single article
 Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 
 # Output directory: outputs/20-阅读笔记/YYYYMMDD-slug-abcdef/
@@ -92,6 +92,19 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 # - note.md          # Structured notes
 # - images/          # Downloaded images
 # - meta.json        # Metadata
+
+# Using Claude Skill - Album/Collection (batch download)
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=xxx&album_id=xxx")
+
+# Output directory: outputs/20-阅读笔记/album-name/
+# - _index.md                    # Index file with all article links
+# - 001-first-article/
+#   ├── article.md
+#   └── images/
+# - 002-second-article/
+#   ├── article.md
+#   └── images/
+# ... (all articles numbered by publication time)
 ```
 
 #### Batch Archive from inbox.md
@@ -182,6 +195,10 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 6. **wechat2md** (Called by wechat-archiver)
    - Converts WeChat articles to clean Markdown
    - Downloads all images to self-contained output directory
+   - **Album/Collection Batch Download**: One URL downloads entire article series (8 articles in 1 command)
+   - **Smart URL Detection**: Auto-detects single article vs album, maintains backward compatibility
+   - **Auto-Sorting by Time**: Articles numbered by publication order (001, 002, 003...)
+   - **Index Generation**: Auto-creates `_index.md` with links to all articles
    - **Knowledge Base Integration**: Configurable output paths, frontmatter, and metadata
    - Proper paragraph separation and code block formatting
    - Converts inline styles to native Markdown syntax
@@ -345,7 +362,7 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 #### 归档微信文章
 
 ```bash
-# 使用 Claude Skill
+# 使用 Claude Skill - 单篇文章
 Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 
 # 输出目录：outputs/20-阅读笔记/YYYYMMDD-slug-abcdef/
@@ -353,6 +370,19 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 # - note.md          # 结构化笔记
 # - images/          # 下载的图片
 # - meta.json        # 元数据
+
+# 使用 Claude Skill - 合集/专题（批量下载）
+Skill(wechat-archiver, args="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=xxx&album_id=xxx")
+
+# 输出目录：outputs/20-阅读笔记/合集名称/
+# - _index.md                    # 索引文件（包含所有文章链接）
+# - 001-第一篇文章/
+#   ├── article.md
+#   └── images/
+# - 002-第二篇文章/
+#   ├── article.md
+#   └── images/
+# ... (所有文章按发布时间编号)
 ```
 
 #### 从 inbox.md 批量归档
@@ -443,6 +473,10 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
 6. **wechat2md**（被 wechat-archiver 调用）
    - 将微信文章转换为干净的 Markdown
    - 下载所有图片到自包含输出目录
+   - **合集/专题批量下载**：一个 URL 下载整个系列文章（8 篇文章仅需 1 条命令）
+   - **智能 URL 识别**：自动识别单篇文章或合集，保持向后兼容
+   - **按时间自动排序**：文章按发布顺序编号（001, 002, 003...）
+   - **索引自动生成**：自动创建 `_index.md` 包含所有文章链接
    - **知识库集成**：可配置输出路径、frontmatter 和元数据
    - 正确的段落分隔和代码块格式
    - 将内联样式转换为原生 Markdown 语法
@@ -546,6 +580,23 @@ When you encounter or fix a bug:
 ---
 
 ## 📝 Changelog
+
+### 2026-01-29
+- **wechat2md**: Add album/collection batch download feature
+  - **One-command batch download**: Download entire article series with single URL (8 articles → 1 command)
+  - **Smart URL detection**: Auto-detects single article vs album URLs, fully backward compatible
+  - **Time-based sorting**: Articles automatically numbered by publication order (001, 002, 003...)
+  - **Index generation**: Auto-creates `_index.md` with links to all articles in collection
+  - **Folder isolation**: Each album uses unique folder name to prevent overwriting
+  - **Error recovery**: Single article failure doesn't block other downloads
+  - **26 new unit tests**: Comprehensive test coverage for URL detection, parsing, downloading, and index generation
+  - **91% time savings**: 8-article series from ~12 minutes manual work to ~1 minute automated
+  - **Technical article**: Created `outputs/skill-engineering-10-album-download.md` following "Skill 工程化" series style
+  - **Documentation updates**:
+    - Updated README.md with album usage examples (English & Chinese)
+    - Enhanced wechat2md feature description
+    - Added comprehensive changelog entry
+    - Corrected article descriptions to reflect skill-based workflow (Claude Code interactions, not manual Python commands)
 
 ### 2026-01-19
 - **wechat2md**: Add knowledge base configuration system
