@@ -1,0 +1,4 @@
+interface:
+  display_name: "README Maintainer"
+  short_description: "Update project README using current model"
+  default_prompt: "Update this repository README.md using current session model and local codebase facts."
