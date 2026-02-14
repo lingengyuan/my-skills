@@ -10,8 +10,8 @@ Features:
 - Mark processed URLs in source file
 
 Usage:
-  python batch_archiver.py --inbox inbox.md [options]
-  python batch_archiver.py --inbox inbox.md --dry-run  # Preview only
+  python3 batch_archiver.py --inbox inbox.md [options]
+  python3 batch_archiver.py --inbox inbox.md --dry-run  # Preview only
 """
 
 import argparse
@@ -193,7 +193,7 @@ def run_single_archive(url: str, cwd: Path, folder: str, force: bool = False) ->
     """Run wechat_archiver.py for a single URL."""
     script_path = cwd / ".claude" / "skills" / "wechat-archiver" / "tools" / "wechat_archiver.py"
 
-    cmd = ["python", str(script_path), url, "--folder", folder]
+    cmd = [sys.executable, str(script_path), url, "--folder", folder]
     if force:
         cmd.append("--force")
 

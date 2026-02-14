@@ -679,7 +679,13 @@ def download_album_main(url: str) -> int:
             print(str(result.index_file))
         print(str(result.output_dir))
 
-        return 0 if result.failed == 0 else 0  # Return 0 even with partial failures
+        if result.failed > 0:
+            print(
+                f"WARNING: {result.failed} article(s) failed in album download",
+                file=sys.stderr,
+            )
+            return 1
+        return 0
 
     except ValueError as e:
         print(f"ERROR: {e}", file=sys.stderr)

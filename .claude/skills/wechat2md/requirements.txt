@@ -9,3 +9,6 @@ lxml>=4.9.0
 
 # Optional but recommended
 Pillow>=10.0.0  # For image processing if needed
+
+# Test dependencies
+pytest>=7.0.0

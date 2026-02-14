@@ -60,16 +60,16 @@ python .claude/skills/wechat-archiver/tools/batch_archiver.py --inbox inbox.md
 
 ```bash
 # 预览
-python batch_archiver.py --inbox ~/notes/inbox.md --dry-run
+python3 batch_archiver.py --inbox ~/notes/inbox.md --dry-run
 
 # 处理到指定文件夹
-python batch_archiver.py --inbox inbox.md --folder "30-方法论"
+python3 batch_archiver.py --inbox inbox.md --folder "30-方法论"
 
 # 强制重新处理所有
-python batch_archiver.py --inbox inbox.md --force --reset-checkpoint
+python3 batch_archiver.py --inbox inbox.md --force --reset-checkpoint
 
 # 不标记源文件
-python batch_archiver.py --inbox inbox.md --no-mark
+python3 batch_archiver.py --inbox inbox.md --no-mark
 ```
 
 ## 断点续传

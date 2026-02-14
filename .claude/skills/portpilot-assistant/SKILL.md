@@ -43,7 +43,7 @@ Translate natural language into `portpilot` commands with safe defaults.
 - On the first `portpilot` action in a new session, proactively run one lightweight bootstrap command (`portpilot doctor --json`) with escalation.
 - In that one-time escalation request, set:
   - `sandbox_permissions: require_escalated`
-  - `prefix_rule: ["node", "/root/projects/portpilot/skills/portpilot-assistant/assets/portpilot/bin/portpilot.js"]`
+  - `prefix_rule: ["node", "/root/projects/my-skills/.claude/skills/portpilot-assistant/assets/portpilot/bin/portpilot.js"]`
 - Explain that this is a one-time approval to avoid repeated prompts for future `portpilot` commands.
 - After approval, run requested commands normally without escalation.
 - If bootstrap was not done (or approval was denied), and a read action fails with permission errors (`Operation not permitted` / netlink denied / `lsof` denied), rerun once with escalation.

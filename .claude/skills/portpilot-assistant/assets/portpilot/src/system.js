@@ -28,6 +28,34 @@ function runRaw(command, args, { timeout = 3000 } = {}) {
   };
 }
 
+function stderrHasPermissionHint(stderr = '') {
+  const text = String(stderr).toLowerCase();
+  return (
+    text.includes('operation not permitted') ||
+    text.includes('permission denied') ||
+    text.includes('cannot open netlink socket') ||
+    text.includes('cannot open a network socket')
+  );
+}
+
+function resultHasPermissionIssue(result) {
+  if (!result) {
+    return false;
+  }
+  const code = result.error?.code;
+  if (code === 'EPERM' || code === 'EACCES') {
+    return true;
+  }
+  return stderrHasPermissionHint(result.stderr);
+}
+
+function summarizeProbeResults(results) {
+  return {
+    probeFailed: results.length > 0 && results.every((result) => !result.ok),
+    permissionDenied: results.some((result) => resultHasPermissionIssue(result))
+  };
+}
+
 export function which(cmd, options = {}) {
   if (!cmd) {
     return '';
@@ -336,10 +364,13 @@ function parseLsofListening(stdout) {
 export function listListeningPorts(options = {}) {
   const timeout = options.timeout ?? 3000;
   const diagnostics = [];
+  const probeResults = [];
 
   const tcp = runRaw('ss', ['-ltnp'], { timeout });
+  probeResults.push(tcp);
   diagnostics.push({ probe: 'ss-tcp', ok: tcp.ok, status: tcp.status, stderr: tcp.stderr.trim() });
   const udp = runRaw('ss', ['-lunp'], { timeout });
+  probeResults.push(udp);
   diagnostics.push({ probe: 'ss-udp', ok: udp.ok, status: udp.status, stderr: udp.stderr.trim() });
 
   let records = [
@@ -349,6 +380,7 @@ export function listListeningPorts(options = {}) {
 
   if (records.length === 0) {
     const lsof = runRaw('lsof', ['-nP', '-iTCP', '-sTCP:LISTEN'], { timeout });
+    probeResults.push(lsof);
     diagnostics.push({ probe: 'lsof-listen', ok: lsof.ok, status: lsof.status, stderr: lsof.stderr.trim() });
     records = parseLsofListening(lsof.stdout);
   }
@@ -360,41 +392,58 @@ export function listListeningPorts(options = {}) {
   }
 
   const out = [...dedupe.values()].sort((a, b) => a.port - b.port);
-  return { records: out, diagnostics };
+  if (out.length > 0) {
+    return { records: out, diagnostics, probeFailed: false, permissionDenied: false };
+  }
+  const { probeFailed, permissionDenied } = summarizeProbeResults(probeResults);
+  return { records: out, diagnostics, probeFailed, permissionDenied };
 }
 
 export function probeTcpPort(port, options = {}) {
   const timeout = options.timeout ?? 3000;
   const diagnostics = [];
+  const probeResults = [];
 
   const lsof = runRaw('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN'], { timeout });
+  probeResults.push(lsof);
   diagnostics.push({ probe: 'lsof', ok: lsof.ok, status: lsof.status, stderr: lsof.stderr.trim() });
   if (lsof.ok && lsof.stdout.trim()) {
-    return { occupied: true, records: parseLsofOutput(port, lsof.stdout, { timeout }), diagnostics };
+    return {
+      occupied: true,
+      records: parseLsofOutput(port, lsof.stdout, { timeout }),
+      diagnostics,
+      probeFailed: false,
+      permissionDenied: false
+    };
   }
 
   const ss = runRaw('ss', ['-lptn', `sport = :${port}`], { timeout });
+  probeResults.push(ss);
   diagnostics.push({ probe: 'ss', ok: ss.ok, status: ss.status, stderr: ss.stderr.trim() });
   if (ss.ok && ss.stdout.trim()) {
     const records = parseSsOutput(port, ss.stdout, { timeout });
     if (records.length > 0) {
-      return { occupied: true, records, diagnostics };
+      return { occupied: true, records, diagnostics, probeFailed: false, permissionDenied: false };
     }
   }
 
   const fuser = runRaw('fuser', ['-n', 'tcp', String(port)], { timeout });
+  probeResults.push(fuser);
   diagnostics.push({ probe: 'fuser', ok: fuser.ok, status: fuser.status, stderr: fuser.stderr.trim() });
   if (fuser.ok && fuser.stdout.trim()) {
     const records = parseFuserOutput(port, fuser.stdout, { timeout });
     if (records.length > 0) {
-      return { occupied: true, records, diagnostics };
+      return { occupied: true, records, diagnostics, probeFailed: false, permissionDenied: false };
     }
   }
 
+  const { probeFailed, permissionDenied } = summarizeProbeResults(probeResults);
   return {
     occupied: false,
     records: [],
-    diagnostics
+    diagnostics,
+    probeFailed,
+    permissionDenied
   };
 }
 

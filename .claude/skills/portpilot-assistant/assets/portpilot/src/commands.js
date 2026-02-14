@@ -53,6 +53,34 @@ function classifyPermissionError(error) {
   return error.code === 'EPERM' || error.code === 'EACCES';
 }
 
+function diagnosticsHavePermissionIssue(diagnostics = []) {
+  return diagnostics.some((diag) => {
+    const text = String(diag?.stderr || '').toLowerCase();
+    return (
+      text.includes('operation not permitted') ||
+      text.includes('permission denied') ||
+      text.includes('cannot open netlink socket') ||
+      text.includes('cannot open a network socket')
+    );
+  });
+}
+
+function createProbeError(command, data, probe, permissionMessage) {
+  const permissionDenied = Boolean(probe?.permissionDenied) || diagnosticsHavePermissionIssue(probe?.diagnostics);
+  return createResult(command, data, {
+    ok: false,
+    exitCode: permissionDenied ? EXIT_CODES.PERMISSION_DENIED : EXIT_CODES.SYSTEM_PROBE_FAILED,
+    errors: [
+      toCommandError(
+        permissionDenied ? 'probe-permission-denied' : 'probe-failed',
+        permissionDenied
+          ? (permissionMessage || 'Unable to inspect port state due permission restrictions')
+          : 'Unable to inspect port state due probe failures'
+      )
+    ]
+  });
+}
+
 export async function cmdWho(args, global) {
   try {
     const port = parsePort(args[0]);
@@ -60,6 +88,14 @@ export async function cmdWho(args, global) {
     const records = normalizeRecords(probe.records);
 
     if (records.length === 0) {
+      if (probe.probeFailed) {
+        return createProbeError(
+          'who',
+          { port, occupied: false, records: [], diagnostics: probe.diagnostics },
+          probe,
+          `Unable to inspect port ${port} due permission restrictions`
+        );
+      }
       return createResult('who', { port, occupied: false, records: [], diagnostics: probe.diagnostics }, {
         ok: false,
         exitCode: EXIT_CODES.PORT_NOT_OCCUPIED,
@@ -98,26 +134,46 @@ export async function cmdPick(args, global) {
     const leaseMs = options.leaseMs ? Math.max(1000, Math.floor(options.leaseMs)) : 20000;
 
     const picked = [];
+    const unknownPorts = [];
     for (let p = range.start; p <= range.end && picked.length < count; p += 1) {
       if (exclude.has(p)) {
         continue;
       }
       const probe = probeTcpPort(p, global);
+      if (probe.probeFailed) {
+        unknownPorts.push({ port: p, diagnostics: probe.diagnostics });
+        continue;
+      }
       if (!probe.occupied) {
         picked.push(p);
       }
     }
 
     if (picked.length < count) {
+      const permissionDenied = unknownPorts.some((item) => diagnosticsHavePermissionIssue(item.diagnostics));
+      const hasProbeFailures = unknownPorts.length > 0;
       return createResult('pick', {
         picked,
         checkedRange: `${range.start}-${range.end}`,
         requestedCount: count,
+        unknownCount: unknownPorts.length,
+        unknownPorts: unknownPorts.map((item) => item.port),
         strategy: 'lowest-first'
       }, {
         ok: false,
-        exitCode: EXIT_CODES.SYSTEM_PROBE_FAILED,
-        errors: [toCommandError('insufficient-ports', `Only found ${picked.length} available ports`)]
+        exitCode: hasProbeFailures
+          ? (permissionDenied ? EXIT_CODES.PERMISSION_DENIED : EXIT_CODES.SYSTEM_PROBE_FAILED)
+          : EXIT_CODES.SYSTEM_PROBE_FAILED,
+        errors: [
+          hasProbeFailures
+            ? toCommandError(
+              permissionDenied ? 'probe-permission-denied' : 'probe-failed',
+              permissionDenied
+                ? `Unable to safely inspect ${unknownPorts.length} port(s) in range ${range.start}-${range.end}`
+                : `Probe failed for ${unknownPorts.length} port(s) in range ${range.start}-${range.end}`
+            )
+            : toCommandError('insufficient-ports', `Only found ${picked.length} available ports`)
+        ]
       });
     }
 
@@ -165,6 +221,14 @@ export async function cmdClaim(args, global) {
     }
 
     const probe = probeTcpPort(lease.port, global);
+    if (probe.probeFailed) {
+      return createProbeError(
+        'claim',
+        { leaseId, port: lease.port, diagnostics: probe.diagnostics },
+        probe,
+        `Unable to verify lease port ${lease.port} due permission restrictions`
+      );
+    }
     if (probe.occupied) {
       return createResult('claim', {
         leaseId,
@@ -302,6 +366,20 @@ export async function cmdScan(args, global) {
     }
 
     const scan = listListeningPorts(global);
+    if (scan.probeFailed) {
+      return createProbeError(
+        'scan',
+        {
+          protocol,
+          total: 0,
+          ports: { tcp: [], udp: [] },
+          records: [],
+          diagnostics: scan.diagnostics
+        },
+        scan,
+        'Unable to scan listening ports due permission restrictions'
+      );
+    }
     const records = scan.records.filter((record) => protocol === 'both' || record.protocol === protocol);
     const tcpPorts = [...new Set(records.filter((r) => r.protocol === 'tcp').map((r) => r.port))].sort((a, b) => a - b);
     const udpPorts = [...new Set(records.filter((r) => r.protocol === 'udp').map((r) => r.port))].sort((a, b) => a - b);
@@ -343,6 +421,14 @@ export async function cmdFree(args, global) {
     const initial = probeTcpPort(port, global);
     const records = normalizeRecords(initial.records);
     if (records.length === 0) {
+      if (initial.probeFailed) {
+        return createProbeError(
+          'free',
+          { port, released: false, diagnostics: initial.diagnostics },
+          initial,
+          `Unable to inspect port ${port} due permission restrictions`
+        );
+      }
       return createResult('free', { port, released: false }, {
         ok: false,
         exitCode: EXIT_CODES.PORT_NOT_OCCUPIED,
@@ -370,6 +456,14 @@ export async function cmdFree(args, global) {
     }
 
     const recheck = probeTcpPort(port, global);
+    if (recheck.probeFailed) {
+      return createProbeError(
+        'free',
+        { port, released: false, diagnostics: recheck.diagnostics },
+        recheck,
+        `Unable to re-check port ${port} due permission restrictions`
+      );
+    }
     const current = normalizeRecords(recheck.records);
     for (const target of targets) {
       const match = current.find((record) => fingerprint(record) === target.fingerprint);
@@ -416,6 +510,14 @@ export async function cmdFree(args, global) {
     if (signal === 'SIGTERM') {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const afterTerm = probeTcpPort(port, global);
+      if (afterTerm.probeFailed) {
+        return createProbeError(
+          'free',
+          { port, released: false, killed, diagnostics: afterTerm.diagnostics },
+          afterTerm,
+          `Unable to verify port ${port} after SIGTERM due permission restrictions`
+        );
+      }
       if (afterTerm.occupied) {
         if (!options.yes) {
           const confirmKill = await confirmPrompt(`Port ${port} is still occupied. Escalate to SIGKILL?`);
@@ -445,6 +547,21 @@ export async function cmdFree(args, global) {
     }
 
     const finalProbe = probeTcpPort(port, global);
+    if (finalProbe.probeFailed) {
+      return createProbeError(
+        'free',
+        {
+          port,
+          released: false,
+          killed,
+          targetFingerprint: targets.map((x) => x.fingerprint),
+          revalidated: false,
+          diagnostics: finalProbe.diagnostics
+        },
+        finalProbe,
+        `Unable to verify final port state for ${port} due permission restrictions`
+      );
+    }
     return createResult('free', {
       port,
       released: !finalProbe.occupied,

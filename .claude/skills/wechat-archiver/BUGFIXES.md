@@ -18,11 +18,11 @@
 **使用示例**：
 ```bash
 # 默认：包含 asset_id
-python wechat_archiver.py "https://mp.weixin.qq.com/s/xxx"
+python3 wechat_archiver.py "https://mp.weixin.qq.com/s/xxx"
 # 输出：20260111-文章标题-41f7f7/
 
 # 使用 --simple-slug
-python wechat_archiver.py "https://mp.weixin.qq.com/s/xxx" --simple-slug
+python3 wechat_archiver.py "https://mp.weixin.qq.com/s/xxx" --simple-slug
 # 输出：20260111-文章标题/
 ```
 

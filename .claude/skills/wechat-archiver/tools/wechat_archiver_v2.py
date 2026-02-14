@@ -13,13 +13,13 @@ Workflow:
 1) Call wechat2md_v2 to fetch article (returns article.md + images/ + meta.json)
 2) Read metadata and check idempotency
 3) Decide artifact_plan (auto canvas/base)
-4) Call note-creator to generate note.md + diagram.canvas + table.base
+4) Prepare note-creator prompt/context (manual invocation in next step)
 5) Merge meta.json
 6) Cleanup temporary files
 7) Return execution summary
 
 Usage:
-  python wechat_archiver_v2.py <url> [options]
+  python3 wechat_archiver_v2.py <url> [options]
 """
 
 import argparse
@@ -308,13 +308,10 @@ def call_note_creator(
     context_files: List[Path],
     cwd: Path
 ) -> Dict:
-    """Call note-creator skill.
+    """Build note-creator invocation payload.
 
-    For now, this is a placeholder - the actual invocation is done by Claude.
-    When using the skill through Claude, it will handle this step.
+    Actual note-creator execution is performed by the skill runtime.
     """
-    # This is handled by Claude's skill system
-    # We just return the prepared information
     return {
         "success": True,
         "user_prompt": user_prompt,
@@ -433,7 +430,7 @@ def main():
             print("✓ Skipping note generation")
             return 0
 
-        print(f"✓ Need to generate note ({idempotency['reason']})")
+        print(f"✓ Need to refresh note context ({idempotency['reason']})")
 
         # Step 3: Decide artifact plan
         print("\n" + "=" * 60)
@@ -456,7 +453,7 @@ def main():
 
         # Step 4: Prepare input for note-creator
         print("\n" + "=" * 60)
-        print("Step 4: Preparing note generation...")
+        print("Step 4: Preparing note-creator input...")
         print("=" * 60)
 
         title = wechat2md_meta.get("title", "Unknown Title")
@@ -496,7 +493,7 @@ def main():
         print(f"Images:         {images_dir} ({images_count} images)")
         print(f"Asset ID:       {asset_id}")
         print(f"Content hash:   {content_hash}")
-        print(f"\nNext step: Invoke note-creator skill")
+        print(f"\nNext step: Invoke note-creator skill manually")
         print(f"  Context files: {article_md_path}")
         print(f"  User prompt:   {user_prompt[:100]}...")
 

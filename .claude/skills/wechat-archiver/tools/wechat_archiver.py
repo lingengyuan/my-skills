@@ -13,7 +13,7 @@ Orchestration workflow:
 8) Return execution summary
 
 Usage:
-  python wechat_archiver.py <url> [options]
+  python3 wechat_archiver.py <url> [options]
 """
 
 import argparse
@@ -203,7 +203,7 @@ def run_wechat2md(url: str, cwd: Path) -> Dict:
 
     # Run wechat2md
     result = subprocess.run(
-        ["python", str(script), url],
+        [sys.executable, str(script), url],
         capture_output=True,
         text=True,
         encoding='utf-8',
