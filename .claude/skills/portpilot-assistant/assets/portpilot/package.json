@@ -1,0 +1,24 @@
+{
+  "name": "portpilot-cli",
+  "version": "0.1.0",
+  "description": "PortPilot: zero-install port conflict discovery and management CLI",
+  "type": "module",
+  "bin": {
+    "portpilot": "bin/portpilot.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin",
+    "src",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "start": "node bin/portpilot.js"
+  },
+  "license": "MIT"
+}

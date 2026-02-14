@@ -52,6 +52,7 @@ To use `zimage-api` skill, you need a Replicate API token:
 | ├── `wechat-archiver/` | WeChat article archiving workflow |
 | ├── `wechat2md/` | WeChat article to Markdown converter |
 | ├── `sync_to_github/` | Automated git commit and push |
+| ├── `portpilot-assistant/` | Natural-language local dev port management |
 | ├── `zimage-api/` | Manga style image generation (Cloud API) |
 | ├── `zimage-local/` | Manga style image generation (Local ComfyUI) |
 | └── `zimage-core/` | Shared core module for Z-Image skills |
@@ -213,16 +214,22 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - Optional push to remote
    - Location: `.claude/skills/sync_to_github/SKILL.md`
 
+8. **portpilot-assistant**
+   - Natural-language local dev port management via PortPilot CLI
+   - Supports read actions (`scan`, `who`, `pick`, `doctor`) with direct execution
+   - Requires explicit confirmation for write actions (`free`, `init --force`, `config migrate`)
+   - Location: `.claude/skills/portpilot-assistant/SKILL.md`
+
 #### Image Generation Skills
 
-8. **zimage-api**
+9. **zimage-api**
    - Generate manga-style images using Replicate cloud API
    - Supports Hojo Tsukasa (B&W manga) and Urushihara Satoshi (90s anime) styles
    - Claude Code analyzes images and generates prompts automatically
    - No local GPU required
    - Location: `.claude/skills/zimage-api/SKILL.md`
 
-9. **zimage-local**
+10. **zimage-local**
    - Generate manga-style images using local ComfyUI
    - Same style support as API version
    - **Completely free** - no API costs
@@ -330,6 +337,7 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 | ├── `wechat-archiver/` | 微信文章归档工作流 |
 | ├── `wechat2md/` | 微信文章转 Markdown 转换器 |
 | ├── `sync_to_github/` | 自动提交和推送 |
+| ├── `portpilot-assistant/` | 本地开发端口自然语言管理 |
 | ├── `zimage-api/` | 漫画风格图像生成（云端 API） |
 | ├── `zimage-local/` | 漫画风格图像生成（本地 ComfyUI） |
 | └── `zimage-core/` | Z-Image 共享核心模块 |
@@ -491,16 +499,22 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - 可选推送到远程
    - 位置：`.claude/skills/sync_to_github/SKILL.md`
 
+8. **portpilot-assistant**
+   - 通过 PortPilot CLI 用自然语言管理本地开发端口
+   - 支持 `scan`、`who`、`pick`、`doctor` 等只读操作直接执行
+   - 对 `free`、`init --force`、`config migrate` 等写操作要求显式确认
+   - 位置：`.claude/skills/portpilot-assistant/SKILL.md`
+
 #### 图像生成 Skills
 
-8. **zimage-api**
+9. **zimage-api**
    - 使用 Replicate 云端 API 生成漫画风格图像
    - 支持北条司风格（黑白漫画）和漆原智志风格（90年代动漫）
    - Claude Code 自动分析图片并生成提示词
    - 无需本地 GPU
    - 位置：`.claude/skills/zimage-api/SKILL.md`
 
-9. **zimage-local**
+10. **zimage-local**
    - 使用本地 ComfyUI 生成漫画风格图像
    - 与 API 版支持相同的风格
    - **完全免费** - 无 API 费用
@@ -580,6 +594,11 @@ When you encounter or fix a bug:
 ---
 
 ## 📝 Changelog
+
+### 2026-02-14
+- **portpilot-assistant**: Add natural-language local dev port management skill
+  - Added `.claude/skills/portpilot-assistant` to the project skill set
+  - Updated README project structure and skill references (English & Chinese)
 
 ### 2026-01-29
 - **wechat2md**: Add album/collection batch download feature
