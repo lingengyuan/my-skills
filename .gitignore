@@ -7,6 +7,12 @@ venv/
 ENV/
 env/
 
+# uv cache
+.uv-cache/
+
+# JS dependency directories
+node_modules/
+
 # Python cache
 __pycache__/
 *.py[cod]
