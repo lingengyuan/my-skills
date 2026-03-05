@@ -70,6 +70,7 @@ Skill(readme-maintainer, "Update README based on current repository facts")
 | `portpilot-assistant` | Utility | Natural-language local port management | `.claude/skills/portpilot-assistant` |
 | `zimage-api` | Image | Generate manga-style images with Replicate API | `.claude/skills/zimage-api` |
 | `zimage-local` | Image | Generate manga-style images with local ComfyUI | `.claude/skills/zimage-local` |
+| `insight-collector` | Knowledge | Analyze URLs/code/images/docs and archive insights into CodeSnippets | `.claude/skills/insight-collector` |
 
 Shared module (not a standalone skill):
 
@@ -95,7 +96,8 @@ Shared module (not a standalone skill):
 │       ├── portpilot-assistant/
 │       ├── zimage-api/
 │       ├── zimage-local/
-│       └── zimage-core/
+│       ├── zimage-core/
+│       └── insight-collector/
 ├── .postmortem/
 ├── docs/
 ├── requirements.txt
@@ -222,6 +224,7 @@ Skill(readme-maintainer, "基于当前仓库事实更新 README")
 | `portpilot-assistant` | 工具 | 自然语言本地端口管理 | `.claude/skills/portpilot-assistant` |
 | `zimage-api` | 图像 | 通过 Replicate API 生成漫画风图像 | `.claude/skills/zimage-api` |
 | `zimage-local` | 图像 | 通过本地 ComfyUI 生成漫画风图像 | `.claude/skills/zimage-local` |
+| `insight-collector` | 知识 | 分析 URL/代码/图片/文档，提取洞察归档至 CodeSnippets | `.claude/skills/insight-collector` |
 
 共享模块（非独立 skill）：
 
@@ -247,7 +250,8 @@ Skill(readme-maintainer, "基于当前仓库事实更新 README")
 │       ├── portpilot-assistant/
 │       ├── zimage-api/
 │       ├── zimage-local/
-│       └── zimage-core/
+│       ├── zimage-core/
+│       └── insight-collector/
 ├── .postmortem/
 ├── docs/
 ├── requirements.txt
