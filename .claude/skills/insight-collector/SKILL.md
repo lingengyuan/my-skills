@@ -12,49 +12,316 @@ description: >
 
 # Insight Collector
 
-Analyze input material and extract technical insights into the CodeSnippets project.
+**核心目标：榨干价值。** 不只列举内容——要推理、连接、推导出行动。模板是容器，推理才是价值所在。
 
-## Workflow
+---
 
-1. **Identify input type** and acquire content:
+## Step 0：扫描现有知识库
 
-   | Input | Action |
-   |-------|--------|
-   | URL | Fetch with WebFetch, extract full technical content |
-   | Code snippet (pasted) | Analyze directly |
-   | Image / screenshot | Read the image file, extract visible code or concepts |
-   | Document (.pdf, .md, .txt) | Read the file |
-   | Raw text | Analyze directly |
+读 `/root/projects/CodeSnippets/README.md` 目录表，记住：
+- 已有哪些主题（避免重复）
+- 哪些现有条目可能与本次材料产生连接
+- 知识库的空白领域（本次材料能否填补？）
 
-2. **Analyze** — extract these from the material:
+---
 
-   - **Reusable code snippets**: working code worth saving (identify language)
-   - **Technical patterns**: architectural ideas, API usage, design patterns
-   - **Tools & libraries**: notable dependencies worth knowing about
-   - **Ideas & directions**: what could be built with this, non-obvious use cases
+## Step 1：获取内容
 
-3. **Classify and write** — route each extracted item to the right location. Read `references/project-conventions.md` for directory map, header templates, and naming conventions. Write outputs:
+| 输入类型 | 处理方式 |
+|---------|---------|
+| URL | WebFetch 完整内容；有重要链出页面一并 fetch |
+| 粘贴代码 | 直接分析 |
+| 图片 / 截图 | Read 图片，描述架构图，提取可见代码和概念 |
+| 文档（PDF/md/txt） | Read 文件 |
+| 原始文本 | 直接分析 |
 
-   - Code snippets → `{language}/` directory with standard header comment
-   - Ideas and inspiration → `ideas/{topic}.md` using idea template
-   - Cross-cutting analysis → `analysis/{topic}.md`
-   - Combined HTML tools → `html-tools/`
+---
 
-   File naming: lowercase, hyphens, descriptive. E.g. `zvec-inprocess-vector.py`, `agentic-hoarding-patterns.md`.
+## Step 2：提取——9 个维度
 
-4. **Update README.md** — add new entries to both English and Chinese catalog tables. Update the project structure tree only if a new directory was created.
+从材料中提取所有适用维度。🧠⚖️⚠️💡 信息密度最高、最容易被忽视，优先挖掘：
 
-5. **Report** — summarize to the user:
-   - What files were created
-   - Key insights extracted
-   - Suggested next steps or related existing snippets in the project
+| 维度 | 提取内容 | 说明 |
+|------|---------|------|
+| 🟢 **可复用代码** | 可直接运行/导入的代码 | 原文提取，标注语言 |
+| 🏗️ **技术模式** | 架构思路、API 用法、设计模式 | 给模式命名 |
+| 📦 **工具与依赖** | 值得关注的库、工具、服务 | 记录版本（如有） |
+| 🧠 **心智模型** | 作者使用的思维框架 | 往往是最有价值的部分 |
+| ⚖️ **权衡取舍** | 明确陈述的 tradeoff | X vs Y：什么时候选哪个 |
+| ⚠️ **反模式与陷阱** | Gotcha、常见错误、边界情况 | 独立踩坑要付出的代价 |
+| 💡 **非显见洞见** | 不经提示不会想到的"啊哈"结论 | 专家知道而新手不知道的 |
+| ❓ **开放问题** | 材料提出或暗示的悬而未决问题 | 潜在研究方向 |
+| 🚀 **衍生想法种子** | 能从这里出发构建的方向（原始列表） | 下一步 Step 3 深化 |
+
+---
+
+## Step 3：深度推理——把提取物榨干
+
+**这是最重要的步骤。** 对 Step 2 中每个高价值提取物，运行以下推理：
+
+### 3A：蕴含链（"所以……"）
+
+对每个重要洞见，追问 3 层：
+
+```
+洞见：X
+→ 所以：Y（X 的直接推论）
+→ 所以：Z（Y 的推论）
+→ 因此可以：[具体行动]
+```
+
+**示例**：
+```
+洞见：agent 把"写代码"的时间成本降到接近零
+→ 所以：过去"这个功能值不值花一天实现"的权衡框架已过时
+→ 所以：边界情况、实验性功能、一次性脚本都值得尝试
+→ 因此可以：建立"任何模糊想法都 prompt 一次"的工作习惯，而不是预先评估
+```
+
+### 3B：隐含假设挖掘
+
+问：**作者默认了什么，但没有说出来？**
+
+这些假设往往比结论本身更有价值——它们揭示了适用边界：
+- 这个方案在什么条件下成立？
+- 如果某个假设不成立，结论会怎么变？
+- 作者的上下文（规模、技术栈、团队文化）是否影响结论的普适性？
+
+### 3C：反事实分析
+
+问：**为什么选 X 而不是 Y？**
+
+不要只记录"他们用了 X"，要分析"选 X 而不是 Y 的决策逻辑"——这才是可迁移的判断力：
+- 被放弃的替代方案是什么？
+- 放弃的理由揭示了什么约束或价值观？
+- 在不同场景下，Y 可能比 X 更合适吗？
+
+### 3D：组合生成（连接现有知识库）
+
+把本次材料中的概念与 Step 0 中记住的现有 KB 条目交叉：
+
+```
+[本次概念 A] × [已有 KB 条目 B] → [新想法 C]
+新想法 C 的价值：{为什么 A+B 的组合比各自单独更有意思}
+最小验证实验：{能在一天内完成的最小 spike}
+```
+
+**示例**：
+```
+[本次：Symphony 工作区隔离机制] × [已有：mini_symphony.py 的 TASKS.md 队列]
+→ 新想法：给 mini_symphony 加 per-task git worktree，让每个任务在独立分支工作
+价值：彻底消除任务间的文件干扰，失败任务不污染主工作区
+最小验证：给 mini_symphony 加 --isolate 标志，用 git worktree add 实现
+```
+
+### 3E：边界与反例
+
+问：**这个方案在哪里会失效？**
+
+- 规模边界（10 个用户 vs 10万？）
+- 复杂度边界（玩具项目 vs 生产系统？）
+- 团队边界（单人 vs 多人协作？）
+- 列出 1-2 个具体反例场景
+
+---
+
+## Step 4：分类写出
+
+### 目录路由
+
+| 内容类型 | 目标目录 | 命名规则 |
+|---------|---------|---------|
+| 可运行代码 | `{language}/` 或 `snippets/`（跨语言） | `功能描述.py/.js/.rs` |
+| 项目灵感与方向 | `ideas/` | `主题-方向.md` |
+| 外部资料精读 | `analysis/` | `作者-主题.md` |
+| 独立 HTML 工具 | `html-tools/` | `工具名.html` |
+| 项目/配置模板 | `templates/` | `用途.template` |
+
+文件命名：小写、连字符、描述性。
+
+### 代码文件 Header
+
+```
+# =============================================================================
+# 名称: <Snippet Name>
+# 来源: <原始 URL 或 "原创">
+# 用途: <解决什么问题>
+# 依赖: <pip install ... | stdlib only>
+# 适用场景: <在哪些地方可以用>
+# 日期: YYYY-MM-DD
+# =============================================================================
+```
+
+### Analysis 精读文档模板（`analysis/{topic}.md`）
+
+```markdown
+# {标题} 精读
+
+**来源**: [{标题}]({url})
+**日期**: YYYY-MM-DD
+**标签**: tag1, tag2, tag3
+
+---
+
+## 30秒 TL;DR
+
+> {一段话核心论点——读完就知道这篇文章解决了什么问题}
+
+## 概念总览
+
+| 概念/模式 | 核心思想 | 适用场景 |
+|---------|---------|---------|
+
+---
+
+## 深读
+
+{从原文各章节展开，逐点深读}
+
+---
+
+## 心智模型
+
+> {作者看问题的框架}
+
+**适用条件**：{什么情况下这个模型成立}
+**失效条件**：{什么情况下这个模型不适用}
+**在我的工作中如何用**：{具体场景}
+
+---
+
+## 非显见洞见
+
+对每条洞见，写出完整蕴含链：
+- **洞见**：{具体结论，不是泛泛的"很重要"}
+  - 所以：{直接推论}
+  - 因此可以：{具体行动}
+
+---
+
+## 隐含假设
+
+作者默认了但没有说明的前提：
+- {假设 1}：若不成立，则 {结论的哪个部分会失效}
+
+---
+
+## 反模式与陷阱
+
+- **{陷阱名}**：{具体描述} → 正确做法：{...}
+
+---
+
+## 与现有知识库的连接
+
+- 关联 `path/to/file`：{说明关联方式，以及组合后能做什么}
+
+---
+
+## 衍生项目想法
+
+每个想法必须说明来源组合和最小验证实验：
+
+### {想法标题}
+
+**来源组合**：[本次材料中的 X] + [已有 KB 中的 Y]
+**为什么有意思**：{非显见的价值，不是"这个很有用"}
+**最小 spike**：{能在 1 天内完成的最小实验}
+**潜在难点**：{预见的最大障碍}
+```
+
+### Idea 灵感文档模板（`ideas/{topic}.md`）
+
+```markdown
+# {标题}
+
+**来源**: {原始 URL}
+**日期**: YYYY-MM-DD
+**状态**: 💡灵感 / 🔄 进行中 / ✅ 已实现
+
+---
+
+## 核心理念
+
+> {一句话：这个想法解决什么问题，用什么方式}
+
+**解决的核心痛点**：{...}
+**非显见之处**：{为什么这个组合/方向不是第一反应}
+
+---
+
+## 关键技术要点
+
+{代码片段、架构图、关键参数、API 调用方式}
+
+---
+
+## 蕴含链
+
+{核心洞见}
+→ 所以：{推论 1}
+→ 所以：{推论 2}
+→ 因此可以：{这个想法的核心价值主张}
+
+---
+
+## 可行性分析
+
+- ✅ 已验证可行：{...}
+- ⚠️ 待解决：{...}
+- ❌ 潜在阻断：{如有}
+
+**适用边界**：{在什么规模/场景下成立，哪里会失效}
+
+---
+
+## 与现有知识库的连接
+
+- 关联 `path/to/file`：{怎么连，组合后做什么}
+
+---
+
+## 下一步行动
+
+- [ ] {最小可行 spike——1 天内能做完的实验}
+- [ ] {下一个验证点}
+```
+
+---
+
+## Step 5：更新 README.md 和 READING_LIST.md
+
+在中英文目录表中各新增一行：
+
+```
+| {emoji} | `path/to/file` | {功能描述} | {依赖} |
+```
+
+类型 emoji：🟢 代码 · 🟡 模板 · 🔵 参考。仅在新建目录时更新结构树。
+
+**同步 READING_LIST.md**（`/root/projects/CodeSnippets/READING_LIST.md`）：
+- 若本次来源 URL 在"待归档"中有对应的 `- [ ]` 条目 → 改为 `- [x]`
+- 若 URL 不在列表中 → 在"已归档"末尾追加 `- [x] {url}`
+
+---
+
+## Step 6：汇报
+
+向用户报告，**必须包含推理结论，不只是文件列表**：
+
+1. **创建了哪些文件**（路径 + 一句话描述）
+2. **Top 3 非显见洞见 + 蕴含链**（最有价值的推理结论）
+3. **最强组合想法**（哪两个概念组合最有意思，为什么）
+4. **建议的最小下一步**（具体，能立即开始）
+
+---
 
 ## Guidelines
 
-- Prefer Chinese for idea docs and comments (matching project convention), English for code
-- One insight source may produce multiple output files (e.g. a blog post yields 2 code snippets + 1 idea doc)
-- Always include `来源` (source URL) in headers when input was a URL
-- Do NOT fabricate code that wasn't in the source — only extract what's actually there
-- For large sources, focus on the most novel and reusable parts
-- Cross-reference existing files in the project when relevant (e.g. "relates to python/tape_context.py")
-- When the input is an image/screenshot, describe what you see and extract any visible code or architecture diagrams
+- 中文写 idea/analysis 文档和注释，代码用英文
+- 一个来源可以产出多个文件（博文 → 代码片段 + idea 文档）
+- URL 来源必须包含 `来源` 字段
+- **不要虚构代码**——只提取实际存在于原材料的内容
+- 对长文，聚焦最新颖可复用的部分，宁可深度不够广也不要广度不够深
+- 衍生想法必须注明"来源组合"和"最小 spike"——没有这两项的想法是无效的
+- 分析的质量标准：读完这个文档，能否做出比读原文更好的设计决策？
