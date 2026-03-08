@@ -29,6 +29,8 @@ __pycache__/
 # These contain generated content from note-creator and wechat2md skills
 outputs/
 /images/
+analysis/
+plans/
 
 # Distribution / packaging
 .Python
