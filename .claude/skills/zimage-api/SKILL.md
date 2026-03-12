@@ -1,3 +1,8 @@
+---
+name: zimage-api
+description: Generate manga-style images using Replicate cloud API in Hojo Tsukasa (City Hunter black-and-white) or Satoshi Urushihara (colorful 90s OVA) style. Use when user asks to convert a photo or generate an image in 北条司/漆原智志/City Hunter/anime style using cloud API (no local GPU needed).
+---
+
 # Z-Image API Skill
 
 > 使用 Replicate 云端 API 生成北条司/漆原智志风格漫画图像

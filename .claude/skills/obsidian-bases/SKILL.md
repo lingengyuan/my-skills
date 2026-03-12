@@ -158,7 +158,7 @@ display_name: 'author + " - " + title'
 
 ## Detailed Documentation
 
-For complete API documentation, see **REFERENCE.md**:
+For complete API documentation, see [REFERENCE.md](REFERENCE.md):
 - Filter syntax and patterns
 - All formula functions (100+ functions)
 - View type configurations

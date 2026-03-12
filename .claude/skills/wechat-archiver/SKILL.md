@@ -173,35 +173,7 @@ if os.path.exists(meta_path) and not force:
 
 **Step 6.1: 决定 artifact_plan**
 
-```python
-# 读取 article.md 内容
-article_content = read_file(f"{asset_dir}/article.md")
-
-# 决定 canvas
-if canvas == "on":
-    canvas_enabled = True
-elif canvas == "off":
-    canvas_enabled = False
-else:  # auto
-    canvas_keywords = ["流程", "步骤", "架构", "原理", "时序", "sequence", "flow", "architecture"]
-    canvas_enabled = any(kw in article_content for kw in canvas_keywords)
-
-# 决定 base
-if base == "on":
-    base_enabled = True
-elif base == "off":
-    base_enabled = False
-else:  # auto
-    base_keywords = ["对比", "比较", "清单", "要点", "总结", "术语", "vs", "对比表"]
-    base_enabled = any(kw in article_content for kw in base_keywords)
-
-# 构建 artifact_plan
-artifact_plan = ["md"]
-if canvas_enabled:
-    artifact_plan.append("canvas")
-if base_enabled:
-    artifact_plan.append("base")
-```
+读取 `article.md` 内容，按 [rules/classification.md](rules/classification.md) 中的关键词规则判断 canvas/base 是否启用。`on`/`off` 参数可覆盖 auto 逻辑。构建 `artifact_plan = ["md"] + (enabled items)`。
 
 **Step 6.2: 调用 note-creator**
 
@@ -328,64 +300,11 @@ rm -rf "outputs/<title>/"
 
 ## Examples
 
-### Example 1: 首次抓取
-```bash
-User: "抓取这个微信文章：https://mp.weixin.qq.com/s/xxx"
-Action:
-  1. 调用 wechat2md → 获得 "Understanding Async.md"
-  2. 生成 slug: "20260111-understanding-async-a1b2c3"
-  3. 创建 "outputs/20-阅读笔记/20260111-understanding-async-a1b2c3/"
-  4. 复制 article.md + images/
-  5. 检测到 "async" 关键词 → canvas=on
-  6. 调用 note-creator → 生成 note.md + diagram.canvas
-  7. 写入 meta.json + run.jsonl
-Output: "✅ 归档成功：outputs/20-阅读笔记/20260111-understanding-async-a1b2c3/"
-```
+- 首次抓取 → 完整运行 Steps 0-10，生成资产目录和所有文件
+- 重复抓取 → hash_content 不变时 Step 5 短路，跳过 note-creator
+- 强制更新 → `force=true` 跳过幂等检查，重新调用 note-creator
+- 批量模式 → 读取 inbox.md 中的 URL 列表，逐个执行；详见 [references/batch-processing.md](references/batch-processing.md)
 
-### Example 2: 重复抓取（幂等）
-```bash
-User: "再次抓取同一个 URL"
-Action:
-  1. 生成相同的 asset_id
-  2. 发现资产目录已存在
-  3. 计算 hash_content = 历史记录中的 hash
-  4. 跳过 note-creator
-  5. 追加运行日志到 run.jsonl
-Output: "⏭️ 内容未变化，跳过生成笔记"
-```
-
-### Example 3: 强制更新
-```bash
-User: "强制重新生成笔记"
-Action:
-  1. 忽略 hash_content 检查
-  2. 重新调用 note-creator
-  3. 覆盖 note.md / diagram.canvas / table.base
-  4. 更新 meta.json
-Output: "🔄 已更新笔记"
-```
-
-### Example 4: 批量处理 inbox.md
-```bash
-User: "把 inbox.md 里的微信文章都归档一下"
-Action:
-  1. 读取 inbox.md，提取所有 mp.weixin.qq.com 链接
-  2. 去重并过滤已处理的 URL
-  3. 逐个调用 wechat_archiver 处理
-  4. 更新 inbox.md 标记已完成项
-Output: "✅ 批量归档完成：处理 5 篇，跳过 2 篇，失败 0 篇"
-```
-
-**批量处理命令**：
-```bash
-# 预览
-python3 .claude/skills/wechat-archiver/tools/batch_archiver.py --inbox inbox.md --dry-run
-
-# 执行
-python3 .claude/skills/wechat-archiver/tools/batch_archiver.py --inbox inbox.md
-```
-
----
 
 ## Templates
 

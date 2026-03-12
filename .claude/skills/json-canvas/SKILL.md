@@ -201,7 +201,7 @@ Preset colors: `"1"` through `"6"` (red, orange, yellow, green, blue, purple)
 
 ## Detailed Documentation
 
-For complete examples and advanced patterns, see **REFERENCE.md**:
+For complete examples and advanced patterns, see [REFERENCE.md](REFERENCE.md):
 - Complete canvas examples (mind maps, flowcharts, project boards)
 - Advanced node configurations
 - Edge styling and routing

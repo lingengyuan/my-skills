@@ -279,7 +279,7 @@ See also #project/planning for timeline details.
 
 ## Detailed Documentation
 
-For complete syntax reference and examples, see **REFERENCE.md**:
+For complete syntax reference and examples, see [REFERENCE.md](REFERENCE.md):
 - All Markdown formatting options
 - Advanced link techniques
 - All callout types and styling

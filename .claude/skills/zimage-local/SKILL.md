@@ -1,3 +1,8 @@
+---
+name: zimage-local
+description: Generate manga-style images locally using ComfyUI (no API cost) in Hojo Tsukasa (City Hunter black-and-white) or Satoshi Urushihara (colorful 90s OVA) style. Use when user asks to convert a photo or generate an image in 北条司/漆原智志/City Hunter/anime style using local ComfyUI (free, requires local GPU setup).
+---
+
 # Z-Image Local Skill
 
 > 使用本地 ComfyUI 生成北条司/漆原智志风格漫画图像
