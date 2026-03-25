@@ -63,6 +63,7 @@ Archive this WeChat article: https://mp.weixin.qq.com/s/your-article-url
 Create a comparison note for markdown, canvas, and bases
 Update README based on current repository facts
 Convert input/photo.jpg to Hojo style
+Write a Chinese technical article about my new tool
 ```
 
 Useful local entrypoints in this repo:
@@ -91,6 +92,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 | `zimage-api` | Image | Generate stylized images through Replicate | `.claude/skills/zimage-api` |
 | `zimage-local` | Image | Generate stylized images through local ComfyUI | `.claude/skills/zimage-local` |
 | `insight-collector` | Knowledge | Extract reusable insights into the CodeSnippets knowledge base | `.claude/skills/insight-collector` |
+| `tech-article` | Content | Write polished Chinese technical articles for WeChat/blog. Full pipeline: type selection → research → draft → fact-check → illustration | `.claude/skills/tech-article` |
 
 Shared module:
 
@@ -117,6 +119,7 @@ Shared module:
 │       ├── zimage-api/
 │       ├── zimage-local/
 │       ├── insight-collector/
+│       ├── tech-article/
 │       └── zimage-core/
 ├── .postmortem/          # incident reports and fix history
 ├── docs/                 # project docs and images
@@ -136,12 +139,14 @@ REPLICATE_API_TOKEN=r8_your_token_here
 COMFYUI_SERVER=127.0.0.1:8188
 WECHAT_APPID=your_wechat_appid
 WECHAT_SECRET=your_wechat_secret
+DASHSCOPE_API_KEY=your_dashscope_key
 ```
 
 Use the variables that match the skills you actually run:
 - `REPLICATE_API_TOKEN`: required by `zimage-api`
 - `COMFYUI_SERVER`: optional override for `zimage-local`
 - `WECHAT_APPID` / `WECHAT_SECRET`: required for draft publishing in `md2wechat`
+- `DASHSCOPE_API_KEY`: required by `tech-article` for illustration generation (uses `qwen-image-plus-2026-01-09`)
 
 ### Development and Testing
 
@@ -187,6 +192,8 @@ Recommended maintenance rules:
 ### License
 
 MIT. See `LICENSE`.
+
+---
 
 <a name="简体中文"></a>
 ## 简体中文
@@ -247,6 +254,7 @@ pip install -r .claude/skills/zimage-core/requirements.txt
 创建一篇比较 markdown、canvas、bases 的笔记
 基于当前仓库事实更新 README
 把 input/photo.jpg 转成北条司风格
+帮我写一篇关于这个工具的中文技术文章
 ```
 
 本仓库中常用的本地入口命令：
@@ -275,6 +283,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 | `zimage-api` | 图像 | 通过 Replicate 生成风格化图像 | `.claude/skills/zimage-api` |
 | `zimage-local` | 图像 | 通过本地 ComfyUI 生成风格化图像 | `.claude/skills/zimage-local` |
 | `insight-collector` | 知识 | 将可复用洞察整理进 CodeSnippets 知识库 | `.claude/skills/insight-collector` |
+| `tech-article` | 内容 | 为微信公众号/博客撰写中文技术文章。完整流程：类型判断 → 研究 → 起草 → 核查 → 配图 | `.claude/skills/tech-article` |
 
 共享模块：
 
@@ -301,6 +310,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 │       ├── zimage-api/
 │       ├── zimage-local/
 │       ├── insight-collector/
+│       ├── tech-article/
 │       └── zimage-core/
 ├── .postmortem/          # 事故复盘与修复记录
 ├── docs/                 # 项目文档与示例图片
@@ -320,12 +330,14 @@ REPLICATE_API_TOKEN=r8_your_token_here
 COMFYUI_SERVER=127.0.0.1:8188
 WECHAT_APPID=your_wechat_appid
 WECHAT_SECRET=your_wechat_secret
+DASHSCOPE_API_KEY=your_dashscope_key
 ```
 
 变量用途如下：
 - `REPLICATE_API_TOKEN`：`zimage-api` 必需
 - `COMFYUI_SERVER`：`zimage-local` 的可选地址覆盖
 - `WECHAT_APPID` / `WECHAT_SECRET`：`md2wechat` 发布草稿时必需
+- `DASHSCOPE_API_KEY`：`tech-article` 配图生成必需（使用 `qwen-image-plus-2026-01-09`）
 
 ### 开发与测试
 
