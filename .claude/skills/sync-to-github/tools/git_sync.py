@@ -8,15 +8,15 @@ Deterministic pipeline:
 3) Generate descriptive commit message based on changes
 4) Stage all changes (git add .)
 5) Create commit with generated message
-6) Optionally push to remote
+6) Push to remote by default (use --no-push to skip)
 
 Output contract:
 - Git commit created with AI-generated message
-- Optional: Push to remote repository
+- Push to remote repository by default (unless --no-push)
 - Console output with file list, commit message, and commit hash
 
 Usage:
-  python3 git_sync.py [--push] [--dry-run]
+  python3 git_sync.py [--dry-run] [--no-push]
 """
 
 from __future__ import annotations
@@ -322,7 +322,17 @@ def main() -> int:
         description="Automated git commit and push with AI-generated commit messages"
     )
     parser.add_argument(
-        "--push", action="store_true", help="Push to remote after committing"
+        "--push",
+        dest="push",
+        action="store_true",
+        default=True,
+        help="Push to remote after committing (default: enabled)",
+    )
+    parser.add_argument(
+        "--no-push",
+        dest="push",
+        action="store_false",
+        help="Skip push after committing",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview commit message without committing"
@@ -339,10 +349,10 @@ def main() -> int:
     changes = get_file_changes()
     if not changes:
         print("ERROR: No changes to commit", file=sys.stderr)
-        print("Working directory is clean. Make some changes before running sync_to_github.", file=sys.stderr)
+        print("Working directory is clean. Make some changes before running sync-to-github.", file=sys.stderr)
         return 1
 
-    print_header("sync_to_github - Analyzing changes...")
+    print_header("sync-to-github - Analyzing changes...")
 
     print_section("Files changed")
     for change in changes:
@@ -384,23 +394,23 @@ def main() -> int:
 
     # Create commit
     print_section("Creating commit")
-    success, result = create_commit(commit_message)
+    success, commit_hash = create_commit(commit_message)
     if not success:
-        print(f"ERROR: Failed to create commit: {result}", file=sys.stderr)
+        print(f"ERROR: Failed to create commit: {commit_hash}", file=sys.stderr)
         return 1
 
-    print(f"  Commit created: {result}")
+    print(f"  Commit created: {commit_hash}")
 
-    # Push to remote if requested
+    # Push to remote by default (disable with --no-push).
     if args.push:
         print_section("Pushing to remote")
-        success, result = push_to_remote()
+        success, push_result = push_to_remote()
         if not success:
-            print(f"WARNING: Push failed: {result}", file=sys.stderr)
-            print(f"  Commit hash: {result}")
+            print(f"WARNING: Push failed: {push_result}", file=sys.stderr)
+            print(f"  Commit hash: {commit_hash}")
             print("  Manual push required: git push")
             return 1
-        print(f"  {result}")
+        print(f"  {push_result}")
 
     print_header("Done!")
     print()

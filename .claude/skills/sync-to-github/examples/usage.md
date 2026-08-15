@@ -1,16 +1,16 @@
-# sync_to_github Usage Examples
+# sync-to-github Usage Examples
 
-## Example 1: Basic Commit
+## Example 1: Basic Commit + Push (Default)
 
 After implementing a new feature or making changes:
 
 ```bash
-Skill(sync_to_github)
+Skill(sync-to-github)
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -42,20 +42,24 @@ Creating commit
 ---------------
   Commit created: abc123def
 
+Pushing to remote
+-----------------
+  Pushed to origin/main
+
 Done!
 ```
 
-## Example 2: Commit and Push
+## Example 2: Commit Without Push
 
-After fixing a bug and wanting to push immediately:
+After fixing a bug and wanting to keep the commit local:
 
 ```bash
-Skill(sync_to_github, args="--push")
+Skill(sync-to-github, args="--no-push")
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -87,10 +91,6 @@ Creating commit
 ---------------
   Commit created: 456789ghi
 
-Pushing to remote
------------------
-  Pushed to origin/main
-
 Done!
 ```
 
@@ -99,12 +99,12 @@ Done!
 To preview the commit message without actually committing:
 
 ```bash
-Skill(sync_to_github, args="--dry-run")
+Skill(sync-to-github, args="--dry-run")
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -138,12 +138,12 @@ Dry run mode - no commit created
 After updating documentation files:
 
 ```bash
-Skill(sync_to_github)
+Skill(sync-to-github)
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -175,6 +175,10 @@ Creating commit
 ---------------
   Commit created: def123abc
 
+Pushing to remote
+-----------------
+  Pushed to origin/main
+
 Done!
 ```
 
@@ -183,12 +187,12 @@ Done!
 After adding or updating tests:
 
 ```bash
-Skill(sync_to_github)
+Skill(sync-to-github)
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -218,6 +222,10 @@ Creating commit
 ---------------
   Commit created: 789xyz123
 
+Pushing to remote
+-----------------
+  Pushed to origin/main
+
 Done!
 ```
 
@@ -226,12 +234,12 @@ Done!
 After making both code and documentation changes:
 
 ```bash
-Skill(sync_to_github, args="--push")
+Skill(sync-to-github)
 ```
 
 **Expected Output:**
 ```
-sync_to_github - Analyzing changes...
+sync-to-github - Analyzing changes...
 ====================================
 
 Files changed
@@ -277,19 +285,19 @@ Done!
 ### No Changes
 
 ```bash
-Skill(sync_to_github)
+Skill(sync-to-github)
 ```
 
 **Output:**
 ```
 ERROR: No changes to commit
-Working directory is clean. Make some changes before running sync_to_github.
+Working directory is clean. Make some changes before running sync-to-github.
 ```
 
 ### Not a Git Repository
 
 ```bash
-Skill(sync_to_github)
+Skill(sync-to-github)
 ```
 
 **Output:**
@@ -301,7 +309,7 @@ Initialize with: git init
 ### Push Fails (Authentication Issue)
 
 ```bash
-Skill(sync_to_github, args="--push")
+Skill(sync-to-github)
 ```
 
 **Output:**
@@ -325,7 +333,7 @@ WARNING: Push failed: fatal: Authentication failed
 Skill(note-creator, "Create API documentation")
 
 # Commit and push the changes
-Skill(sync_to_github, args="--push")
+Skill(sync-to-github)
 ```
 
 ### After Code Generation Session
@@ -334,13 +342,10 @@ Skill(sync_to_github, args="--push")
 # ... after making multiple code changes ...
 
 # Review what will be committed
-Skill(sync_to_github, args="--dry-run")
+Skill(sync-to-github, args="--dry-run")
 
-# If satisfied, commit for real
-Skill(sync_to_github)
-
-# Later, when ready to push
-Skill(sync_to_github, args="--push")
+# If satisfied, commit and push
+Skill(sync-to-github)
 ```
 
 ### Feature Branch Workflow
@@ -352,8 +357,8 @@ git checkout -b feature/new-ui
 # Make changes...
 
 # Commit changes
-Skill(sync_to_github)
+Skill(sync-to-github)
 
 # Push to feature branch
-Skill(sync_to_github, args="--push")
+Skill(sync-to-github)
 ```

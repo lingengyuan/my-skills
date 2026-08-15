@@ -51,7 +51,7 @@ To use `zimage-api` skill, you need a Replicate API token:
 | ├── `obsidian-bases/` | Database-like table view generation |
 | ├── `wechat-archiver/` | WeChat article archiving workflow |
 | ├── `wechat2md/` | WeChat article to Markdown converter |
-| ├── `sync_to_github/` | Automated git commit and push |
+| ├── `sync-to-github/` | Automated git commit and push |
 | ├── `portpilot-assistant/` | Natural-language local dev port management |
 | ├── `zimage-api/` | Manga style image generation (Cloud API) |
 | ├── `zimage-local/` | Manga style image generation (Local ComfyUI) |
@@ -208,11 +208,11 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - **Backward Compatible**: v1 behavior without config, enhanced features with config.json
    - Location: `.claude/skills/wechat2md/SKILL.md`
 
-7. **sync_to_github**
+7. **sync-to-github**
    - Automated git workflow
    - AI-generated commit messages
    - Optional push to remote
-   - Location: `.claude/skills/sync_to_github/SKILL.md`
+   - Location: `.claude/skills/sync-to-github/SKILL.md`
 
 8. **portpilot-assistant**
    - Natural-language local dev port management via PortPilot CLI
@@ -336,7 +336,7 @@ Skill(wechat-archiver, args="https://mp.weixin.qq.com/s/your-article-url")
 | ├── `obsidian-bases/` | 数据库式表格视图生成 |
 | ├── `wechat-archiver/` | 微信文章归档工作流 |
 | ├── `wechat2md/` | 微信文章转 Markdown 转换器 |
-| ├── `sync_to_github/` | 自动提交和推送 |
+| ├── `sync-to-github/` | 自动提交和推送 |
 | ├── `portpilot-assistant/` | 本地开发端口自然语言管理 |
 | ├── `zimage-api/` | 漫画风格图像生成（云端 API） |
 | ├── `zimage-local/` | 漫画风格图像生成（本地 ComfyUI） |
@@ -493,11 +493,11 @@ python generate.py "1girl, solo, glasses, smile, portrait" hojo
    - **向后兼容**：无配置时保持 v1 行为，有 config.json 时启用增强功能
    - 位置：`.claude/skills/wechat2md/SKILL.md`
 
-7. **sync_to_github**
+7. **sync-to-github**
    - 自动化 git 工作流
    - AI 生成的提交信息
    - 可选推送到远程
-   - 位置：`.claude/skills/sync_to_github/SKILL.md`
+   - 位置：`.claude/skills/sync-to-github/SKILL.md`
 
 8. **portpilot-assistant**
    - 通过 PortPilot CLI 用自然语言管理本地开发端口

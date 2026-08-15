@@ -1,16 +1,16 @@
 ---
-name: sync_to_github
-description: Automate git commit and push. Use when user says "sync to github", "commit and push", "push my changes", "save to git", "submit my work", or invokes /sync_to_github. Stages all changes, generates a commit message, commits, and pushes to remote.
+name: sync-to-github
+description: Automate git commit and push. Use when user says "sync to github", "commit and push", "push my changes", "save to git", "submit my work", or invokes /sync-to-github. Stages all changes, generates a commit message, commits, and pushes to remote.
 ---
 
-# sync_to_github
+# sync-to-github
 
 Run the bundled script to analyze changes, generate a commit message, commit, and push.
 
 ## Usage
 
 ```bash
-SKILL_DIR="/root/.claude/skills/sync_to_github"
+SKILL_DIR="${HOME}/.agents/skills/sync-to-github"
 
 # Commit and push (default)
 python3 "$SKILL_DIR/tools/git_sync.py"

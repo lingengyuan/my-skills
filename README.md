@@ -71,7 +71,7 @@ Useful local entrypoints in this repo:
 ```bash
 python .claude/skills/wechat2md/tools/wechat2md_v2.py --help
 python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py --help
-python .claude/skills/sync_to_github/tools/git_sync.py --help
+python .claude/skills/sync-to-github/tools/git_sync.py --help
 bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 ```
 
@@ -87,7 +87,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 | `obsidian-bases` | Format | Create and edit Obsidian Bases files | `.claude/skills/obsidian-bases` |
 | `wechat2md` | Utility | Convert WeChat articles to local Markdown with downloaded images | `.claude/skills/wechat2md` |
 | `md2wechat` | Utility | Convert Markdown to WeChat HTML and optionally publish drafts | `.claude/skills/md2wechat` |
-| `sync_to_github` | Utility | Analyze changes, generate commit messages, and commit/push | `.claude/skills/sync_to_github` |
+| `sync-to-github` | Utility | Analyze changes, generate commit messages, and commit/push | `.claude/skills/sync-to-github` |
 | `portpilot-assistant` | Utility | Manage local development ports through PortPilot CLI | `.claude/skills/portpilot-assistant` |
 | `zimage-api` | Image | Generate stylized images through Replicate | `.claude/skills/zimage-api` |
 | `zimage-local` | Image | Generate stylized images through local ComfyUI | `.claude/skills/zimage-local` |
@@ -114,7 +114,7 @@ Shared module:
 │       ├── obsidian-bases/
 │       ├── wechat2md/
 │       ├── md2wechat/
-│       ├── sync_to_github/
+│       ├── sync-to-github/
 │       ├── portpilot-assistant/
 │       ├── zimage-api/
 │       ├── zimage-local/
@@ -162,7 +162,7 @@ Verified checks in this repository:
 python -m pytest .claude/skills/wechat2md/tests -q
 python .claude/skills/wechat2md/tools/wechat2md_v2.py --help
 python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py --help
-python .claude/skills/sync_to_github/tools/git_sync.py --help
+python .claude/skills/sync-to-github/tools/git_sync.py --help
 bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 ```
 
@@ -262,7 +262,7 @@ pip install -r .claude/skills/zimage-core/requirements.txt
 ```bash
 python .claude/skills/wechat2md/tools/wechat2md_v2.py --help
 python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py --help
-python .claude/skills/sync_to_github/tools/git_sync.py --help
+python .claude/skills/sync-to-github/tools/git_sync.py --help
 bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 ```
 
@@ -278,7 +278,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 | `obsidian-bases` | 格式 | 创建和编辑 Obsidian Bases 文件 | `.claude/skills/obsidian-bases` |
 | `wechat2md` | 工具 | 将微信文章转换为本地 Markdown 并下载图片 | `.claude/skills/wechat2md` |
 | `md2wechat` | 工具 | 将 Markdown 转为微信公众号 HTML，并可选发布草稿 | `.claude/skills/md2wechat` |
-| `sync_to_github` | 工具 | 分析改动、生成提交信息并执行提交/推送 | `.claude/skills/sync_to_github` |
+| `sync-to-github` | 工具 | 分析改动、生成提交信息并执行提交/推送 | `.claude/skills/sync-to-github` |
 | `portpilot-assistant` | 工具 | 通过 PortPilot CLI 管理本地开发端口 | `.claude/skills/portpilot-assistant` |
 | `zimage-api` | 图像 | 通过 Replicate 生成风格化图像 | `.claude/skills/zimage-api` |
 | `zimage-local` | 图像 | 通过本地 ComfyUI 生成风格化图像 | `.claude/skills/zimage-local` |
@@ -305,7 +305,7 @@ bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 │       ├── obsidian-bases/
 │       ├── wechat2md/
 │       ├── md2wechat/
-│       ├── sync_to_github/
+│       ├── sync-to-github/
 │       ├── portpilot-assistant/
 │       ├── zimage-api/
 │       ├── zimage-local/
@@ -353,7 +353,7 @@ source set_env.sh
 python -m pytest .claude/skills/wechat2md/tests -q
 python .claude/skills/wechat2md/tools/wechat2md_v2.py --help
 python .claude/skills/wechat-archiver/tools/wechat_archiver_v2.py --help
-python .claude/skills/sync_to_github/tools/git_sync.py --help
+python .claude/skills/sync-to-github/tools/git_sync.py --help
 bash .claude/skills/portpilot-assistant/scripts/run_portpilot.sh --help
 ```
 

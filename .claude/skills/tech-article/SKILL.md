@@ -1,6 +1,10 @@
 ---
 name: tech-article
-description: Writes polished Chinese technical articles for WeChat or blog publication, then optionally generates matching illustrations. Use when user wants to write, draft, optimize, or illustrate a technical article. Handles the full pipeline: type selection → research → draft → fact-check → illustration.
+description: >-
+  Writes polished Chinese technical articles for WeChat or blog publication, then optionally
+  generates matching illustrations. Use when user wants to write, draft, optimize, or illustrate
+  a technical article. Handles the full pipeline: type selection → research → draft → fact-check
+  → illustration.
 ---
 
 # Tech Article Writing Skill
