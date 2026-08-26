@@ -1,166 +1,50 @@
 ---
 name: obsidian-bases
-description: Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.
-allowed-tools:
-  - Read
-  - Write
-  - Edit
+description: Create, edit, and validate Obsidian Bases .base files with filters, formulas, properties, summaries, and table/card/list views. Use whenever the user works with Obsidian Bases, database-like note views, Base filters, formulas, lookup-style displays, or .base files.
 ---
 
-# Obsidian Bases Skill
+# Obsidian Bases
 
-This skill enables Claude Code to create and edit valid Obsidian Bases (`.base` files) including views, filters, formulas, and all related configurations.
+Create valid YAML-based `.base` files. Read [REFERENCE.md](REFERENCE.md) for the full syntax and examples.
 
-## Overview
+## Workflow
 
-Obsidian Bases are YAML-based files that define dynamic views of notes in an Obsidian vault. A Base file can contain multiple views, global filters, formulas, property configurations, and custom summaries.
+1. Read the existing Base and the frontmatter of representative source notes.
+2. Define the source scope with the narrowest correct filter.
+3. Add formulas only for requested computed values.
+4. Configure views and display order.
+5. Preserve unrelated existing views and properties.
+6. Parse the result as YAML and verify referenced properties and formulas.
+7. When Obsidian is available, open the Base and confirm it renders.
 
-## Core Schema
-
-```yaml
-# Global filters apply to ALL views
-filters:
-  and: []  # or: [], not: []
-
-# Define formula properties
-formulas:
-  formula_name: 'expression'
-
-# Configure display names
-properties:
-  property_name:
-    displayName: "Display Name"
-
-# Define summary formulas
-summaries:
-  custom_summary: 'values.mean().round(3)'
-
-# Define views
-views:
-  - type: table | cards | list | map
-    name: "View Name"
-    limit: 10
-    filters: { and: [] }
-    order: [file.name, property_name]
-    summaries: { property_name: Average }
-```
-
-## Quick Examples
-
-### Example 1: Task Tracker
+## Structure
 
 ```yaml
 filters:
   and:
-    - file.hasTag("task")
+    - 'file.inFolder("Projects")'
+    - 'status == "active"'
 
 formulas:
-  priority_label: 'if(priority == 1, "🔴", if(priority == 2, "🟡", "🟢"))'
+  days_open: '(today() - file.ctime).days'
 
 properties:
-  formula.priority_label:
-    displayName: Priority
+  formula.days_open:
+    displayName: Days open
 
 views:
   - type: table
-    name: "Tasks"
-    order: [file.name, status, formula.priority_label]
+    name: Active projects
+    order:
+      - file.name
+      - status
+      - formula.days_open
 ```
 
-### Example 2: Reading List
+## Rules
 
-```yaml
-filters:
-  or:
-    - file.hasTag("book")
-    - file.hasTag("article")
-
-views:
-  - type: cards
-    name: "Library"
-    order: [file.name, author, status]
-```
-
-### Example 3: Daily Notes
-
-```yaml
-filters:
-  and:
-    - file.inFolder("Daily Notes")
-
-views:
-  - type: table
-    name: "Recent"
-    order: [file.name, file.mtime]
-```
-
-## Validation Rules
-
-### Required Structure
-- File extension: `.base`
-- Valid YAML syntax
-- At least one view defined
-
-### Filters
-- Can be string: `filters: 'status == "done"'`
-- Can be object: `filters: { and: [...] }`
-- Supported operators: `==`, `!=`, `>`, `<`, `>=`, `<=`, `&&`, `||`, `!`
-
-### View Types
-- `table`: Spreadsheet-like view
-- `cards`: Visual card grid
-- `list`: Simple list view
-- `map`: Requires Maps plugin + lat/lng properties
-
-### Property Types
-1. Note properties: `note.author` or `author`
-2. File properties: `file.name`, `file.path`, `file.mtime`, `file.tags`, etc.
-3. Formula properties: `formula.my_formula`
-
-## Summary Functions
-
-| Name | Type | Description |
-|------|------|-------------|
-| Average | Number | Mathematical mean |
-| Sum | Number | Sum of all numbers |
-| Min/Max | Number | Smallest/Largest number |
-| Count | Any | Count of values |
-| Earliest/Latest | Date | Earliest/Latest date |
-
-## Common Formulas
-
-```yaml
-# Conditional
-status_icon: 'if(done, "✅", "⏳")'
-
-# Date formatting
-created: 'file.ctime.format("YYYY-MM-DD")'
-
-# Arithmetic
-total: 'price * quantity'
-
-# String
-display_name: 'author + " - " + title'
-```
-
-## YAML Quoting Rules
-
-- Single quotes for formulas with double quotes: `'if(done, "Yes")'`
-- Double quotes for simple strings: `"View Name"`
-- Escape nested quotes in complex expressions
-
-## Important Notes
-
-1. **Filter scoping**: Use `sources` to limit search scope
-2. **Markdown only**: Bases only work with `.md` files
-3. **Property references**: Use `file.`, `note.`, or `formula.` prefix
-4. **Date arithmetic**: Use duration strings like `"1d"`, `"1M"`, `"1h"`
-
-## Detailed Documentation
-
-For complete API documentation, see [REFERENCE.md](REFERENCE.md):
-- Filter syntax and patterns
-- All formula functions (100+ functions)
-- View type configurations
-- Complete examples
-- Troubleshooting guide
+- Quote filter and formula expressions.
+- Use only supported view types documented in the local reference.
+- Define every `formula.X` before using it.
+- Keep one logical key under each recursive `and`, `or`, or `not` filter object.
+- Do not claim successful rendering from YAML parsing alone.

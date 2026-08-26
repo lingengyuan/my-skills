@@ -6,17 +6,16 @@ Deterministic pipeline:
 1) Check git status (staged and unstaged changes)
 2) Analyze changed files and their content
 3) Generate descriptive commit message based on changes
-4) Stage all changes (git add .)
-5) Create commit with generated message
-6) Push to remote by default (use --no-push to skip)
+4) Create a commit from already staged changes
+5) Push only when --push is provided
 
 Output contract:
 - Git commit created with AI-generated message
-- Push to remote repository by default (unless --no-push)
+- Push to the configured upstream only when --push is provided
 - Console output with file list, commit message, and commit hash
 
 Usage:
-  python3 git_sync.py [--dry-run] [--no-push]
+  python3 git_sync.py [--dry-run] [--push]
 """
 
 from __future__ import annotations
@@ -265,17 +264,9 @@ def generate_commit_message(summary: ChangeSummary) -> str:
         f"{commit_type}({scope}): {title}",
         "",
         "\n".join(body_parts),
-        "",
-        "Co-Authored-By: Claude Sonnet <noreply@anthropic.com>",
     ]
 
     return "\n".join(message_lines)
-
-
-def stage_all_changes() -> bool:
-    """Stage all changes using git add ."""
-    code, _, _ = run_git_command(["add", "."])
-    return code == 0
 
 
 def create_commit(message: str) -> tuple[bool, str]:
@@ -301,7 +292,7 @@ def push_to_remote() -> tuple[bool, str]:
 
     code, _, err = run_git_command(["push"])
     if code == 0:
-        return True, f"Pushed to origin/{branch}"
+        return True, f"Pushed branch {branch}"
     return False, err
 
 
@@ -325,14 +316,8 @@ def main() -> int:
         "--push",
         dest="push",
         action="store_true",
-        default=True,
-        help="Push to remote after committing (default: enabled)",
-    )
-    parser.add_argument(
-        "--no-push",
-        dest="push",
-        action="store_false",
-        help="Skip push after committing",
+        default=False,
+        help="Push to the configured upstream after committing",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview commit message without committing"
@@ -346,10 +331,10 @@ def main() -> int:
         return 1
 
     # Get file changes
-    changes = get_file_changes()
+    changes = [change for change in get_file_changes() if change.is_staged]
     if not changes:
-        print("ERROR: No changes to commit", file=sys.stderr)
-        print("Working directory is clean. Make some changes before running sync-to-github.", file=sys.stderr)
+        print("ERROR: No staged changes to commit", file=sys.stderr)
+        print("Stage the intended files explicitly before running sync-to-github.", file=sys.stderr)
         return 1
 
     print_header("sync-to-github - Analyzing changes...")
@@ -385,13 +370,6 @@ def main() -> int:
         print_section("Dry run mode - no commit created")
         return 0
 
-    # Stage all changes
-    print_section("Staging changes")
-    if not stage_all_changes():
-        print("ERROR: Failed to stage changes", file=sys.stderr)
-        return 1
-    print("  All changes staged")
-
     # Create commit
     print_section("Creating commit")
     success, commit_hash = create_commit(commit_message)
@@ -401,7 +379,7 @@ def main() -> int:
 
     print(f"  Commit created: {commit_hash}")
 
-    # Push to remote by default (disable with --no-push).
+    # Push only when explicitly requested.
     if args.push:
         print_section("Pushing to remote")
         success, push_result = push_to_remote()

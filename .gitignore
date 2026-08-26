@@ -159,6 +159,11 @@ desktop.ini
 
 # Local settings
 .claude/settings.local.json
+.claude/skills/**/.env
+.claude/skills/**/config.json
+
+# Temporary skill validation (never tracked)
+.skill-test-tmp/
 
 # obsidian
 .obsidian/

@@ -403,7 +403,21 @@ export async function cmdScan(args, global) {
   }
 }
 
-const PROTECTED_PROCESS_NAMES = new Set(['systemd', 'launchd', 'init', 'kernel_task', 'sshd']);
+const PROTECTED_PROCESS_NAMES = new Set([
+  'systemd',
+  'launchd',
+  'init',
+  'kernel_task',
+  'sshd',
+  'system',
+  'registry',
+  'smss.exe',
+  'csrss.exe',
+  'wininit.exe',
+  'services.exe',
+  'lsass.exe',
+  'svchost.exe'
+]);
 
 export async function cmdFree(args, global) {
   const defs = new Map([
@@ -436,12 +450,15 @@ export async function cmdFree(args, global) {
       });
     }
 
-    const blocked = records.find((record) => PROTECTED_PROCESS_NAMES.has(record.command));
+    const blocked = records.find((record) => {
+      const command = String(record.command || '').toLowerCase();
+      return !command || PROTECTED_PROCESS_NAMES.has(command);
+    });
     if (blocked) {
       return createResult('free', { port, records }, {
         ok: false,
         exitCode: EXIT_CODES.PERMISSION_DENIED,
-        errors: [toCommandError('protected-process', `Refusing to stop protected process ${blocked.command} (${blocked.pid})`)]
+        errors: [toCommandError('protected-process', `Refusing to stop protected or unidentified process ${blocked.command || '<unknown>'} (${blocked.pid})`)]
       });
     }
 

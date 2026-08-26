@@ -1,29 +1,41 @@
 ---
 name: sync-to-github
-description: Automate git commit and push. Use when user says "sync to github", "commit and push", "push my changes", "save to git", "submit my work", or invokes /sync-to-github. Stages all changes, generates a commit message, commits, and pushes to remote.
+description: Safely prepare, commit, and optionally push Git changes. Use when the user asks to commit, commit and push, sync to GitHub, save work to Git, inspect staged changes, or generate a commit message.
 ---
 
-# sync-to-github
+# Sync to GitHub
 
-Run the bundled script to analyze changes, generate a commit message, commit, and push.
+Use the bundled script for deterministic staged-change commits. Resolve it relative to this Skill.
 
-## Usage
+## Safe workflow
+
+1. Inspect `git status --short`, the staged diff, current branch, and remote.
+2. Check staged files for secrets, generated output, and unrelated changes.
+3. Stage only the files authorized by the user.
+4. Preview the generated message:
 
 ```bash
-SKILL_DIR="${HOME}/.agents/skills/sync-to-github"
-
-# Commit and push (default)
-python3 "$SKILL_DIR/tools/git_sync.py"
-
-# Commit only, no push
-python3 "$SKILL_DIR/tools/git_sync.py" --no-push
-
-# Preview message without committing
-python3 "$SKILL_DIR/tools/git_sync.py" --dry-run
+python "<skill-dir>/tools/git_sync.py" --dry-run
 ```
 
-## Notes
+5. Commit the currently staged files:
 
-- Stages **all** changes via `git add .` — if user wants selective staging, stage files first, then run with `--no-push` flow
-- Commit message is generated from heuristics (file types, counts, statuses); if user wants a specific or richer message, generate it yourself and call `git commit -m` directly
-- Push failure is non-destructive — commit is preserved, manual `git push` is all that's needed
+```bash
+python "<skill-dir>/tools/git_sync.py"
+```
+
+6. Push only when explicitly requested:
+
+```bash
+python "<skill-dir>/tools/git_sync.py" --push
+```
+
+7. After pushing, verify the exact remote ref with `git ls-remote`.
+
+## Rules
+
+- Default behavior commits staged files only and does not push.
+- Never stage all files implicitly.
+- Do not add assistant co-author trailers unless the user asks.
+- Stop if nothing is staged.
+- Preserve the local commit if pushing fails and report the exact failure.

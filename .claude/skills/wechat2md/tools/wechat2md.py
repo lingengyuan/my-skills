@@ -32,7 +32,7 @@ Usage:
 Notes:
 - If an image download fails, Markdown keeps the original URL and a failure list is appended
   near the top.
-- Configuration is loaded from .claude/skills/wechat2md/config.json if present.
+- Configuration is loaded from <skill-dir>/config.json if present.
 - Albums skip inaccessible articles and continue downloading others.
 """
 

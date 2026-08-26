@@ -71,13 +71,18 @@ export function which(cmd, options = {}) {
   }
 
   const pathEnv = process.env.PATH || '';
+  const extensions = getPlatform() === 'win32'
+    ? ['', ...(process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').map((x) => x.toLowerCase())]
+    : [''];
   for (const base of pathEnv.split(path.delimiter).filter(Boolean)) {
-    const candidate = path.join(base, cmd);
-    try {
-      fs.accessSync(candidate, fs.constants.X_OK);
-      return candidate;
-    } catch {
-      // continue
+    for (const extension of extensions) {
+      const candidate = path.join(base, cmd + extension);
+      try {
+        fs.accessSync(candidate, fs.constants.X_OK);
+        return candidate;
+      } catch {
+        // continue
+      }
     }
   }
   return '';
@@ -144,6 +149,30 @@ function parsePsLine(line) {
 }
 
 export function getProcessInfo(pid, options = {}) {
+  if (getPlatform() === 'win32') {
+    const command = [
+      `$p = Get-CimInstance Win32_Process -Filter \"ProcessId = ${pid}\"`,
+      'if ($p) { $p | Select-Object ProcessId,ParentProcessId,Name,ExecutablePath,CreationDate | ConvertTo-Json -Compress }'
+    ].join('; ');
+    const result = runRaw('powershell.exe', ['-NoProfile', '-Command', command], options);
+    if (!result.ok || !result.stdout.trim()) {
+      return null;
+    }
+    try {
+      const info = JSON.parse(result.stdout.trim());
+      return {
+        pid: Number(info.ProcessId),
+        ppid: Number(info.ParentProcessId),
+        user: '',
+        command: info.Name || '',
+        startTime: info.CreationDate || '',
+        cwd: ''
+      };
+    } catch {
+      return null;
+    }
+  }
+
   const ps = runRaw('ps', ['-p', String(pid), '-o', 'pid=,ppid=,user=,comm=,lstart='], options);
   if (!ps.ok) {
     return null;
@@ -294,6 +323,36 @@ function extractPortFromAddress(address) {
   return port;
 }
 
+function parseWindowsNetstat(stdout, protocol = 'both') {
+  const records = [];
+  for (const rawLine of stdout.split('\n')) {
+    const line = rawLine.trim();
+    const tcp = /^TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)$/i.exec(line);
+    const udp = /^UDP\s+(\S+)\s+\S+\s+(\d+)$/i.exec(line);
+    const match = tcp || udp;
+    if (!match) {
+      continue;
+    }
+    const itemProtocol = tcp ? 'tcp' : 'udp';
+    if (protocol !== 'both' && protocol !== itemProtocol) {
+      continue;
+    }
+    const port = extractPortFromAddress(match[1]);
+    const pid = Number(match[2]);
+    if (!port || !Number.isInteger(pid)) {
+      continue;
+    }
+    records.push({
+      protocol: itemProtocol,
+      localAddress: match[1],
+      port,
+      pids: [pid],
+      command: ''
+    });
+  }
+  return records;
+}
+
 function parseSsListening(stdout, protocol) {
   const lines = stdout
     .split('\n')
@@ -366,6 +425,18 @@ export function listListeningPorts(options = {}) {
   const diagnostics = [];
   const probeResults = [];
 
+  if (getPlatform() === 'win32') {
+    const netstat = runRaw('netstat.exe', ['-ano'], { timeout });
+    diagnostics.push({ probe: 'netstat', ok: netstat.ok, status: netstat.status, stderr: netstat.stderr.trim() });
+    const records = netstat.ok ? parseWindowsNetstat(netstat.stdout, options.protocol || 'both') : [];
+    return {
+      records,
+      diagnostics,
+      probeFailed: !netstat.ok,
+      permissionDenied: resultHasPermissionIssue(netstat)
+    };
+  }
+
   const tcp = runRaw('ss', ['-ltnp'], { timeout });
   probeResults.push(tcp);
   diagnostics.push({ probe: 'ss-tcp', ok: tcp.ok, status: tcp.status, stderr: tcp.stderr.trim() });
@@ -403,6 +474,42 @@ export function probeTcpPort(port, options = {}) {
   const timeout = options.timeout ?? 3000;
   const diagnostics = [];
   const probeResults = [];
+
+  if (getPlatform() === 'win32') {
+    const netstat = runRaw('netstat.exe', ['-ano', '-p', 'tcp'], { timeout });
+    diagnostics.push({ probe: 'netstat', ok: netstat.ok, status: netstat.status, stderr: netstat.stderr.trim() });
+    const matches = netstat.ok
+      ? parseWindowsNetstat(netstat.stdout, 'tcp').filter((record) => record.port === port)
+      : [];
+    const records = matches.map((record) => {
+      const pid = record.pids[0];
+      const processInfo = getProcessInfo(pid, { timeout }) ?? {
+        ppid: null,
+        user: '',
+        command: '',
+        cwd: '',
+        startTime: ''
+      };
+      return {
+        port,
+        protocol: 'tcp',
+        pid,
+        ppid: processInfo.ppid,
+        user: processInfo.user,
+        command: processInfo.command,
+        cwd: processInfo.cwd,
+        startTime: processInfo.startTime,
+        isLikelyDevProcess: /node|python|vite|next|nuxt|webpack|bun|deno|go|java/i.test(processInfo.command || '')
+      };
+    });
+    return {
+      occupied: records.length > 0,
+      records,
+      diagnostics,
+      probeFailed: !netstat.ok,
+      permissionDenied: resultHasPermissionIssue(netstat)
+    };
+  }
 
   const lsof = runRaw('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN'], { timeout });
   probeResults.push(lsof);
@@ -450,6 +557,15 @@ export function probeTcpPort(port, options = {}) {
 export function listPreflight() {
   const platform = getPlatform();
   const pm = detectPackageManager();
+  if (platform === 'win32') {
+    const required = ['netstat', 'powershell'];
+    return {
+      platform,
+      detectedPackageManager: '',
+      missingDeps: required.filter((cmd) => !which(cmd)),
+      installHints: []
+    };
+  }
   const required = platform === 'macos' ? ['lsof', 'ps', 'kill'] : ['ps', 'kill'];
   const alternatives = platform === 'linux' ? ['lsof', 'ss', 'fuser'] : [];
 

@@ -1,236 +1,43 @@
 ---
 name: insight-collector
-description: >
-  Analyze any input material (URLs, code snippets, images, text, documents, screenshots)
-  and extract technical insights, reusable code, and project ideas into the CodeSnippets
-  knowledge base at ~/Projects/CodeSnippets. Use this skill when the user drops a link,
-  pastes code, shares a screenshot, sends a document, or provides raw text and wants it
-  analyzed and archived as inspiration. Triggers: "收录", "分析这个", "记录一下",
-  "add this to snippets", "collect", "/insight", or when user provides material
-  (link/code/image/doc) with intent to archive into the project.
+description: Analyze URLs, code, images, documents, screenshots, or raw text and archive reusable technical insights, code, and project ideas into a user-selected knowledge-base directory. Use when the user asks to collect, archive, analyze and save, 收录, 记录一下, or add material to a snippets/knowledge project.
 ---
 
 # Insight Collector
 
-**核心目标：榨干价值。** 不只列举内容——要推理、连接、推导出行动。模板是容器，推理才是价值所在。
+Turn source material into traceable, reusable knowledge without assuming a personal directory layout.
 
----
+## Inputs
 
-## Step 0：扫描现有知识库
+- Source material: URL, file, image, code, or text.
+- Target knowledge-base directory.
 
-读 `~/Projects/CodeSnippets/README.md` 目录表，记住：
-- 已有哪些主题（避免重复）
-- 哪些现有条目可能与本次材料产生连接
-- 知识库的空白领域（本次材料能否填补？）
+If the target is not stated, inspect the current workspace for an existing catalog such as `README.md` or `READING_LIST.md`. Ask before writing if more than one destination is plausible.
 
----
+## Workflow
 
-## Step 1：获取内容
+1. Read the existing catalog and nearby entries to avoid duplicates.
+2. Read the source completely enough to identify its claims and boundaries.
+3. Extract only applicable items:
+   - reusable code,
+   - technical patterns,
+   - tools and dependencies,
+   - tradeoffs,
+   - failure modes,
+   - non-obvious conclusions,
+   - open questions,
+   - concrete follow-up ideas.
+4. Separate source facts from your inference. Attach the source URL or file path to every archived item.
+5. Search the web only when freshness matters or when claiming that an idea is novel. Prefer primary sources.
+6. Write into an existing category. Create a new category only when none fits.
+7. Update the local catalog and reading list only if those files already exist or the user explicitly requests them.
+8. Re-read every changed file and report paths plus the most useful conclusions.
 
-| 输入类型 | 处理方式 |
-|---------|---------|
-| URL | WebFetch 完整内容；有重要链出页面一并 fetch |
-| 粘贴代码 | 直接分析 |
-| 图片 / 截图 | Read 图片，描述架构图，提取可见代码和概念 |
-| 文档（PDF/md/txt） | Read 文件 |
-| 原始文本 | 直接分析 |
+## Output rules
 
----
+- Use Chinese for analysis documents unless the target project uses another language.
+- Keep code in its natural language and do not invent code that was absent from the source.
+- A proposed experiment must state its source, expected value, minimum validation, and known alternatives.
+- Do not write outside the selected knowledge-base directory.
 
-## Step 2：提取——9 个维度
-
-从材料中提取所有适用维度。🧠⚖️⚠️💡 信息密度最高、最容易被忽视，优先挖掘：
-
-| 维度 | 提取内容 | 说明 |
-|------|---------|------|
-| 🟢 **可复用代码** | 可直接运行/导入的代码 | 原文提取，标注语言 |
-| 🏗️ **技术模式** | 架构思路、API 用法、设计模式 | 给模式命名 |
-| 📦 **工具与依赖** | 值得关注的库、工具、服务 | 记录版本（如有） |
-| 🧠 **心智模型** | 作者使用的思维框架 | 往往是最有价值的部分 |
-| ⚖️ **权衡取舍** | 明确陈述的 tradeoff | X vs Y：什么时候选哪个 |
-| ⚠️ **反模式与陷阱** | Gotcha、常见错误、边界情况 | 独立踩坑要付出的代价 |
-| 💡 **非显见洞见** | 不经提示不会想到的"啊哈"结论 | 专家知道而新手不知道的 |
-| ❓ **开放问题** | 材料提出或暗示的悬而未决问题 | 潜在研究方向 |
-| 🚀 **衍生想法种子** | 能从这里出发构建的方向（原始列表） | 下一步 Step 3 深化 |
-
----
-
-## Step 3：深度推理——把提取物榨干
-
-**这是最重要的步骤。** 对 Step 2 中每个高价值提取物，运行以下推理：
-
-### 3A：蕴含链（"所以……"）
-
-对每个重要洞见，追问 3 层：
-
-```
-洞见：X
-→ 所以：Y（X 的直接推论）
-→ 所以：Z（Y 的推论）
-→ 因此可以：[具体行动]
-```
-
-**示例**：
-```
-洞见：agent 把"写代码"的时间成本降到接近零
-→ 所以：过去"这个功能值不值花一天实现"的权衡框架已过时
-→ 所以：边界情况、实验性功能、一次性脚本都值得尝试
-→ 因此可以：建立"任何模糊想法都 prompt 一次"的工作习惯，而不是预先评估
-```
-
-### 3B：隐含假设挖掘
-
-问：**作者默认了什么，但没有说出来？**
-
-这些假设往往比结论本身更有价值——它们揭示了适用边界：
-- 这个方案在什么条件下成立？
-- 如果某个假设不成立，结论会怎么变？
-- 作者的上下文（规模、技术栈、团队文化）是否影响结论的普适性？
-
-### 3C：反事实分析
-
-问：**为什么选 X 而不是 Y？**
-
-不要只记录"他们用了 X"，要分析"选 X 而不是 Y 的决策逻辑"——这才是可迁移的判断力：
-- 被放弃的替代方案是什么？
-- 放弃的理由揭示了什么约束或价值观？
-- 在不同场景下，Y 可能比 X 更合适吗？
-
-### 3D：组合生成（连接现有知识库）
-
-把本次材料中的概念与 Step 0 中记住的现有 KB 条目交叉：
-
-```
-[本次概念 A] × [已有 KB 条目 B] → [新想法 C]
-新想法 C 的价值：{为什么 A+B 的组合比各自单独更有意思}
-最小验证实验：{能在一天内完成的最小 spike}
-```
-
-**示例**：
-```
-[本次：Symphony 工作区隔离机制] × [已有：mini_symphony.py 的 TASKS.md 队列]
-→ 新想法：给 mini_symphony 加 per-task git worktree，让每个任务在独立分支工作
-价值：彻底消除任务间的文件干扰，失败任务不污染主工作区
-最小验证：给 mini_symphony 加 --isolate 标志，用 git worktree add 实现
-```
-
-### 3E：边界与反例
-
-问：**这个方案在哪里会失效？**
-
-- 规模边界（10 个用户 vs 10万？）
-- 复杂度边界（玩具项目 vs 生产系统？）
-- 团队边界（单人 vs 多人协作？）
-- 列出 1-2 个具体反例场景
-
-### 3F：实时景观验证（🔴 强制步骤）
-
-**在生成任何行动建议或衍生想法之前，必须先用实时搜索验证。**
-
-不要基于模型已有知识判断"这个方向没人做过"——必须搜了才能说。
-
-对每个候选行动/想法，执行以下验证：
-
-1. **原始论文/来源验证**：回到原论文的 Experiments 章节，确认作者本身是否已经做了类似实验。搜索论文中出现的数据集名称、基线对比。
-2. **GitHub 搜索**：搜索关键词组合（技术名 + benchmark / implementation / comparison），检查是否已有人做了同样或更好的事。
-3. **社区搜索**：用 web_search 搜索 "技术名 + benchmark/comparison/vs" 确认当前社区现状。
-
-对每个候选行动，标注验证结果：
-
-```
-行动建议：{具体建议}
-验证状态：
-  - 原始论文：{✅ 论文未覆盖 | ❌ 论文已有 Table X / Figure Y}
-  - GitHub：{✅ 未找到同类项目 | ❌ 已有 user/repo 做了类似工作}
-  - 社区：{✅ 确认空白 | ⚠️ 部分覆盖 | ❌ 已有成熟方案}
-增量价值：{基于验证结果，这个行动具体新增了什么？}
-```
-
-**判定规则**：
-- 三项全 ✅ → 高价值建议，推荐执行
-- 有 ⚠️ → 需要明确说明差异点在哪里，增量价值是什么
-- 任何一项 ❌ → 必须告知用户已有成果，不推荐重复劳动；如果仍有独特角度，需要显式论证
-
-**反面教材**：
-```
-❌ "建议做一个 10K 向量检索 benchmark"
-   → 没搜索就推荐
-   → 后来发现论文本身有 SIFT1M (100万) 规模的完整实验
-   → 10K 是论文已有成果的小规模子集，浪费用户时间
-```
-
----
-
-## Step 4：分类写出
-
-### 目录路由
-
-| 内容类型 | 目标目录 | 命名规则 |
-|---------|---------|---------|
-| 可运行代码 | `{language}/` 或 `snippets/`（跨语言） | `功能描述.py/.js/.rs` |
-| 项目灵感与方向 | `ideas/` | `主题-方向.md` |
-| 外部资料精读 | `analysis/` | `作者-主题.md` |
-| 独立 HTML 工具 | `html-tools/` | `工具名.html` |
-| 项目/配置模板 | `templates/` | `用途.template` |
-
-文件命名：小写、连字符、描述性。
-
-### 代码文件 Header
-
-```
-# =============================================================================
-# 名称: <Snippet Name>
-# 来源: <原始 URL 或 "原创">
-# 用途: <解决什么问题>
-# 依赖: <pip install ... | stdlib only>
-# 适用场景: <在哪些地方可以用>
-# 日期: YYYY-MM-DD
-# =============================================================================
-```
-
-### 文档模板
-
-写 `analysis/` 或 `ideas/` 文件时，读取 [references/doc-templates.md](references/doc-templates.md) 获取完整模板结构。
-
----
-
-## Step 5：更新 README.md 和 READING_LIST.md
-
-在中英文目录表中各新增一行：
-
-```
-| {emoji} | `path/to/file` | {功能描述} | {依赖} |
-```
-
-类型 emoji：🟢 代码 · 🟡 模板 · 🔵 参考。仅在新建目录时更新结构树。
-
-**同步 READING_LIST.md**（`~/Projects/CodeSnippets/READING_LIST.md`）：
-- 若本次来源 URL 在"待归档"中有对应的 `- [ ]` 条目 → 改为 `- [x]`
-- 若 URL 不在列表中 → 在"已归档"末尾追加 `- [x] {url}`
-
----
-
-## Step 6：汇报
-
-向用户报告，**必须包含推理结论，不只是文件列表**：
-
-1. **创建了哪些文件**（路径 + 一句话描述）
-2. **Top 3 非显见洞见 + 蕴含链**（最有价值的推理结论）
-3. **最强组合想法**（哪两个概念组合最有意思，为什么）
-4. **建议的最小下一步**（具体，能立即开始）——**每条建议必须附带 3F 验证结果**
-
-⚠️ **如果 Step 3F 的验证未完成，不允许在此步骤给出行动建议。** 宁可说"需要进一步验证后再建议"，也不要给出未经验证的建议。
-
----
-
-## Guidelines
-
-- 中文写 idea/analysis 文档和注释，代码用英文
-- 一个来源可以产出多个文件（博文 → 代码片段 + idea 文档）
-- URL 来源必须包含 `来源` 字段
-- **不要虚构代码**——只提取实际存在于原材料的内容
-- 对长文，聚焦最新颖可复用的部分，宁可深度不够广也不要广度不够深
-- 衍生想法必须注明"来源组合"和"最小 spike"——没有这两项的想法是无效的
-- 分析的质量标准：读完这个文档，能否做出比读原文更好的设计决策？
-- **🔴 不要基于模型知识推荐行动——必须先用实时搜索（web_search / GitHub search）验证再建议。** 这是最容易犯的错误：觉得"大概没人做过"就推荐，结果浪费用户时间。宁可多搜一次，也不要给出未经验证的建议。
-- **搜索优先原则**：当用户问"这个值不值得做"、"有没有人做过"、"意义是什么"时，第一步永远是搜索，不是推理。推理建立在搜索结果之上，而非替代搜索。
+Read [references/doc-templates.md](references/doc-templates.md) for document shapes and [references/project-conventions.md](references/project-conventions.md) only when the target project follows those conventions.

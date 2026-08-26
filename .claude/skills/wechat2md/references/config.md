@@ -1,6 +1,6 @@
 # wechat2md 配置系统
 
-配置文件位置：`.claude/skills/wechat2md/config.json`
+配置文件位置：`<skill-dir>/config.json`
 
 无配置文件时使用 v1 默认行为（输出到 `outputs/<标题>/<标题>.md`）。
 
