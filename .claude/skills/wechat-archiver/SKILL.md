@@ -9,6 +9,8 @@ This Skill is standalone. It contains its own article fetcher and does not call 
 
 ## Setup
 
+Python 3.8+ and `curl` in `PATH` are required.
+
 ```bash
 pip install -r "<skill-dir>/requirements.txt"
 ```
@@ -22,8 +24,10 @@ pip install -r "<skill-dir>/requirements.txt"
 python "<skill-dir>/tools/fetch_article.py" "<article-url>" --output-dir "<target-root>/outputs" --target-folder "<folder>"
 ```
 
-3. Read the generated `article.md` and `meta.json`.
-4. If an existing asset has the same normalized URL and content hash, report `skipped` unless the user requested refresh.
+The fetcher reports `STATUS=skipped` and leaves the existing asset unchanged when its metadata matches the normalized URL and its article hash is valid. Append `--refresh` only when the user explicitly requests a refresh.
+
+3. Read the reported or generated `article.md` and `meta.json`.
+4. If the fetcher reports `skipped`, validate the existing asset and do not recreate its artifacts.
 5. Create `note.md` directly in the asset directory:
    - concise summary,
    - key arguments and evidence,

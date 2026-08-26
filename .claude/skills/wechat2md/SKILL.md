@@ -1,6 +1,6 @@
 ---
 name: wechat2md
-description: Convert WeChat Official Account article and album URLs from mp.weixin.qq.com into local Markdown with downloaded images. Use when the user asks to save, archive, download, or convert a WeChat article or collection.
+description: Convert WeChat Official Account article and album URLs from mp.weixin.qq.com into local Markdown with downloaded images. Use for format conversion or local capture; use wechat-archiver when the user requests a complete knowledge-base archive with notes, metadata, or Canvas/Base artifacts.
 ---
 
 # WeChat to Markdown
@@ -9,11 +9,13 @@ Use the scripts and dependencies bundled in this Skill.
 
 ## Setup
 
+Python 3.8+ and `curl` in `PATH` are required.
+
 ```bash
 pip install -r "<skill-dir>/requirements.txt"
 ```
 
-Optional configuration lives at `<skill-dir>/config.json`. Copy [config.example.json](config.example.json) and read [references/config.md](references/config.md). Do not require project-root configuration.
+Optional configuration is read by the legacy/album converter only. Copy [config.example.json](config.example.json) to `<skill-dir>/config.json` and read [references/config.md](references/config.md) when using `wechat2md.py`. The single-article `wechat2md_v2.py` route does not read this file; use its `--output-dir`, `--target-folder`, and `--slug` options instead. Do not require project-root configuration.
 
 ## Routing
 

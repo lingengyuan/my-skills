@@ -10,5 +10,7 @@ outputs/<folder>/<title>/
 
 ## Collision Policy
 If the directory already exists:
-- Overwrite all artifacts (MVP behavior)
-
+- Inspect its existing artifacts first.
+- Preserve existing files by default.
+- Overwrite only files the user explicitly asks to replace.
+- Use a new title or path when creating a separate note package.

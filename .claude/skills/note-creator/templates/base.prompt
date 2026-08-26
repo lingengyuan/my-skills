@@ -29,8 +29,8 @@ Hard Requirements:
 - sources MUST be exactly (relative to VAULT ROOT):
   outputs/<folder>/<title>/
 - Non-markdown files MUST be excluded
-- Define at least one view of type "table"
-- The view's "order" MUST include at least 6 column specifications
+- Define at least one usable view; use a table view for tabular or comparison data.
+- Include only properties and columns available in the source notes; do not invent fields to meet a count.
 - MUST include file.inFolder() filter to ensure only files from the target directory are shown
 
 Recommended Columns (for the view's "order" section):

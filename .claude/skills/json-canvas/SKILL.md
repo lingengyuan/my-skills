@@ -5,14 +5,14 @@ description: Create, edit, and validate JSON Canvas .canvas files used by Obsidi
 
 # JSON Canvas
 
-Create valid JSON Canvas 1.0 files. Read [REFERENCE.md](REFERENCE.md) for the full schema and examples when needed.
+Create valid JSON Canvas 1.0 files. Read [REFERENCE.md](REFERENCE.md) for the full schema and examples when needed. Read [templates/flowchart.prompt](templates/flowchart.prompt) only when the user requests its standard vertical flowchart layout.
 
 ## Workflow
 
 1. Read an existing canvas before editing it.
 2. Preserve unrelated nodes, edges, positions, and IDs.
 3. Use unique string IDs for every node and edge.
-4. Avoid overlaps and keep 50-100 pixels between neighboring nodes.
+4. Avoid unintended overlaps and leave enough spacing for readable layout.
 5. Write valid JSON with top-level `nodes` and `edges` arrays.
 6. Parse the completed file and validate all edge references.
 

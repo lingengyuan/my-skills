@@ -40,7 +40,7 @@ Use [templates/note.md.prompt](templates/note.md.prompt) as guidance, not as a r
 
 ## Canvas contract
 
-Select one internal layout template from `templates/canvas.*.md`.
+Use [templates/canvas.prompt](templates/canvas.prompt) only for the generic Canvas field/output contract, then select one content-specific layout template from `templates/canvas.*.md`.
 
 - Write valid JSON Canvas with `nodes` and `edges`.
 - Every edge uses `fromNode` and `toNode`; never `from` or `to`.
@@ -49,9 +49,13 @@ Select one internal layout template from `templates/canvas.*.md`.
 
 ## Base contract
 
-For comparisons, create one Markdown record per item under `compare/`, then scope the Base to that directory. For generic views, scope the Base to the note package directory and include Markdown files only.
+For comparisons, create one Markdown record per item under `compare/` using [templates/compare.item.md](templates/compare.item.md), then use [templates/base.comparison.prompt](templates/base.comparison.prompt) and scope the Base to that directory. For generic views, use [templates/base.prompt](templates/base.prompt), scope the Base to the note package directory, and include Markdown files only.
 
 Write valid YAML and verify every referenced property or formula exists.
+
+## Metadata contract
+
+Use [templates/meta.json.prompt](templates/meta.json.prompt) as a schema example only. Replace its sample values with values from the current run, and compute current timestamps and fingerprints before reporting completion.
 
 ## Boundaries
 

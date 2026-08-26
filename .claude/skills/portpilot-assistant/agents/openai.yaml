@@ -1,5 +1,5 @@
 version: 1
 interface:
-  display_name: PortPilot Assistant
-  short_description: Natural-language assistant for local port management via PortPilot CLI.
-  default_prompt: Help me manage local development ports.
+  display_name: "PortPilot Assistant"
+  short_description: "Manage local development ports with PortPilot CLI."
+  default_prompt: "Use $portpilot-assistant to manage my local development ports."

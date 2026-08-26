@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
-import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
@@ -79,22 +78,8 @@ async function loadBeautifulMermaid() {
   if (process.env.BEAUTIFUL_MERMAID_NODE_PATH) {
     candidates.push(process.env.BEAUTIFUL_MERMAID_NODE_PATH)
   }
-  candidates.push(process.cwd())
   candidates.push(scriptDir)
   candidates.push(resolve(scriptDir, '..'))
-  if (process.env.APPDATA) {
-    candidates.push(join(process.env.APPDATA, 'npm', 'node_modules'))
-  }
-
-  for (const npmCommand of process.platform === 'win32' ? ['npm.cmd', 'npm'] : ['npm']) {
-    try {
-      const globalRoot = execFileSync(npmCommand, ['root', '-g'], { encoding: 'utf8' }).trim()
-      if (globalRoot) candidates.push(globalRoot)
-      break
-    } catch {
-      // npm may be unavailable in restricted environments. Other candidates still apply.
-    }
-  }
 
   for (const base of candidates) {
     const normalizedBase = isAbsolute(base) ? base : resolve(base)
@@ -121,7 +106,7 @@ async function loadBeautifulMermaid() {
   }
 
   throw new Error(
-    'Could not resolve beautiful-mermaid. Install it with `npm install -g beautiful-mermaid` or set BEAUTIFUL_MERMAID_NODE_PATH.\n'
+    'Could not resolve beautiful-mermaid. Install dependencies in this Skill with `npm install --prefix <skill-dir>` or set BEAUTIFUL_MERMAID_NODE_PATH.\n'
     + errors.join('\n')
   )
 }

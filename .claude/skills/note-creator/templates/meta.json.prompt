@@ -1,52 +1,52 @@
 {
   "schema_version": "3.0",
-  "id": "nc_20260109_40_tools_docker_common_cmds",
-  "stable_key": "40-工具脚本::Docker 常用命令",
-  "title": "Docker 常用命令",
-  "folder": "40-工具脚本",
+  "id": "nc_<timestamp>_<stable-key-slug>",
+  "stable_key": "<folder>::<title>",
+  "title": "<title>",
+  "folder": "<folder>",
 
   "diagram_type": "artifact",
 
-  "artifact_plan": ["md", "base"],
-  "tags": ["docker", "运维", "命令", "容器"],
+  "artifact_plan": ["md"],
+  "tags": ["<tag>"],
 
   "properties": {
-    "category": "容器技术",
-    "created": "2026-01-09",
-    "modified": "2026-01-09",
-    "source": "user_prompt"
+    "category": "<category>",
+    "created": "<current-date>",
+    "modified": "<current-date>",
+    "source": "<source-type>"
   },
 
   "paths": {
-    "root_dir": "outputs/40-工具脚本/Docker 常用命令/",
-    "note": "outputs/40-工具脚本/Docker 常用命令/note.md",
+    "root_dir": "outputs/<folder>/<title>/",
+    "note": "outputs/<folder>/<title>/note.md",
     "canvas": null,
-    "base": "outputs/40-工具脚本/Docker 常用命令/table.base",
-    "meta": "outputs/40-工具脚本/Docker 常用命令/meta.json"
+    "base": null,
+    "meta": "outputs/<folder>/<title>/meta.json"
   },
 
   "revision": {
     "number": 1,
-    "mode": "overwrite",
+    "mode": "create",
     "previous_meta": null,
     "previous_outputs": null
   },
 
   "update": {
     "intent": "create",
-    "strategy": "overwrite",
+    "strategy": "create",
     "reason": "no previous note found for stable_key",
     "change_summary": [
-      "Created note.md with structured sections and examples",
-      "Created table.base for filterable command catalog"
+      "Created note.md from source-backed sections",
+      "Created selected optional artifacts when requested"
     ],
     "input_fingerprint": {
-      "user_prompt_sha256": "TO_FILL",
+      "user_prompt_sha256": "<sha256-of-user-prompt>",
       "context_files": []
     },
     "output_fingerprint": {
-      "note_md_sha256": "TO_FILL",
-      "base_sha256": "TO_FILL",
+      "note_md_sha256": "<sha256-of-note-md>",
+      "base_sha256": null,
       "canvas_sha256": null
     }
   },
@@ -62,8 +62,8 @@
       }
     ],
     "links": {
-      "canonical_link": "[[outputs/40-工具脚本/Docker 常用命令/note]]",
-      "base_link": "[[outputs/40-工具脚本/Docker 常用命令/table.base]]",
+      "canonical_link": "[[outputs/<folder>/<title>/note]]",
+      "base_link": null,
       "canvas_link": null
     }
   },
@@ -84,7 +84,7 @@
       "meta_json_prompt": ".claude/skills/note-creator/templates/meta.json.prompt"
     },
     "run": {
-      "timestamp": "2026-01-09T08:18:00+08:00",
+      "timestamp": "<current-timestamp>",
       "environment": {
         "host": "local_or_ssh",
         "vault": "OBSIDIAN",
@@ -113,11 +113,10 @@
   "history": [
     {
       "revision": 1,
-      "timestamp": "2026-01-09T08:18:00+08:00",
+      "timestamp": "<current-timestamp>",
       "intent": "create",
-      "strategy": "overwrite",
+      "strategy": "create",
       "note": "initial creation"
     }
   ]
 }
-

@@ -6,7 +6,8 @@ SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BUNDLED_CLI="${SKILL_DIR}/assets/portpilot/bin/portpilot.js"
 
 if [[ -f "${BUNDLED_CLI}" ]]; then
-  node "${BUNDLED_CLI}" "$@"
+  exec node "${BUNDLED_CLI}" "$@"
 else
-  npx -y portpilot-cli@1 "$@"
+  echo "ERROR: bundled PortPilot CLI not found: ${BUNDLED_CLI}" >&2
+  exit 1
 fi

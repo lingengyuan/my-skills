@@ -2,6 +2,8 @@
 
 配置文件位置：`<skill-dir>/config.json`
 
+此配置由 `tools/wechat2md.py` 及其合集流程读取；当前单篇路由 `tools/wechat2md_v2.py` 不读取该文件，请使用命令行参数指定输出位置。
+
 无配置文件时使用 v1 默认行为（输出到 `outputs/<标题>/<标题>.md`）。
 
 ## 默认配置（v1 兼容）

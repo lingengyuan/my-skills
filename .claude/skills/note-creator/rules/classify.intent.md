@@ -212,5 +212,5 @@ Fallback for unclassified or temporary content.
 ---
 
 ## properties Rules
-- created/modified MUST be today's date: 2026-01-10
+- created/modified MUST use the current execution date in YYYY-MM-DD format
 - source: "user_prompt" unless the request indicates file input.

@@ -18,21 +18,15 @@ Context you are given:
 - canvas_template (a markdown template that defines REQUIRED layout, node ids, coordinates, and edge patterns)
 
 Requirements:
-- At least 6 nodes
-- At least 5 edges
-- Must include:
-  - User request
-  - Intent classification
-  - note.md generation
-  - Optional base/canvas branches
-  - Persistence to root_dir
+- Include only the nodes and edges needed to explain the requested content.
+- Include relationship edges when the source contains relationships; do not invent them to meet a count.
+- Do not add orchestrator workflow nodes, optional artifact branches, or persistence steps unless the requested diagram is about that workflow.
 
 Layout:
-- You MUST follow the provided canvas_template.
-- Node IDs, relative positions, and edge patterns must match the template intent.
-- Coordinates may be approximate ONLY where the template allows flexibility.
+- When a canvas_template is provided, follow its required layout constraints.
+- Otherwise choose readable node IDs, positions, and edge patterns that fit the requested content.
+- Treat coordinates as approximate unless the selected template specifies fixed values.
 
 Output:
 - Output ONLY the JSON content of the .canvas file
 - No markdown, no explanation
-

@@ -10,7 +10,7 @@ Key improvements over v1:
 5. Better structure preservation
 
 Usage:
-  python3 wechat2md_v2.py "https://mp.weixin.qq.com/s/xxxxxxxx" [--output-dir OUTPUT_DIR]
+  python3 fetch_article.py "https://mp.weixin.qq.com/s/xxxxxxxx" [--output-dir OUTPUT_DIR] [--refresh]
 
 Output contract (relative to CWD):
   outputs/<target_folder>/<slug>/
@@ -81,6 +81,39 @@ def compute_asset_id(url: str) -> str:
     """Compute asset_id as SHA1 of normalized URL."""
     normalized = normalize_url(url)
     return hashlib.sha1(normalized.encode('utf-8')).hexdigest()
+
+
+def find_existing_asset(output_root: Path, target_folder: str, asset_id: str) -> Optional[Path]:
+    """Find a complete, hash-verified asset with the same normalized URL."""
+    folder_root = output_root / target_folder
+    if not folder_root.is_dir():
+        return None
+
+    for meta_path in folder_root.rglob("meta.json"):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                metadata = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        if not isinstance(metadata, dict):
+            continue
+        metadata_url = metadata.get("url")
+        same_asset = bool(
+            isinstance(metadata_url, str)
+            and compute_asset_id(metadata_url) == asset_id
+        )
+        article_path = meta_path.parent / "article.md"
+        content_hash = metadata.get("content_hash")
+        if same_asset and isinstance(content_hash, str) and article_path.is_file():
+            try:
+                current_hash = compute_content_hash(article_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError):
+                continue
+            if current_hash == content_hash:
+                return meta_path.parent
+
+    return None
 
 
 def fetch_html(url: str, timeout_s: int = 30) -> str:
@@ -345,6 +378,7 @@ def main() -> int:
     parser.add_argument("--output-dir", default="outputs", help="Output directory (default: outputs)")
     parser.add_argument("--target-folder", default="20-阅读笔记", help="Target folder name (default: 20-阅读笔记)")
     parser.add_argument("--slug", help="Custom slug (default: auto from title)")
+    parser.add_argument("--refresh", action="store_true", help="Refresh an existing matching asset")
 
     args = parser.parse_args()
 
@@ -354,6 +388,18 @@ def main() -> int:
         return 2
 
     try:
+        asset_id = compute_asset_id(url)
+        existing_asset_dir = find_existing_asset(
+            Path(args.output_dir),
+            args.target_folder,
+            asset_id,
+        )
+        if existing_asset_dir and not args.refresh:
+            print("STATUS=skipped")
+            print(f"ASSET_DIR={existing_asset_dir}")
+            print(f"ASSET_ID={asset_id}")
+            return 0
+
         # Parse HTML
         html = fetch_html(url)
         soup = BeautifulSoup(html, "html.parser")
@@ -364,14 +410,30 @@ def main() -> int:
         author = extract_author(soup)
         publish_time = extract_publish_time(soup)
 
-        # Compute asset_id
-        asset_id = compute_asset_id(url)
-
         # Determine output paths
         slug = args.slug or title
-        output_dir = Path(args.output_dir) / args.target_folder / slug
+        output_dir = existing_asset_dir or Path(args.output_dir) / args.target_folder / slug
         article_path = output_dir / "article.md"
         images_dir = output_dir / "images"
+
+        existing_meta_path = output_dir / "meta.json"
+        if output_dir.exists() and not existing_asset_dir:
+            if not existing_meta_path.is_file():
+                raise RuntimeError(
+                    f"Output directory already exists without metadata: {output_dir}; choose a different --slug"
+                )
+            try:
+                with open(existing_meta_path, "r", encoding="utf-8") as f:
+                    existing_metadata = json.load(f)
+            except (OSError, json.JSONDecodeError) as error:
+                raise RuntimeError(
+                    f"Cannot safely reuse output directory {output_dir}: invalid meta.json"
+                ) from error
+            existing_url = existing_metadata.get("url")
+            if not existing_url or compute_asset_id(existing_url) != asset_id:
+                raise RuntimeError(
+                    f"Output directory belongs to another article: {output_dir}; choose a different --slug"
+                )
 
         # Create output directory
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -419,7 +481,7 @@ def main() -> int:
         save_metadata(output_dir, metadata)
 
         # Clean up empty images directory
-        if images_count == 0 and images_dir.exists():
+        if images_count == 0 and images_dir.exists() and not args.refresh:
             shutil.rmtree(images_dir)
 
         # Output paths (for script integration)
