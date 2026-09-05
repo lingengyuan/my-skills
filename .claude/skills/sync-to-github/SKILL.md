@@ -5,37 +5,13 @@ description: Safely prepare, commit, and optionally push Git changes. Use when t
 
 # Sync to GitHub
 
-Use the bundled script for deterministic staged-change commits. Resolve it relative to this Skill.
+Match the operation to the user's request: inspection or commit-message drafting is read-only; commit requests authorize a local commit; push/sync requests authorize the corresponding push. Do not commit merely because this Skill was selected.
 
-## Safe workflow
+1. Inspect status, staged and unstaged diffs, current branch and relevant remotes. Isolate task-related changes and preserve unrelated staged work.
+2. Check the intended diff for secrets and unintended generated files; stage only authorized paths or hunks. Never use blanket staging to capture unrelated work.
+3. When committing, use the bundled `tools/git_sync.py` if it fits the required scope, or ordinary Git for precise control. A script dependency is not a blocker. Preview the actual staged diff and message yourself; existing commit authorization needs no additional approval.
+4. If nothing changed, report that result. If a local commit already exists and a push is requested, continue the push even when the index is empty. After committing, do not invoke another commit-only path merely to push.
+5. Push only within the requested destination and scope; never force-push or rewrite unrelated history by inference. On rejection, inspect the cause, preserve work, and resolve routine divergence in an isolated checkout when appropriate.
+6. Verify the exact remote ref after pushing. Report actual local/remote status and any blocker; do not describe an unpushed local commit as synchronized.
 
-1. Inspect `git status --short`, the staged diff, current branch, and remote.
-2. Check staged files for secrets, generated output, and unrelated changes.
-3. Stage only the files authorized by the user.
-4. Preview the generated message:
-
-```bash
-python "<skill-dir>/tools/git_sync.py" --dry-run
-```
-
-5. Commit the currently staged files:
-
-```bash
-python "<skill-dir>/tools/git_sync.py"
-```
-
-6. Push only when explicitly requested:
-
-```bash
-python "<skill-dir>/tools/git_sync.py" --push
-```
-
-7. After pushing, verify the exact remote ref with `git ls-remote`.
-
-## Rules
-
-- Default behavior commits staged files only and does not push.
-- Never stage all files implicitly.
-- Do not add assistant co-author trailers unless the user asks.
-- Stop if nothing is staged.
-- Preserve the local commit if pushing fails and report the exact failure.
+Do not add assistant co-author trailers unless requested. A push does not by itself prove deployment; verify CI or deployment only when required by the user's requested outcome or project checks.

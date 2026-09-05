@@ -18,10 +18,10 @@ In a POSIX shell, [scripts/run_portpilot.sh](scripts/run_portpilot.sh) is an opt
 ## Workflow
 
 1. Map the request to `scan`, `who`, `pick`, `claim`, `doctor`, `free`, `init`, or `config`.
-2. Run read-only commands with `--json`. `pick` creates a temporary lease, so run it only when the user explicitly asks for a port and report the lease expiry.
-3. Request elevated permission only if a read-only command fails because the operating system blocks process or socket inspection.
-4. Before `free`, show the port, PID, command, working directory, start time, and intended signal, then obtain explicit confirmation.
-5. Preview configuration changes before `init --force` or `config migrate`; run `claim` only when the user explicitly asks to consume a lease.
+2. Run read-only commands with `--json`. Use `pick` when the requested development task needs a port; it creates a temporary lease, so report the expiry when handing it off.
+3. Try normal permissions first; request elevation only for an observed permission restriction on an already authorized operation.
+4. Before `free`, inspect the current port owner, PID, command, working directory and start time. If the user already authorized stopping this exact process or the task-owned development server, proceed with the intended signal. Ask only if the owner is unexpected, shared, unrelated, or the stopping scope is unclear; do not reconfirm unchanged authorization.
+5. Inspect configuration differences before `init --force` or `config migrate`; use `claim` only when consuming the lease is part of the authorized task.
 6. Return the conclusion first and the relevant command result second.
 
 ## Commands

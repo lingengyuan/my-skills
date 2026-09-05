@@ -1,11 +1,7 @@
 # Safety Policy
 
-1. Auto-run read operations: `scan`, `who`, `doctor`, and `init --dry-run`.
-2. `pick` creates a temporary lease; run it only for an explicit request and report its expiry. `claim` consumes a lease and also requires an explicit request.
-3. Confirm write operations: `free`, `init --force`, and `config migrate`.
-4. Before `free`, run `who` and display PID/command/cwd/startTime.
-5. Never skip confirmation unless user explicitly asks.
-6. Resolve the bundled CLI relative to this Skill's directory.
-7. Run read actions without escalation first.
-8. Request escalation only after a read action fails with an operating-system permission error.
-9. Write actions still require explicit confirmation before execution.
+1. Read-only inspection runs directly. `pick` and `claim` may run when a requested development task needs a port; report any lease that matters to the caller.
+2. Before terminating a process, inspect its current identity and ownership. Authorization to stop a known task-owned server persists; a changed PID/process, shared service or unrelated application requires reassessment and, if not covered, user approval.
+3. `free`, `init --force` and configuration migration require task authorization for their actual scope; do not ask again when already granted. Preserve unrelated configuration and processes.
+4. Resolve the bundled CLI relative to this Skill. Try normal permissions first; request platform escalation only for a demonstrated permission restriction on an authorized operation.
+5. Prefer graceful termination and verify the target port state. Do not infer authorization for a stronger signal or a different process from a failed attempt.
