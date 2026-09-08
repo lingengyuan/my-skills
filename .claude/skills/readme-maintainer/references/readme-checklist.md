@@ -1,41 +1,32 @@
 # README Checklist
 
-Use this checklist before writing `README.md`.
+Use for full rewrites; select content by reader need rather than treating this as a required section list.
 
-## Grounding
+## Content
 
-- Verify every command exists in repo files (`package.json`, `Makefile`, `pyproject.toml`, scripts).
-- Verify referenced paths/files exist.
-- Keep versions/tool names consistent with source files.
+- A short project definition and purpose.
+- Runtime prerequisites and the primary installation path.
+- A runnable usage example with the configuration it requires.
+- Common operations and constraints that affect correct use, data, or recovery.
+- Development commands and license where relevant.
+- Verified links for detailed configuration, command reference, and architecture; destinations cover the topics delegated to them.
 
-## Core sections
+## Evidence
 
-- `# ProjectName` and one-sentence summary
-- Features or capabilities
-- Installation
-- Usage / quick start
-- Configuration (if env vars or config files exist)
-- Development + test commands
-- Contributing
-- Project structure (short tree)
-- License
+- Commands and options match current source or maintained scripts.
+- Paths and links resolve; versions and tool names match authoritative files.
+- Source-verified commands are not presented as successfully executed.
+- Compatibility, metrics, and deployment claims have evidence.
 
-## Bilingual parity (default)
+## Publication quality
 
-- Include both `## English` and `## 简体中文` for user-facing project README files.
-- Keep mirrored sections aligned in meaning and scope.
-- If you add/remove a section in one language, mirror the same change in the other language.
-- Validate headings with `scripts/check_bilingual_readme.sh README.md`.
+- The README stands alone without conversation, review, or editing history.
+- Each paragraph adds useful information; repeated facts and empty sections are removed.
+- Responsibilities and rules are stated directly; real constraints retain their meaning.
+- Details are linked rather than duplicated, while the quick start remains usable.
+- Brevity preserves prerequisites, contracts, safety conditions, and recovery limits.
 
-## Writing rules
+## Language
 
-- Prefer concise, executable instructions.
-- Show copy-pasteable commands.
-- State prerequisites explicitly.
-- Keep marketing language minimal; favor concrete behavior.
-
-## Do not do
-
-- Do not invent benchmarks, adoption numbers, or compatibility claims.
-- Do not include commands that are not verifiable from the repo.
-- Do not add sections with empty placeholders unless user asks for template-style README.
+- Preserve the existing language unless the user requests a change.
+- For existing or requested bilingual content, keep both versions aligned in meaning and scope, then run `scripts/check_bilingual_readme.sh README.md`.
