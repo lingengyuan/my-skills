@@ -223,7 +223,23 @@ After:
 
 如果上一句已经准确表达规则，本句没有独立信息价值。
 
-## 25. 转换判断顺序
+## 25. 影响面安抚 → 改动事实
+
+Before:
+> 改动仅涉及 CURSOR c_data，c_prom_level 及 PL/SQL 调用处不变。
+
+After:
+> 改动仅涉及 CURSOR c_data。
+
+Before:
+> CASE 无 ELSE 时返回 NULL，XMLFOREST 对 NULL 表达式不输出元素，即非 NEW_PRICE 时 REWARD_VALUE 元素缺省（与现状 p_reward 为 NULL 时的输出形态一致，RMS 解析无新增风险）。
+
+After:
+> CASE 无 ELSE 时返回 NULL，XMLFOREST 对 NULL 表达式不输出元素，即非 NEW_PRICE 时 REWARD_VALUE 元素缺省。
+
+影响范围已有改动位置表达时，删除安抚从句；括号内为风险自证时整体删除。
+
+## 26. 转换判断顺序
 
 遇到疑似坏味道时按以下顺序处理：
 
