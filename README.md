@@ -4,7 +4,7 @@
 
 ## English
 
-Independent Claude/Codex Skills for technical writing, knowledge management, and development. Each directory under `.claude/skills/` includes its instructions and supporting resources.
+Skills for technical writing, knowledge management, and development. Each directory under `.claude/skills/` includes its instructions and supporting resources. Three directories are copies of [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) and remain under its license — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ### Skills
 
@@ -40,7 +40,7 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 
 ## 简体中文
 
-用于技术写作、知识管理和开发的独立 Claude/Codex Skills。每个 Skill 的说明与配套资源位于 `.claude/skills/`。
+用于技术写作、知识管理和开发的 Claude/Codex Skills。每个 Skill 的说明与配套资源位于 `.claude/skills/`。其中三个目录复制自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)，仍适用其许可证——见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ### Skill 目录
 
@@ -74,4 +74,4 @@ cd my-skills
 
 `portpilot-assistant` 需要 Node.js 18+。凭据保存在本地配置：`md2wechat/.env` 使用 `WECHAT_APPID` 和 `WECHAT_SECRET`；`wechat2md/config.json` 保存可选输出规则。路径均相对于 `.claude/skills/`，这些配置文件由 Git 忽略。
 
-[MIT License](LICENSE)
+[MIT License](LICENSE) · 部分内容来自第三方，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
