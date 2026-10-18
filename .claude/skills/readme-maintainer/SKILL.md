@@ -1,46 +1,51 @@
 ---
 name: readme-maintainer
-description: Update, rewrite, or generate concise, publication-ready project READMEs from current repository facts. Use for README maintenance, install and usage refreshes, command verification, and existing bilingual alignment.
+description: Maintain, update, and rewrite concise, publication-ready repository README files grounded in codebase facts. Use when updating README.md, refreshing installation and usage guides, verifying CLI commands, or aligning bilingual documentation.
 ---
 
-# README Maintainer
+# README Maintainer Skill
 
-Treat repository files as the source of truth. Write a standalone entry point that tells readers what the project does and how to install, configure, and use it.
+Generate and maintain clear, verified README files directly from repository source code, build manifests, and runtime configuration. Standard Markdown is assumed knowledge.
 
 ## Workflow
 
-1. Resolve the repository and README path; read the existing README.
-2. Collect only the facts needed for the change. For broad updates, use:
+1. **Locate README and files**: Identify repository root and existing `README.md`. Read the current content.
+2. **Collect repository facts**: Inspect `package.json`, `Cargo.toml`, `pyproject.toml`, CLI help outputs, and configuration files. For repository-wide updates, run:
+   ```bash
+   bash "<skill-dir>/scripts/collect_repo_facts.sh" "<repo-path>"
+   ```
+3. **Verify claims against code**: Verify installation steps, prerequisites, environment variables, and CLI commands against actual repository source code. Delete stale claims and unverified statements.
+4. **Structure the document**:
+   - **Project Overview**: One concise sentence describing what the project does.
+   - **Prerequisites & Installation**: Exact runtime versions, package managers, and setup commands.
+   - **Quick Start / Basic Usage**: Minimal runnable command or code example with realistic input and output.
+   - **Configuration / Key Options**: Essential configuration table or common operations.
+   - **Documentation Links**: Link detailed architectural guides, API references, and development procedures to existing files instead of duplicating them.
+5. **Apply publication pass**:
+   - Delete meta-discourse, author reflections, and review commentary.
+   - State product features and constraints directly in active voice.
+   - Define each technical fact in one authoritative place.
+   - Keep only sections the reader needs. A README is an entry point, not an exhaustive encyclopedia.
+6. **Align bilingual documentation (if applicable)**:
+   - Match the existing language convention.
+   - If bilingual READMEs exist, ensure semantic parity across sections. Run:
+     ```bash
+     bash "<skill-dir>/scripts/check_bilingual_readme.sh" README.md
+     ```
+7. **Verify & report**: Test links, verify command syntax, and report material changes outside the README.
 
-```bash
-bash "<skill-dir>/scripts/collect_repo_facts.sh" "<repo-path>"
-```
+## Guidelines
 
-3. Verify purpose, prerequisites, examples, configuration, and commands against authoritative files. Preserve useful user-authored content; remove stale claims rather than guessing.
-4. Match the existing language. Use bilingual output only when already present or requested.
-5. Keep the main installation path, a working usage example, common operations, and essential constraints. Link detailed configuration, architecture, exhaustive options, and development procedures to existing documentation instead of duplicating them. Verify that each destination actually covers the referenced topic.
-6. Apply the publication pass below, then verify paths, command syntax, and semantic preservation. Execute commands only when appropriate to the task; distinguish source verification from successful execution.
-7. For bilingual files, check semantic parity and run:
+- **Grounding**: Never invent compatibility guarantees, benchmarks, test coverage stats, or feature lists.
+- **Single source of truth**: Link to specialized documentation (architecture, full API, contributing guides) rather than duplicating large sections.
+- **Brevity with completeness**: Delete conversational filler, but keep essential setup commands, parameter definitions, and failure recovery notes.
 
-```bash
-bash "<skill-dir>/scripts/check_bilingual_readme.sh" README.md
-```
+## Verification Checklist
 
-8. Report the completed change and material unresolved facts briefly, outside the README.
+Before completing the task, verify:
 
-Read [references/readme-checklist.md](references/readme-checklist.md) before a full rewrite.
-
-## Publication pass
-
-- Delete before rewriting: remove a sentence if its absence does not impair understanding, setup, operation, or verification.
-- Describe the product and its current behavior directly. Remove author reasoning, review history, temporary work status, defensive explanations, rhetorical transitions, and repeated claims.
-- Express responsibilities through their owners and operational warnings as concrete rules. Preserve real prohibitions, safety constraints, compatibility conditions, and recovery limits.
-- Keep each fact in one authoritative place. Prefer a short paragraph, runnable example, or compact table over repeated explanations.
-- Use only sections the reader needs; a README is not a complete manual. Do not impose a fixed word count, reduction percentage, section template, or mandatory project tree.
-- Preserve enough context for a new reader to act. Correctness, necessary completeness, and usability take priority over brevity.
-
-## Evidence rules
-
-- Do not invent compatibility, metrics, deployment status, or test results.
-- Keep internal checks and editing history out of the final document. Include validation commands or supported behavior only when useful to project readers.
-- A full rewrite must retain essential setup steps, technical contracts, and operational constraints, either directly or through verified documentation links.
+1. All installation and run commands match repository build tools.
+2. Code examples and CLI flags reflect current implementations.
+3. All internal links and relative file paths resolve correctly.
+4. If bilingual, both language sections cover identical concepts without drift.
+5. Output contains no internal editing chatter or temporary task notes.

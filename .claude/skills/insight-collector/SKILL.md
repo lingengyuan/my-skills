@@ -1,43 +1,52 @@
 ---
 name: insight-collector
-description: Analyze URLs, code, images, documents, screenshots, or raw text and archive reusable technical insights, code, and project ideas into a user-selected knowledge-base directory. Use when the user asks to collect, archive, analyze and save, 收录, 记录一下, or add material to a snippets/knowledge project.
+description: Analyze URLs, source code, images, technical documents, or notes, and archive reusable insights, code snippets, and architecture patterns into a knowledge base. Use when collecting knowledge, archiving technical articles, saving reusable code, or recording insights (收录, 记录一下).
 ---
 
-# Insight Collector
+# Insight Collector Skill
 
-Turn source material into traceable, reusable knowledge without assuming a personal directory layout.
+Extract actionable engineering insights, reusable code snippets, and system design patterns from raw material and archive them into structured knowledge assets.
 
 ## Inputs
 
-- Source material: URL, file, image, code, or text.
-- Target knowledge-base directory.
+- **Source Material**: URL, code repository, image, screenshot, PDF, or text notes.
+- **Target Knowledge Base**: Target directory for archiving.
 
-If the target is not stated, inspect the current workspace for an existing catalog such as `README.md` or `READING_LIST.md`. Ask before writing if more than one destination is plausible.
+If the target directory is not specified, inspect the workspace for existing catalogs (e.g. `README.md`, `INDEX.md`, `READING_LIST.md`). If multiple plausible destinations exist, ask the user to select the location before writing.
 
 ## Workflow
 
-1. Read the existing catalog and nearby entries to avoid duplicates.
-2. Read the source completely enough to identify its claims and boundaries.
-3. Extract only applicable items:
-   - reusable code,
-   - technical patterns,
-   - tools and dependencies,
-   - tradeoffs,
-   - failure modes,
-   - non-obvious conclusions,
-   - open questions,
-   - concrete follow-up ideas.
-4. Separate source facts from your inference. Attach the source URL or file path to every archived item.
-5. Search the web only when freshness matters or when claiming that an idea is novel. Prefer primary sources.
-6. Write into an existing category. Create a new category only when none fits.
-7. Update the local catalog and reading list only if those files already exist or the user explicitly requests them.
-8. Re-read every changed file and report paths plus the most useful conclusions.
+1. **Inspect existing catalog**: Inspect the target directory to understand existing taxonomy and prevent duplicate notes.
+2. **Analyze source material**: Read the source thoroughly to understand core arguments, architecture decisions, and boundary conditions.
+3. **Extract high-signal items**:
+   - **Reusable code**: Self-contained functions, scripts, and configuration blocks with explicit dependency requirements.
+   - **Design patterns**: Reusable architectural models, mental models, and component boundaries.
+   - **Trade-offs and failure modes**: Real-world constraints, performance bottlenecks, and edge cases.
+   - **Actionable implications**: Concrete follow-up ideas or spike experiments.
+4. **Structure the document**:
+   - Select an appropriate document template from [references/doc-templates.md](references/doc-templates.md):
+     - In-depth reading analysis (`analysis/<topic>.md`)
+     - Project inspiration note (`ideas/<topic>.md`)
+     - Standalone snippet (`python/`, `javascript/`, `shell/`)
+   - Keep source facts and analytical inferences strictly distinguished.
+   - Include original source URL or file path and capture date.
+5. **Categorize and save**: Save the file in the matching category folder. Follow [references/project-conventions.md](references/project-conventions.md) when the target project adheres to those conventions.
+6. **Update index catalog**: If the knowledge base maintains an index table in `README.md`, add a row referencing the new asset.
+7. **Verify and report**: Verify that all files exist and links resolve. Present the key takeaways and saved paths concisely.
 
-## Output rules
+## Guidelines & Boundaries
 
-- Use Chinese for analysis documents unless the target project uses another language.
-- Keep code in its natural language and do not invent code that was absent from the source.
-- A proposed experiment must state its source, expected value, minimum validation, and known alternatives.
-- Do not write outside the selected knowledge-base directory.
+- **Language consistency**: Write analytical notes in clear Chinese unless the target project specifies English. Keep code and technical identifiers in their original programming language.
+- **Fact preservation**: Never fabricate claims, fake benchmark results, or code that was not present in or derived from the source.
+- **Minimal experiments**: Proposed follow-up spikes must state source motivation, expected value, and minimal verification criteria.
+- **Directory isolation**: Never write outside the target knowledge base directory.
 
-Read [references/doc-templates.md](references/doc-templates.md) for document shapes and [references/project-conventions.md](references/project-conventions.md) only when the target project follows those conventions.
+## Verification Checklist
+
+Before completing the task, verify:
+
+1. The generated markdown file exists and contains valid frontmatter or headers.
+2. Source link and capture date are accurately recorded.
+3. Code blocks specify language identifiers and required dependencies.
+4. Existing catalog or index file is updated if applicable.
+5. Output summary reports file paths and key findings directly.

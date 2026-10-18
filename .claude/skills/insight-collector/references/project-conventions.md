@@ -2,8 +2,7 @@
 
 ## Project Root
 
-`/root/projects/CodeSnippets`
-
+`<workspace-root>/CodeSnippets`
 ## Directory Map
 
 | Directory | Purpose | File types |

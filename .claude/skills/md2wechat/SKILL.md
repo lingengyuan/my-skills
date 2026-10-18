@@ -1,53 +1,72 @@
 ---
 name: md2wechat
-description: Convert Markdown into WeChat Official Account compatible HTML with bundled themes, and optionally upload it to the WeChat draft box. Use for 公众号排版, Markdown 转微信 HTML, inline CSS rendering, image upload, or draft publishing.
+description: Convert Markdown articles into WeChat Official Account compatible inline-styled HTML and optionally publish them to the WeChat draft box. Use when formatting articles for WeChat, rendering WeChat HTML, styling Markdown with themes, uploading article images, or publishing drafts to WeChat.
 ---
 
-# Markdown to WeChat
+# Markdown to WeChat Skill
 
-Use only files and scripts bundled in this Skill.
+Convert Markdown into WeChat Official Account compatible HTML with inline CSS styling, and optionally upload articles directly to the WeChat draft box.
 
 ## Setup
 
-No dependency installation is required. Draft publishing needs a local `<skill-dir>/.env`:
+HTML rendering requires Python 3.8+ and uses only the Python standard library.
+
+Draft publishing requires valid credentials stored in a local `.env` file within this Skill's directory:
 
 ```env
-WECHAT_APPID=your_app_id
-WECHAT_SECRET=your_secret
+WECHAT_APPID=your_wechat_app_id
+WECHAT_SECRET=your_wechat_secret
 ```
 
-Keep this file local; the repository ignores Skill-level `.env` files.
+Keep this file local. The repository ignores Skill-level `.env` files.
 
-## Workflow
+## Workflows
 
-1. Read the Markdown and identify the title, structure, theme, and images.
-2. Read [references/themes.md](references/themes.md) only when choosing a theme.
-3. Render HTML:
+### 1. Render WeChat HTML (Local)
+
+Render Markdown into styled HTML with inlined CSS:
 
 ```bash
-python "<skill-dir>/scripts/md_ai_render.py" --md article.md --theme autumn-warm --out article.html
+python3 "<skill-dir>/scripts/md_ai_render.py" --md article.md --theme autumn-warm --out article.html
 ```
 
-4. Inspect the generated HTML for unresolved image placeholders and unsupported styling.
-5. If the user explicitly requests draft publishing, confirm the target account and publish:
+Supported preset themes:
+- `autumn-warm`: Warm orange tone, editorial styling
+- `spring-fresh`: Fresh green tone, clean reading
+- `ocean-calm`: Deep blue tone, technical and business style
+
+For custom CSS rules and theme details, see [references/themes.md](references/themes.md).
+
+### 2. Publish to WeChat Draft Box (Remote)
+
+Publishing mutates external state on the WeChat platform. Execute publishing only when the user explicitly requests it:
 
 ```bash
-python "<skill-dir>/scripts/wechat_publish.py" --env "<skill-dir>/.env" --md article.md --html article.html --draft --cover cover.jpg
+python3 "<skill-dir>/scripts/wechat_publish.py" --env "<skill-dir>/.env" --md article.md --html article.html --draft --cover cover.jpg
 ```
 
-Publishing changes external state. Rendering does not.
+See [references/wechat-api.md](references/wechat-api.md) for publishing API options and error codes.
 
-## Images
+## Image Handling
 
-- Local and remote images are uploaded only during publishing.
-- Generate requested illustrations with an available image-generation capability before rendering; do not leave `__generate:...` placeholders in final HTML.
-- Use the first suitable image as cover only after the user accepts that choice.
+- **Local images**: Referenced local images are uploaded to WeChat permanent material storage during draft publishing and replaced with WeChat CDN URLs.
+- **Remote images**: Downloaded and uploaded to WeChat storage during publishing.
+- **Cover image**: Specify `--cover <image-path>` explicitly. If unspecified, ask the user before publishing.
+- **Image placeholders**: Ensure no unexpanded `__generate:...` placeholders remain in the final HTML. See [references/image-syntax.md](references/image-syntax.md).
 
-Read [references/html-guide.md](references/html-guide.md), [references/image-syntax.md](references/image-syntax.md), and [references/wechat-api.md](references/wechat-api.md) only for the relevant step.
+## WeChat HTML Compatibility Rules
 
-## Validation
+- All CSS declarations must be inlined in `style` attributes.
+- Wrap body content in a top-level container `<div>`.
+- Explicitly specify font colors on `<p>` and heading tags to prevent WeChat dark mode overriding text colors.
+- Disallowed tags: `<script>`, `<iframe>`, `<style>`, `<link>`, `<form>`. See [references/html-guide.md](references/html-guide.md).
 
-- Output HTML exists and is non-empty.
-- Styles are inline and compatible with WeChat.
-- All local image paths resolve.
-- Draft publishing returns a media ID before reporting success.
+## Verification Checklist
+
+Before completing the task, verify:
+
+1. Rendered HTML file exists and is non-empty.
+2. All styles are properly inlined on HTML elements.
+3. Local image paths in Markdown resolve to valid image files on disk.
+4. If publishing draft, the API response returns a valid `media_id`.
+5. Report the output HTML path and publication status to the user.

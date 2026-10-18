@@ -1,7 +1,7 @@
 # Safety Policy
 
-1. Read-only inspection runs directly. `pick` and `claim` may run when a requested development task needs a port; report any lease that matters to the caller.
-2. Before terminating a process, inspect its current identity and ownership. Authorization to stop a known task-owned server persists; a changed PID/process, shared service or unrelated application requires reassessment and, if not covered, user approval.
-3. `free`, `init --force` and configuration migration require task authorization for their actual scope; do not ask again when already granted. Preserve unrelated configuration and processes.
-4. Resolve the bundled CLI relative to this Skill. Try normal permissions first; request platform escalation only for a demonstrated permission restriction on an authorized operation.
-5. Prefer graceful termination and verify the target port state. Do not infer authorization for a stronger signal or a different process from a failed attempt.
+1. Read-only inspection commands run without prompt. `pick` and `claim` may run when an authorized task requires an available port. Report lease IDs and expirations to the caller.
+2. Before terminating a process, inspect its identity, PID, command line, and working directory. Authorization to stop a known task-owned server persists across turns. If the PID or process changes, or if the process belongs to a shared system daemon, ask for user confirmation before stopping it.
+3. Commands that mutate state (`free`, `init --force`, and `config migrate`) require explicit task authorization. Do not request repetitive approval for operations already authorized. Preserve unrelated configuration files and processes.
+4. Resolve the bundled CLI relative to this Skill's directory. Use standard user permissions first. Request system elevation only when an authorized operation encounters a concrete permission error.
+5. Use graceful process termination first. Verify port release before continuing. Never assume permission for forced termination or unrelated processes from a failed initial attempt.

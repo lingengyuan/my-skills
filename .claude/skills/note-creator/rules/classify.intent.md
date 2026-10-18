@@ -1,8 +1,6 @@
-# Intent Classification Rules (STRICT)
+# Intent Classification Rules
 
-You are classifying a user's note request for the `note-creator` orchestrator.
-
-## Output JSON Schema (STRICT)
+Classify incoming note requests to determine folder, diagram type, and artifact plan for `note-creator`.
 Return ONLY valid JSON.
 
 Base schema (always required):

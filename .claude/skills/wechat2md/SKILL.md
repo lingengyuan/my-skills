@@ -1,64 +1,96 @@
 ---
 name: wechat2md
-description: Convert WeChat Official Account article and album URLs from mp.weixin.qq.com into local Markdown with downloaded images. Use for format conversion or local capture; use wechat-archiver when the user requests a complete knowledge-base archive with notes, metadata, or Canvas/Base artifacts.
+description: Convert WeChat Official Account articles and topic albums (mp.weixin.qq.com) to local Markdown files with downloaded images. Use when converting WeChat articles, saving WeChat albums, downloading article content, or extracting Markdown from WeChat URLs.
 ---
 
-# WeChat to Markdown
+# WeChat to Markdown Skill
 
-Use the scripts and dependencies bundled in this Skill.
+Convert WeChat Official Account web articles and albums into local Markdown with downloaded images. Standard Markdown syntax is assumed knowledge.
 
 ## Setup
 
-Python 3.8+ and `curl` in `PATH` are required.
+Python 3.8+ and `curl` in `PATH` are required. Install dependencies in the Skill directory:
 
 ```bash
 pip install -r "<skill-dir>/requirements.txt"
 ```
 
-Optional configuration is read by the legacy/album converter only. Copy [config.example.json](config.example.json) to `<skill-dir>/config.json` and read [references/config.md](references/config.md) when using `wechat2md.py`. The single-article `wechat2md_v2.py` route does not read this file; use its `--output-dir`, `--target-folder`, and `--slug` options instead. Do not require project-root configuration.
+## Workflows
 
-## Routing
+### 1. Convert Single Article
 
-Single article:
-
-```bash
-python "<skill-dir>/tools/wechat2md_v2.py" "<article-url>"
-```
-
-Album or collection:
+Use `wechat2md_v2.py` for single articles. It creates an isolated asset directory with downloaded images and metadata:
 
 ```bash
-python "<skill-dir>/tools/wechat2md.py" --album "<album-url>"
+python3 "<skill-dir>/tools/wechat2md_v2.py" "<article-url>"
 ```
 
-Use `wechat2md_v2.py` for single articles because it writes one stable asset directory. Use `wechat2md.py` only for album mode.
+Custom output paths:
+```bash
+python3 "<skill-dir>/tools/wechat2md_v2.py" "<article-url>" --output-dir "outputs" --target-folder "20-阅读笔记" --slug "custom-slug"
+```
 
-## Output
+### 2. Convert Topic Album
 
-Single article:
+Use `wechat2md.py` with `--album` to batch-download all articles in a WeChat collection:
+
+```bash
+python3 "<skill-dir>/tools/wechat2md.py" --album "<album-url>"
+```
+
+For custom album configurations (delays, slug templates, tag rules), see [references/config.md](references/config.md).
+
+## CLI Reference
+
+### `wechat2md_v2.py` (Single Article)
+
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `url` | string (positional) | required | WeChat article URL |
+| `--output-dir` | string | `outputs` | Base output directory |
+| `--target-folder` | string | `20-阅读笔记` | Target folder within output directory |
+| `--slug` | string | auto from title | Custom directory slug |
+
+### `wechat2md.py` (Album Mode)
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `--album` | string | WeChat album / topic URL |
+| `--config` | string | Path to custom `config.json` |
+
+## Output Package Structure
+
+### Single Article
 
 ```text
 outputs/<target-folder>/<slug>/
-├── article.md
-├── images/
-└── meta.json
+├── article.md          # Converted article in clean Markdown
+├── images/             # Downloaded local images (if present)
+└── meta.json           # Article metadata (title, author, url, asset_id)
 ```
 
-Album:
+### Album Collection
 
 ```text
 outputs/<target-folder>/<album-name>/
-├── _index.md
+├── _index.md           # Album table of contents
 └── 001-<article-title>/
-    ├── article.md
-    └── images/
+    ├── article.md      # Article Markdown
+    └── images/         # Local images
 ```
 
-## Rules
+## Guidelines
 
-- Resolve output paths from the user's current working directory.
-- Download正文 images and rewrite links to local relative paths.
-- Preserve the original URL and article metadata.
-- On an image failure, retain the original image URL and report the failure.
-- Do not claim success unless the Markdown exists and local image links resolve.
-- For albums, continue after individual article failures and list them in `_index.md`.
+- **Relative paths**: Rewrite image tags in `article.md` to relative paths (`images/001.jpg`).
+- **Image failure handling**: If an individual image fails to download, keep the remote URL and log a warning. Do not terminate the conversion.
+- **Album continuity**: In album mode, continue downloading remaining articles if an individual article fails. Record failed items in `_index.md`.
+- **Metadata preservation**: Always preserve original publishing timestamp, author name, and source URL in frontmatter or `meta.json`.
+
+## Validation Checklist
+
+Before completing the task, verify:
+
+1. `article.md` exists and contains readable article text.
+2. Image links in `article.md` point to local files in the `images/` directory.
+3. Downloaded image files exist on disk and have non-zero size.
+4. For albums, `_index.md` lists all successfully downloaded chapters and any failed URLs.
