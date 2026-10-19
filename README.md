@@ -18,6 +18,7 @@ Skills for technical writing, knowledge management, and development. Each direct
 | [note-creator](.claude/skills/note-creator/SKILL.md) | Create Obsidian note packages |
 | [obsidian-bases](.claude/skills/obsidian-bases/SKILL.md) | Create and edit Obsidian Bases |
 | [obsidian-markdown](.claude/skills/obsidian-markdown/SKILL.md) | Write Obsidian Markdown |
+| [pele](.claude/skills/pele/SKILL.md) | Render and preview Mermaid diagrams as SVG |
 | [portpilot-assistant](.claude/skills/portpilot-assistant/SKILL.md) | Inspect and manage development ports |
 | [publication-ready-docs](.claude/skills/publication-ready-docs/SKILL.md) | Prepare technical documents for publication |
 | [publication-ready-docs-jev](.claude/skills/publication-ready-docs-jev/SKILL.md) | Prepare technical documents with optional Jev-assisted review |
@@ -54,6 +55,7 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 | [note-creator](.claude/skills/note-creator/SKILL.md) | 创建 Obsidian 笔记包 |
 | [obsidian-bases](.claude/skills/obsidian-bases/SKILL.md) | 创建和编辑 Obsidian Bases |
 | [obsidian-markdown](.claude/skills/obsidian-markdown/SKILL.md) | 编写 Obsidian Markdown |
+| [pele](.claude/skills/pele/SKILL.md) | 将 Mermaid 图渲染为 SVG 并预览 |
 | [portpilot-assistant](.claude/skills/portpilot-assistant/SKILL.md) | 检查和管理开发端口 |
 | [publication-ready-docs](.claude/skills/publication-ready-docs/SKILL.md) | 整理可交付的正式技术文档 |
 | [publication-ready-docs-jev](.claude/skills/publication-ready-docs-jev/SKILL.md) | 整理正式技术文档并支持 Jev 预审 |
