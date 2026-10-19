@@ -10,7 +10,6 @@ Skills for technical writing, knowledge management, and development. Each direct
 
 | Skill | Purpose |
 |---|---|
-| [beautiful-mermaid](.claude/skills/beautiful-mermaid/SKILL.md) | Render Mermaid as SVG or terminal text |
 | [brief-output](.claude/skills/brief-output/SKILL.md) | Write concise, professional content |
 | [insight-collector](.claude/skills/insight-collector/SKILL.md) | Archive reusable insights |
 | [json-canvas](.claude/skills/json-canvas/SKILL.md) | Create and edit JSON Canvas files |
@@ -47,7 +46,6 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 
 | Skill | 用途 |
 |---|---|
-| [beautiful-mermaid](.claude/skills/beautiful-mermaid/SKILL.md) | 将 Mermaid 渲染为 SVG 或终端文本 |
 | [brief-output](.claude/skills/brief-output/SKILL.md) | 精炼专业表达 |
 | [insight-collector](.claude/skills/insight-collector/SKILL.md) | 归档可复用洞察 |
 | [json-canvas](.claude/skills/json-canvas/SKILL.md) | 创建和编辑 JSON Canvas |

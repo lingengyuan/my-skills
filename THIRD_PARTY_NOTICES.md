@@ -21,10 +21,3 @@ travels with the Skill when it is installed on its own.
 | `.claude/skills/json-canvas/` | `skills/json-canvas/` |
 
 `json-canvas/templates/` is an empty local addition, not upstream content.
-
-## beautiful-mermaid
-
-`.claude/skills/beautiful-mermaid/` wraps the npm package
-[`beautiful-mermaid`](https://www.npmjs.com/package/beautiful-mermaid)
-(MIT, lukilabs) as a declared dependency in its `package.json`. The package
-is installed on demand and is not vendored here.
