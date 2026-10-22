@@ -31,9 +31,9 @@ Generate structured Obsidian note packages with clean Markdown, metadata, and op
 4. **Resolve directory & title**: Sanitize the title and select an authorized folder using [rules/folders.md](rules/folders.md) and [rules/naming.rules.md](rules/naming.rules.md). Target directory format: `<vault>/<folder>/<title>/`.
 5. **Generate artifacts**:
    - **Markdown (`note.md`)**: Start with valid YAML frontmatter. Structure sections based on evidence in the source material. Follow [templates/note.md.prompt](templates/note.md.prompt).
-   - **Canvas (`diagram.canvas`)**: Generate valid JSON Canvas with unique node IDs. Use `fromNode` and `toNode` for all edges. Never use `from` or `to`.
+   - **Canvas (`diagram.canvas`)**: Generate valid JSON Canvas with unique node IDs grounded in user domain entities. Follow the matching template in `templates/canvas.<type>.md`. Use `fromNode` and `toNode` for all edges. Never use `from` or `to`.
    - **Base (`table.base`)**: Generate valid YAML with scoped filters. For comparisons, create items in `compare/` using [templates/compare.item.md](templates/compare.item.md) and scope the Base to that subfolder.
-6. **Write metadata (`meta.json`)**: Generate the manifest containing title, folder, tags, timestamps, and exact file paths per [rules/output.contract.md](rules/output.contract.md).
+6. **Write metadata (`meta.json`)**: Generate a clean, verifiable manifest containing title, folder, tags, timestamps, summary, and relative file paths per [rules/output.contract.md](rules/output.contract.md). Do not include hallucinated SHA-256 hashes, fake Git revisions, or internal agent provenance.
 7. **Verify package**: Re-read all generated files. Verify JSON and YAML syntax, verify file references, and report file paths.
 
 ## Guidelines & Boundaries

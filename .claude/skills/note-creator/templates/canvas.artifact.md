@@ -1,66 +1,51 @@
 # Canvas Artifact Map Generation Template
 
 ## Purpose
-Create an **artifact map** focusing on **inputs/outputs and produced files**.
-This template is for “what gets generated and where”, not detailed execution timing.
+Create an **artifact and data pipeline map** focusing on **inputs, transformation engines, and output deliverables** for data pipelines, build systems, or compiler tools.
 
 ---
 
-## Columns (Left → Right)
-Create these 3 columns:
-1) 输入 (Inputs)
-2) 处理 (Processing)
-3) 产物 (Outputs)
+## 3-Column Layout (Left → Right)
 
-### Standard Coordinates
-- Column X positions:
-  - 输入: x=0
-  - 处理: x=420
-  - 产物: x=840
-- Node width=360, height=120
-- y positions: 0, 150, 300, 450 ... (consistent spacing)
+Organize nodes into three logical columns:
+1. **Inputs / Raw Data Sources** (`x = 0`)
+2. **Processing / Pipeline Engines** (`x = 420`)
+3. **Outputs / Generated Deliverables** (`x = 840`)
+
+### Dimensions & Spacing
+- Node width: `300 ~ 340`, height: `90 ~ 130`
+- Vertical gap: `40 ~ 60px` (`y = 0, 160, 320, 480...`)
+- Group node (optional): Wrap output nodes in a container representing target storage or output package.
 
 ---
 
-## Required Nodes (Fixed IDs)
-Inputs:
-- art-input-user (text): user_prompt / optional_context_files
+## Semantic Node IDs
 
-Processing:
-- art-process-classify (text): intent classification (title/folder/diagram_type/artifact_plan)
-- art-process-md (text): obsidian-markdown generates note.md
-- art-process-canvas (text): json-canvas generates diagram.canvas (if selected)
-- art-process-base (text): obsidian-bases generates table.base (if selected)
+Name nodes based on the real entities in the user's pipeline:
+- Inputs: `input-<source-slug>` (e.g., `input-raw-logs`, `input-user-config`)
+- Processing: `process-<engine-slug>` (e.g., `process-parser`, `process-transformer`, `process-renderer`)
+- Outputs: `output-<asset-slug>` (e.g., `output-html-report`, `output-sqlite-db`, `output-json-manifest`)
 
-Outputs:
-- art-out-note (text): note.md
-- art-out-meta (text): meta.json
-- art-out-canvas (text): diagram.canvas (optional)
-- art-out-base (text): table.base (optional)
-- art-out-root (text): root_dir = outputs/<folder>/<title>/
-
-Optional: wrap output nodes in a group node with label “outputs/<folder>/<title>/”.
+Node text formatting:
+```markdown
+### [Artifact / Engine Name]
+Format or role (e.g. `.parquet` / Spark ETL)
+- Key attributes or path
+```
 
 ---
 
-## Edge Pattern (Mandatory)
-- art-input-user → art-process-classify
-- art-process-classify → art-process-md
-- art-process-md → art-out-note
-- art-process-classify → art-process-canvas (conditional)
-- art-process-canvas → art-out-canvas (conditional)
-- art-process-classify → art-process-base (conditional)
-- art-process-base → art-out-base (conditional)
-- art-out-note → art-out-meta
-- art-out-meta → art-out-root
-- art-out-canvas → art-out-root (conditional)
-- art-out-base → art-out-root (conditional)
+## Edge Connection Patterns
 
-Use edge labels sparingly (e.g., “生成”, “写入”).
+Connect flow from inputs through transformers to outputs:
+- `input-*` → `process-*` (label: `read / ingest`)
+- `process-*` → `output-*` (label: `emit / write`)
+- Keep edges horizontal (`fromSide: "right"`, `toSide: "left"`) whenever possible.
 
 ---
 
-## Strict Constraints
-- Text nodes MUST use {"type":"text","text":"..."}. No "label" for text nodes.
-- IDs MUST match the fixed IDs above.
-- Do not mix with swimlanes; keep columnar artifact map style.
+## Canvas Constraints
+
+- Text nodes MUST use `{"type": "text", "text": "..."}`. Never use `"label"` on text nodes.
+- Edges MUST use `"fromNode"` and `"toNode"` (never `"from"` or `"to"`).
+- JSON Canvas must be strictly valid JSON.

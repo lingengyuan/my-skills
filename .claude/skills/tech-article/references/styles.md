@@ -1,53 +1,34 @@
-# Style Reference
+# Technical Illustration Styles
 
-## Core Styles (Quick Selection)
+> **核心原则**：技术文章配图以**传递高密度信息**与**降低认知成本**为唯一目标。坚决杜绝空洞无物的“AI 意境图”（如：机器人喝咖啡、发光数字大脑、水彩风景画等营销号插画）。
 
-| Core Style | Best For |
-|------------|----------|
-| `vector` | Tech tutorials, knowledge sharing, AI articles |
-| `minimal-flat` | SaaS tools, productivity, general content |
-| `sci-fi` | AI, system design, frontier tech |
-| `hand-drawn` | Personal stories, casual, reflective |
-| `editorial` | Data explainers, process breakdowns |
-| `scene` | Narratives, lifestyle, emotional hooks |
+---
 
-## Full Style Gallery
+## 1. 推荐插图实现方案优先级
 
-| Style | Description | Best For |
-|-------|-------------|----------|
-| `vector` | Clean flat vector art, bold geometric shapes | Tech tutorials, knowledge articles |
-| `minimal-flat` | Minimalist hand-drawn line art (Notion-style) | Knowledge sharing, SaaS, productivity |
-| `elegant` | Refined, sophisticated, business-grade | Business strategy, thought leadership |
-| `hand-drawn` | Friendly sketch / warm notebook style | Personal stories, education, casual |
-| `minimal` | Ultra-clean, zen-like | Philosophy, core concepts |
-| `sci-fi` | Technical schematics, blueprint | AI, system design, engineering |
-| `watercolor` | Soft artistic, natural warmth | Lifestyle, travel, creative |
-| `editorial` | Magazine-style infographic | Tech explainers, journalism, data |
-| `sketch-notes` | Soft hand-drawn warm notes | Educational, warm technical notes |
-| `playful` | Whimsical pastel doodles | Fun, casual, beginner-friendly |
+| 优先级 | 呈现方案 | 适用场景 | 对应工具 / 交付方式 |
+|---|---|---|---|
+| **P0（首选）** | **确定性工程图表（Mermaid / SVG）** | 架构拓扑、时序调用、状态流转、类与数据关系 | 编写 `.mmd` 源码，使用环境中安装的 Mermaid 编译器（如 `pele` 或 `mmdc`）输出清晰矢量 SVG |
+| **P1** | **对比矩阵 / 表格** | 工具选型对比、参数配置、优缺点权重 | Markdown 结构化表格 / HTML 渲染内联样式 |
+| **P2** | **代码对比 / 终端轨迹（Terminal Trace）** | 执行过程、踩坑报错信息、Patch 差异 | 真实控制台输出块、Diff 代码块 |
+| **P3** | **概念信息图（Infographic / Schematic）** | 协议原理、数据管道分层、核心指标可视化 | 精准技术矢量图 Prompt（无歧义名词与真实数据） |
 
-## Type × Style Compatibility
+---
 
-| | vector | minimal-flat | sci-fi | hand-drawn | editorial | scene |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| infographic | ✓✓ | ✓✓ | ✓✓ | ✓ | ✓✓ | ✗ |
-| flowchart | ✓✓ | ✓✓ | ✓✓ | ✓ | ✓✓ | ✗ |
-| comparison | ✓✓ | ✓✓ | ✓ | ✓ | ✓✓ | ✗ |
-| framework | ✓✓ | ✓✓ | ✓✓ | ✓ | ✓ | ✗ |
-| timeline | ✓ | ✓✓ | ✓ | ✓✓ | ✓✓ | ✓ |
-| scene | ✓ | ✓ | ✗ | ✓✓ | ✓ | ✓✓ |
+## 2. 推荐的技术视觉风格（Styles）
 
-✓✓ = highly recommended | ✓ = compatible | ✗ = not recommended
+| Style | 视觉特征 | 适用场景 |
+|---|---|---|
+| `schematic` (蓝图/架构) | 干净利落的工程蓝图风格，线框分明，高对比度 | 系统架构、组件依赖、协议栈分层 |
+| `technical-vector` (工程矢量) | 扁平几何块面，留白充足，低饱和度功能色 | 数据管道、流程图、协议交互 |
+| `editorial` (技术杂志版式) | 报刊级信息图表，清晰的排版层级与真实数值标注 | 性能评测基准、压测对比、多维度指标分析 |
+| `minimal-flat` (极简扁平) | 极简线框，无多余光影特效，纯色背景 | 快速概念说明、模块边界示意 |
+| `hand-drawn` (白板草图) | 亲和的手绘白板草图风，结构严谨但不死板 | 技术复盘、设计权衡、非正式架构推演 |
 
-## Auto-Select by Article Type
+---
 
-| Article About | Type | Style |
-|---------------|------|-------|
-| AI / LLM / tech tools | infographic | vector, sci-fi |
-| Tutorial / guide / how-to | flowchart | vector, minimal-flat |
-| Tool comparison / review | comparison | vector, editorial |
-| Architecture / framework | framework | sci-fi, vector |
-| Personal journey / story | scene | hand-drawn, scene |
-| Tech history / evolution | timeline | editorial, hand-drawn |
-| Automation / workflow | flowchart | vector, minimal-flat |
-| Metrics / data analysis | infographic | editorial, vector |
+## 3. 严禁使用的插图反模式（Banned Anti-Patterns）
+
+- ❌ **空洞意境图与情感场景**：杜绝与技术无关的光影、情绪、风景氛围、发光大脑或机器人喝咖啡等营销号插画。
+- ❌ **萌系涂鸦与无关装饰**：杜绝无关的装饰性贴纸与动漫元素，保证信息聚焦。
+- ❌ **隐喻直画（Literal Metaphors）**：例如文中出现“开箱即用”画一个真实纸箱；文中出现“杀鸡用牛刀”画一把菜刀。必须画背后的技术逻辑，而非字面隐喻。

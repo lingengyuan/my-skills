@@ -19,12 +19,15 @@ Inspect, stage, commit, and push Git changes according to explicit user authoriz
 2. **Stage task-related changes**: Verify that changes do not contain API keys, credentials, or unintended build artifacts. Stage only files related to the task. Never use blanket staging (`git add .` or `git add -A`) when unrelated modifications exist.
 3. **Draft commit message**: Create a concise commit message following Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`). Describe the specific change and motivation. Do not add assistant co-author trailers unless explicitly requested.
 4. **Create commit**: Run the bundled `tools/git_sync.py` or standard `git commit`. Preview the staged diff before finalizing.
-5. **Push to remote (if authorized)**: Push only to the current branch upstream remote. Never force-push or rewrite public history unless explicitly instructed.
+5. **Push to remote (if authorized)**:
+   - If changes were just committed, push to the configured upstream remote.
+   - **Push-only branch**: If local commits already exist and working tree is clean, do not invoke `tools/git_sync.py` (which requires staged changes). Directly push using standard Git: `git push` or `git push <remote> <branch>`.
+   - Push only to the current branch upstream remote. Never force-push or rewrite public history unless explicitly instructed.
 6. **Verify synchronization**: Verify tracking status with `git status` or `git rev-parse`. Report local commit hash, branch name, and remote status.
 
 ## CLI Usage
 
-### Bundled Tool
+### Bundled Tool (For staging and committing changes)
 
 ```bash
 # Preview status and generated commit message without committing
@@ -37,7 +40,7 @@ python3 "<skill-dir>/tools/git_sync.py"
 python3 "<skill-dir>/tools/git_sync.py" --push
 ```
 
-### Standard Git Fallback
+### Standard Git Workflow & Fallback
 
 ```bash
 # Stage specific files
@@ -46,8 +49,11 @@ git add <file1> <file2>
 # Commit with message
 git commit -m "<type>(<scope>): <summary>"
 
-# Push to current tracking branch
-git push origin <branch>
+# Push to configured upstream tracking branch
+git push
+
+# Or push explicitly to target remote
+git push <remote> <branch>
 ```
 
 ## Guidelines & Safety Rules

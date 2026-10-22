@@ -20,12 +20,12 @@ If the target directory is not specified, inspect the workspace for existing cat
 2. **Analyze source material**: Read the source thoroughly to understand core arguments, architecture decisions, and boundary conditions.
 3. **Extract high-signal items**:
    - **Reusable code**: Self-contained functions, scripts, and configuration blocks with explicit dependency requirements.
-   - **Design patterns**: Reusable architectural models, mental models, and component boundaries.
+   - **System design patterns**: Concrete architecture choices, component boundaries, and data flows.
    - **Trade-offs and failure modes**: Real-world constraints, performance bottlenecks, and edge cases.
    - **Actionable implications**: Concrete follow-up ideas or spike experiments.
 4. **Structure the document**:
    - Select an appropriate document template from [references/doc-templates.md](references/doc-templates.md):
-     - In-depth reading analysis (`analysis/<topic>.md`)
+     - In-depth technical analysis (`analysis/<topic>.md`)
      - Project inspiration note (`ideas/<topic>.md`)
      - Standalone snippet (`python/`, `javascript/`, `shell/`)
    - Keep source facts and analytical inferences strictly distinguished.
@@ -38,6 +38,7 @@ If the target directory is not specified, inspect the workspace for existing cat
 
 - **Language consistency**: Write analytical notes in clear Chinese unless the target project specifies English. Keep code and technical identifiers in their original programming language.
 - **Fact preservation**: Never fabricate claims, fake benchmark results, or code that was not present in or derived from the source.
+- **No pseudo-profundity**: Do not force artificial "mental models", pretentious philosophizing, or fabricated knowledge-base links onto straightforward technical material. Keep notes pragmatic.
 - **Minimal experiments**: Proposed follow-up spikes must state source motivation, expected value, and minimal verification criteria.
 - **Directory isolation**: Never write outside the target knowledge base directory.
 

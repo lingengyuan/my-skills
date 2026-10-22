@@ -1,11 +1,10 @@
 ---
-item_type: skill
 name: "{{display_name}}"
-输入: "{{inputs}}"
-输出: "{{outputs}}"
-定位: "{{positioning}}"
-产物: "{{artifacts}}"
-边界: "{{limitations}}"
+category: "{{category}}"
+core_mechanism: "{{core_mechanism}}"
+best_for: "{{best_for}}"
+pros: "{{pros}}"
+cons: "{{cons}}"
 tags:
   - 对比
   - {{domain_tag}}
@@ -16,17 +15,14 @@ modified: "{{modified}}"
 
 # {{display_name}}
 
-## 定位
-{{positioning}}
+## 核心定位与机制
+{{core_mechanism}}
 
-## 输入
-{{inputs}}
+## 适用场景
+{{best_for}}
 
-## 输出
-{{outputs}}
+## 核心优势
+{{pros}}
 
-## 产物
-{{artifacts}}
-
-## 边界
-{{limitations}}
+## 局限与成本
+{{cons}}

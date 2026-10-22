@@ -1,122 +1,35 @@
 # Canvas Sequence (Compact / Presentation)
 
 ## Purpose
-Create a **clean, presentation-quality sequence diagram** that shows
-**who talks to whom, and in what order**.
+Create a **clean, presentation-quality sequence diagram** showing **who talks to whom, and in what order** for high-level comprehension and public-facing notes.
 
-This diagram is for:
-- documentation
-- sharing
-- explanation
-- public-facing materials
-
-Clarity and visual balance are more important than completeness.
+Clarity, brevity, and visual balance are preferred over exhaustive implementation details.
 
 ---
 
-## Lanes (Fixed)
-Create EXACTLY these 4 lanes, left-to-right:
-1) 用户
-2) note-creator
-3) obsidian-markdown
-4) json-canvas
+## Swimlane Setup
 
-Each lane MUST have:
-- a header text node
-- a single lifeline text node
-
-### Coordinates
-- Lane X:
-  - 用户: 0
-  - note-creator: 320
-  - obsidian-markdown: 640
-  - json-canvas: 960
-- Header: width=240, height=56, y=0
-- Lifeline: width=16, height=900, y=70, x = lane_x + 112
+- Derive 2 to 4 primary actors/roles from the topic (e.g. `Client`, `Gateway`, `Service`, `Database`).
+- Standard Lane Spacing: `X = lane_index * 300` (e.g., `0`, `300`, `600`, `900`).
+- Header Node: `width = 220`, `height = 50`, `y = 0`.
+  ID: `lane-<actor-slug>`.
+- Lifeline Node: `width = 16`, `height = 650`, `y = 65`, `x = lane_x + 102`.
+  ID: `life-<actor-slug>`.
 
 ---
 
-## Message Nodes (Very Limited)
+## Compact Message Rules
 
-### Strict Rules
-- Max **6 message nodes total**
-- Each node:
-  - one short sentence only
-  - no parameters
-  - no bullet points
-  - no file names
-- Recommended: ≤ 10 Chinese characters
-
-### Geometry
-- width = 240
-- height = 56
-- y positions: 120, 220, 320, 420, 520, 620
+- Limit total messages to **4 to 6 critical interactions**.
+- Each message node contains 1 concise line (≤ 15 characters).
+- Node dimensions: `width = 200`, `height = 45`.
+- Vertical step: `y = 100, 190, 280, 370, 460, 550`.
+- Message IDs: `msg-01-<slug>`, `msg-02-<slug>`...
 
 ---
 
-## Required Messages (IDs fixed)
+## Edge Connections
 
-1) msg-request  
-用户  
-Text: “创建笔记请求”
-
-2) msg-md-call  
-note-creator  
-Text: “请求生成 Markdown”
-
-3) msg-md-return  
-obsidian-markdown  
-Text: “返回 Markdown”
-
-4) msg-canvas-call  
-note-creator  
-Text: “请求生成可视化”
-
-5) msg-canvas-return  
-json-canvas  
-Text: “返回可视化结果”
-
-6) msg-done  
-note-creator  
-Text: “完成”
-
----
-
-## Edges (Mandatory)
-
-All edges MUST be:
-- straight
-- horizontal
-- left-to-right or right-to-left only
-
-### Order
-
-1) msg-request → msg-md-call  
-label: “请求”
-
-2) msg-md-call → msg-md-return  
-label: “调用”
-
-3) msg-md-return → msg-done  
-label: “返回”
-
-4) msg-canvas-call → msg-canvas-return  
-label: “调用（可选）”
-
-5) msg-canvas-return → msg-done  
-label: “返回”
-
-Optional:
-- msg-done → lane-user  
-label: “完成”
-
----
-
-## Absolute Prohibitions
-- No filenames
-- No implementation details
-- No routing / planning / saving steps
-- No diagonal or curved edges
-- No node height variation
-
-This diagram must look **simple, calm, and balanced**.
+- Directed edges from sender to receiver with short semantic labels (e.g., `请求`, `验证`, `查询`, `返回`).
+- Text nodes MUST use `{"type": "text", "text": "..."}`.
+- All edges use `"fromNode"` and `"toNode"`.

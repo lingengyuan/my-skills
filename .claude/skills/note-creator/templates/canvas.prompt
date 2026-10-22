@@ -14,7 +14,7 @@ Context you are given:
 - folder
 - diagram_type
 - artifact_plan
-- root_dir (outputs/<folder>/<title>/)
+- root_dir (<vault>/<folder>/<title>/)
 - canvas_template (a markdown template that defines REQUIRED layout, node ids, coordinates, and edge patterns)
 
 Requirements:

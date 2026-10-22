@@ -1,4 +1,4 @@
-生成一个 Obsidian Base（table.base），用于"对比表"。
+生成一个 Obsidian Base（table.base），用于选型或方案“对比表”。
 
 ## 关键约束（必须严格遵守）：
 1. **文件格式必须是 YAML，不是 JSON**
@@ -11,45 +11,40 @@
 ```yaml
 filters:
   and:
-    - file.inFolder("outputs/{{folder}}/{{title}}/compare")
+    - file.inFolder("{{folder}}/{{title}}/compare")
     - 'file.ext == "md"'
-    - 'item_type == "skill"'
 
 properties:
   name:
     displayName: 名称
-  item_type:
-    displayName: 类型
-  输入:
-    displayName: 输入
-  输出:
-    displayName: 输出
-  定位:
-    displayName: 定位
-  产物:
-    displayName: 产物
-  边界:
-    displayName: 边界
+  category:
+    displayName: 分类/类型
+  core_mechanism:
+    displayName: 核心机制
+  best_for:
+    displayName: 适用场景
+  pros:
+    displayName: 核心优势
+  cons:
+    displayName: 局限与成本
 
 views:
   - type: table
-    name: Skills Comparison
+    name: 对比矩阵
     order:
       - name
-      - item_type
-      - 输入
-      - 输出
-      - 定位
-      - 产物
-      - 边界
+      - category
+      - core_mechanism
+      - best_for
+      - pros
+      - cons
 ```
 
 ## 过滤条件说明：
-- file.inFolder("outputs/{{folder}}/{{title}}/compare") - 限制在 compare 目录
+- file.inFolder("{{folder}}/{{title}}/compare") - 限制在 compare 目录（相对 Vault 根目录）
 - file.ext == "md" - 只包含 markdown 文件
-- item_type == "skill" - 只包含 item_type 为 skill 的文件
 
 ## 列配置说明：
 - 使用 properties 定义每列的显示名称
 - 使用 views.order 定义列的显示顺序
-- 列包括：name, item_type, 输入, 输出, 定位, 产物, 边界
+- 列包括：name, category, core_mechanism, best_for, pros, cons

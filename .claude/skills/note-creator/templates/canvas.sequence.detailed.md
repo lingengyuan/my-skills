@@ -1,50 +1,33 @@
-# Canvas Sequence (Detailed / Internal)
+# Canvas Sequence (Detailed / Deep-Dive)
 
 ## Purpose
-Create a **detailed sequence diagram** explaining execution order
-and responsibility boundaries between skills.
-
-This diagram is for internal understanding, not for presentation.
+Create a **detailed sequence diagram** explaining granular call flows, state validations, branch decisions, and error-handling paths between components for internal engineering design and deep-dive notes.
 
 ---
 
-## Lanes
-用户 | note-creator | obsidian-markdown | json-canvas
+## Swimlane Setup
 
-(same coordinates and lifeline rules as compact version)
-
----
-
-## Message Rules
-- Message nodes represent **calls or responses**
-- Internal logic may appear, but must stay abstract
-- File names are allowed but should be minimal
-- Node count should not exceed 10
+- Derive 3 to 5 actors/components from the topic (e.g. `Client`, `Ingress/Gateway`, `AuthService`, `DomainWorker`, `Storage`).
+- Lane Spacing: `X = lane_index * 320`.
+- Header Node: `width = 240`, `height = 55`, `y = 0`. ID: `lane-<actor-slug>`.
+- Lifeline Node: `width = 16`, `height = 950`, `y = 70`, `x = lane_x + 112`. ID: `life-<actor-slug>`.
 
 ---
 
-## Typical Messages (Examples)
-- 创建笔记请求
-- 识别类型与目录
-- 调用生成 Markdown
-- 返回 Markdown（含 frontmatter）
-- 判断是否需要可视化
-- 调用 json-canvas
-- 返回可视化结果
-- 输出到目标目录
+## Detailed Message Rules
+
+- Message nodes represent concrete calls, callbacks, or state validations.
+- Include parameters or return codes where helpful (e.g. `verifyToken(jwt) -> uid`, `200 OK {status: active}`).
+- Limit total message steps to 6 ~ 10 steps to maintain readability.
+- Node dimensions: `width = 240`, `height = 60 ~ 70`.
+- Vertical step: `y = 120, 210, 300, 390, 480, 570, 660, 750, 840`.
+- Message IDs: `msg-01-<action-slug>`, `msg-02-<action-slug>`...
 
 ---
 
-## Edges
-- Horizontal preferred
-- Vertical offset allowed
-- Avoid crossing when possible
+## Edge Connections
 
----
-
-## Guidance
-This diagram may trade beauty for completeness,
-but must still clearly communicate:
-- who initiates
-- who processes
-- who responds
+- Horizontal preferred; vertical offset allowed when showing async or delayed response.
+- Label edges with request method, payload type, or outcome status.
+- Text nodes MUST use `{"type": "text", "text": "..."}`.
+- All edges use `"fromNode"` and `"toNode"`.

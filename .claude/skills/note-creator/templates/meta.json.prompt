@@ -1,122 +1,20 @@
 {
-  "schema_version": "3.0",
-  "id": "nc_<timestamp>_<stable-key-slug>",
-  "stable_key": "<folder>::<title>",
+  "schema_version": "3.1",
+  "id": "nc_<current-date-compact>_<slug>",
   "title": "<title>",
   "folder": "<folder>",
-
-  "diagram_type": "artifact",
-
+  "diagram_type": "none | flowchart | sequence | architecture | artifact",
   "artifact_plan": ["md"],
-  "tags": ["<tag>"],
+  "tags": ["<tag1>", "<tag2>"],
 
-  "properties": {
-    "category": "<category>",
-    "created": "<current-date>",
-    "modified": "<current-date>",
-    "source": "<source-type>"
-  },
+  "created": "<current-date>",
+  "modified": "<current-date>",
+  "summary": "<one-sentence-summary-of-note>",
 
   "paths": {
-    "root_dir": "outputs/<folder>/<title>/",
-    "note": "outputs/<folder>/<title>/note.md",
+    "note": "note.md",
     "canvas": null,
     "base": null,
-    "meta": "outputs/<folder>/<title>/meta.json"
-  },
-
-  "revision": {
-    "number": 1,
-    "mode": "create",
-    "previous_meta": null,
-    "previous_outputs": null
-  },
-
-  "update": {
-    "intent": "create",
-    "strategy": "create",
-    "reason": "no previous note found for stable_key",
-    "change_summary": [
-      "Created note.md from source-backed sections",
-      "Created selected optional artifacts when requested"
-    ],
-    "input_fingerprint": {
-      "user_prompt_sha256": "<sha256-of-user-prompt>",
-      "context_files": []
-    },
-    "output_fingerprint": {
-      "note_md_sha256": "<sha256-of-note-md>",
-      "base_sha256": null,
-      "canvas_sha256": null
-    }
-  },
-
-  "indexing": {
-    "enabled": false,
-    "targets": [
-      {
-        "type": "folder_index",
-        "path": "outputs/40-工具脚本/index.md",
-        "mode": "append",
-        "status": "pending"
-      }
-    ],
-    "links": {
-      "canonical_link": "[[outputs/<folder>/<title>/note]]",
-      "base_link": null,
-      "canvas_link": null
-    }
-  },
-
-  "provenance": {
-    "generated_by": {
-      "orchestrator": ".claude/skills/note-creator/SKILL.md",
-      "dependencies": [
-        ".claude/skills/obsidian-markdown/SKILL.md",
-        ".claude/skills/obsidian-bases/SKILL.md",
-        ".claude/skills/json-canvas/SKILL.md"
-      ]
-    },
-    "templates": {
-      "note_md_prompt": ".claude/skills/note-creator/templates/note.md.prompt",
-      "base_prompt": ".claude/skills/note-creator/templates/base.prompt",
-      "canvas_prompt": ".claude/skills/note-creator/templates/canvas.prompt",
-      "meta_json_prompt": ".claude/skills/note-creator/templates/meta.json.prompt"
-    },
-    "run": {
-      "timestamp": "<current-timestamp>",
-      "environment": {
-        "host": "local_or_ssh",
-        "vault": "OBSIDIAN",
-        "workspace": "."
-      }
-    }
-  },
-
-  "bootstrap": {
-    "self_describe": {
-      "enabled": true,
-      "recommended_prompts": [
-        "为本条笔记生成一张知识结构图（canvas），要求节点包含：概览、分类、关键命令组、注意事项。",
-        "为本目录生成一个 bases 视图（base），按 tags/category/created 筛选并展示摘要。"
-      ]
-    },
-    "autogen_next": [
-      {
-        "artifact": "canvas",
-        "condition": "missing_canvas",
-        "prompt_hint": "generate a canvas that explains the note structure and workflow"
-      }
-    ]
-  },
-
-  "history": [
-    {
-      "revision": 1,
-      "timestamp": "<current-timestamp>",
-      "intent": "create",
-      "strategy": "create",
-      "note": "initial creation"
-    }
-  ]
+    "meta": "meta.json"
+  }
 }

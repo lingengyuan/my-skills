@@ -1,129 +1,72 @@
 # Canvas Sequence (Swimlane) Generation Template
 
 ## Purpose
-Create a **sequence / swimlane** diagram that communicates **execution order** and **cross-skill collaboration**.
+Create a **sequence / swimlane diagram** that communicates **execution order** and **interaction flow** between system actors, services, or components for the requested topic.
 
-Hard rule: This is a **sequence diagram** (messages). Do NOT turn it into a step-by-step flowchart or an artifact/dataflow diagram.
-
----
-
-## Lanes (Fixed Columns)
-Create EXACTLY these 4 lanes, left-to-right:
-1) 用户
-2) note-creator
-3) obsidian-markdown
-4) json-canvas
-
-Each lane MUST have:
-- A **header** text node (lane title)
-- A **lifeline** text node (a thin vertical line placeholder)
-
-### Standard Coordinates
-- Lane X positions:
-  - 用户: x=0
-  - note-creator: x=320
-  - obsidian-markdown: x=640
-  - json-canvas: x=960
-- Header node: width=260, height=60, y=0
-- Lifeline node: width=20, height=980, y=70, x = lane_x + 120
-
-### Lane Node IDs (Fixed)
-Headers:
-- lane-user
-- lane-note-creator
-- lane-obsidian-markdown
-- lane-json-canvas
-
-Lifelines:
-- life-user
-- life-note-creator
-- life-obsidian-markdown
-- life-json-canvas
+This is a **sequence diagram** (interaction messages over time). Do NOT turn it into a static architecture map or file manifest.
 
 ---
 
-## Message Nodes (Must be "messages", not "steps")
-Represent each interaction with a **text node** near the sender lane, then connect it to the receiver lane using an edge.
+## Swimlane Structure
 
-### Standard Message Node Geometry
-- width=260, height=70
-- y positions (top-down): 120, 240, 360, 480, 600
+Derive 2 to 5 participant lanes based on the core actors in the topic (e.g. `Client / Caller`, `Service A / Gateway`, `Service B / Worker`, `Data Store / Third-Party API`).
 
-### Required Message Nodes (IDs + Intended Meaning)
-You MUST create these message nodes (Chinese preferred, short text):
+Lanes are arranged left-to-right in order of initiation.
 
-1) msg-req
-- Lane: 用户 (x=0)
-- Text: “创建笔记请求”
+Each lane consists of:
+1. **Header Node**: Actor / component title
+2. **Lifeline Node**: Vertical dashed or subtle line placeholder extending downwards
 
-2) msg-classify
-- Lane: note-creator (x=320)
-- Text: “识别类型 & 确定目录”
+### Standard Lane Geometry
+- Lane spacing: `X = lane_index * 320` (e.g. Lane 0: `x=0`, Lane 1: `x=320`, Lane 2: `x=640`, Lane 3: `x=960`)
+- Header Node: `width = 240 ~ 280`, `height = 50 ~ 60`, `y = 0`
+- Lifeline Node: `width = 16 ~ 20`, `height = 700 ~ 1000`, `y = 70`, `x = lane_x + 110`
 
-3) msg-md-call
-- Lane: note-creator (x=320)
-- Text: “调用生成 Markdown”
-
-4) msg-md-done
-- Lane: obsidian-markdown (x=640)
-- Text: “返回 Markdown 结果”
-
-5) msg-canvas-call
-- Lane: note-creator (x=320)
-- Text: “调用生成可视化（可选）”
-
-6) msg-canvas-done
-- Lane: json-canvas (x=960)
-- Text: “返回可视化结果”
-
-7) msg-done
-- Lane: note-creator (x=320)
-- Text: “完成并输出到目标目录”
+### Lane IDs
+Use semantic, predictable IDs:
+- Header: `lane-<actor-slug>` (e.g., `lane-client`, `lane-gateway`, `lane-auth`, `lane-db`)
+- Lifeline: `life-<actor-slug>` (e.g., `life-client`, `life-gateway`, `life-auth`, `life-db`)
 
 ---
 
-## Edge Connection Pattern (Mandatory)
-Create cross-lane edges in this order (labels recommended, keep them semantic-level):
+## Interaction Messages (Nodes & Edges)
 
-1) msg-req  → msg-classify
-- fromSide=right, toSide=left
-- label: “请求”
+Represent each meaningful interaction step with a message node placed near the sender lane, connected via directed edges to the receiver.
 
-2) msg-md-call → msg-md-done
-- fromSide=right, toSide=left
-- label: “调用”
+### Message Node Geometry
+- `width = 200 ~ 260`, `height = 50 ~ 70`
+- Top-down Y progression: `y = 120, 220, 320, 420, 520, 620...` (maintain 80~120px vertical step per message)
+- Position `x`: Align with the sender lane or place centered between sender and receiver lanes.
 
-3) msg-md-done → msg-done
-- fromSide=right, toSide=left
-- label: “返回结果”
+### Semantic Message Node IDs
+Name messages by sequence step and intent:
+- `msg-01-<action-slug>` (e.g., `msg-01-login-request`)
+- `msg-02-<action-slug>` (e.g., `msg-02-verify-token`)
+- `msg-03-<action-slug>` (e.g., `msg-03-fetch-profile`)
+- `msg-04-<action-slug>` (e.g., `msg-04-return-response`)
 
-4) msg-canvas-call → msg-canvas-done
-- fromSide=right, toSide=left
-- label: “调用（可选）”
-
-5) msg-canvas-done → msg-done
-- fromSide=left, toSide=right
-- label: “返回结果”
-
-Optional but allowed (keep minimal):
-- msg-classify → msg-md-call (label: “继续”)
-- msg-classify → msg-canvas-call (label: “需要可视化则调用”)
-- msg-done → lane-user (or msg-req) (label: “完成”)
-
-### Strict prohibitions for edges/labels
-- Do NOT mention filenames or artifacts in labels:
-  - forbidden: "note.md", "meta.json", "diagram.canvas", "table.base"
-- Do NOT add "生成计划/判断路由/格式化组织" as separate edges; keep internal details out of the sequence diagram.
+Message node content:
+```markdown
+**[Action Name]**
+Short description or payload summary
+```
 
 ---
 
-## Minimum Node/Edge Count
-- Nodes: at least 15 (4 headers + 4 lifelines + 7 messages)
-- Edges: at least 7 (5 cross-lane + up to 2 optional)
+## Edge Pattern & Flow Rules
+
+1. Connect message nodes in chronological order:
+   - Call edge: sender lane / message node → target lane message node (`fromSide: "right"`, `toSide: "left"`)
+   - Return edge: callee message node → caller lane (`fromSide: "left"`, `toSide: "right"`)
+2. Edge Labels:
+   - Use concise semantic labels (e.g., `POST /auth/token`, `Token Validated`, `Query Profile`, `200 OK`).
+   - Do NOT clutter edges with excessive payload details.
+3. Keep sequential order top-to-bottom so the time dimension is immediately intuitive.
 
 ---
 
-## Strict Constraints
-- Text nodes MUST use {"type":"text","text":"..."}.
-- IDs MUST match the fixed IDs above (do not invent random IDs).
-- Keep the layout readable (no overlapping nodes).
+## Canvas Constraints
+
+- Text nodes MUST use `{"type": "text", "text": "..."}`. Never use `"label"` on text nodes.
+- Edges MUST use `"fromNode"` and `"toNode"` (never `"from"` or `"to"`).
+- Keep layout clean: no overlapping nodes or crossed lifelines.

@@ -3,7 +3,7 @@ Generate a valid Obsidian Bases (.base) YAML file.
 Context you are given:
 - title
 - folder
-- root_dir (outputs/<folder>/<title>/)
+- root_dir (<folder>/<title>/)
 
 CRITICAL CONCEPTS (READ THIS FIRST):
 - Obsidian Bases is a VIEW DEFINITION system, NOT a data storage format
@@ -16,7 +16,7 @@ CRITICAL CONCEPTS (READ THIS FIRST):
 **CRITICAL: Path Resolution in Obsidian Bases**
 - sources paths are relative to the VAULT ROOT, not the .base file location
 - Using "./" will scan the entire vault root, which is usually not what you want
-- ALWAYS use the full path from vault root: "outputs/<folder>/<title>/"
+- ALWAYS use the full path from vault root: "<folder>/<title>/"
 - ALWAYS add file.inFolder() filter as a safety measure to restrict scope
 
 **CRITICAL: File Format**
@@ -27,7 +27,7 @@ CRITICAL CONCEPTS (READ THIS FIRST):
 
 Hard Requirements:
 - sources MUST be exactly (relative to VAULT ROOT):
-  outputs/<folder>/<title>/
+  <folder>/<title>/
 - Non-markdown files MUST be excluded
 - Define at least one usable view; use a table view for tabular or comparison data.
 - Include only properties and columns available in the source notes; do not invent fields to meet a count.
@@ -59,14 +59,14 @@ Rules:
 Required Output Format:
 ```yaml
 sources: |
-  include: outputs/<folder>/<title>/
+  include: <folder>/<title>/
   exclude:
     - "*.json"
 
 filters:
   and:
     - 'file.ext == "md"'
-    - file.inFolder("outputs/<folder>/<title>")
+    - file.inFolder("<folder>/<title>")
 
 properties:
   category:

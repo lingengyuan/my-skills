@@ -32,13 +32,13 @@ python3 "<skill-dir>/tools/wechat2md_v2.py" "<article-url>" --output-dir "output
 
 ### 2. Convert Topic Album
 
-Use `wechat2md.py` with `--album` to batch-download all articles in a WeChat collection:
+Use `wechat2md.py` with `--album` to batch-download all articles in a WeChat collection (auto-detected if URL contains `/mp/appmsgalbum`):
 
 ```bash
-python3 "<skill-dir>/tools/wechat2md.py" --album "<album-url>"
+python3 "<skill-dir>/tools/wechat2md.py" "<album-url>" --album
 ```
 
-For custom album configurations (delays, slug templates, tag rules), see [references/config.md](references/config.md).
+Optional settings (output path template, slug format, tags) are configured via `config.json` in this Skill's directory. See [references/config.md](references/config.md).
 
 ## CLI Reference
 
@@ -51,12 +51,12 @@ For custom album configurations (delays, slug templates, tag rules), see [refere
 | `--target-folder` | string | `20-阅读笔记` | Target folder within output directory |
 | `--slug` | string | auto from title | Custom directory slug |
 
-### `wechat2md.py` (Album Mode)
+### `wechat2md.py` (Album / Batch Mode)
 
-| Argument | Type | Description |
-|----------|------|-------------|
-| `--album` | string | WeChat album / topic URL |
-| `--config` | string | Path to custom `config.json` |
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `url` | string (positional) | required | WeChat article or album URL |
+| `--album` | boolean flag | optional | Force album mode (auto-detected if URL contains `/mp/appmsgalbum`) |
 
 ## Output Package Structure
 

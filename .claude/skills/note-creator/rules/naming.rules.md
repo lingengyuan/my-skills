@@ -6,7 +6,7 @@
 - Keep Chinese characters
 
 ## Output Paths
-outputs/<folder>/<title>/
+<vault>/<folder>/<title>/
 
 ## Collision Policy
 If the directory already exists:

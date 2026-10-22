@@ -101,19 +101,15 @@ If required comparison fields are missing, classification is INVALID.
 
 Rules for comparison_items:
 - Each item MUST have:
-  - slug: lowercase-kebab-case (e.g., "obsidian-markdown")
-  - display_name: short name shown to the user
-- If the user explicitly listed items (A vs B vs C), use those.
-- If the user said "三件套" or clearly implies the known Obsidian Skills trio, default to:
-  - obsidian-markdown
-  - json-canvas
-  - obsidian-bases
+  - slug: lowercase-kebab-case (e.g., "postgresql", "mysql")
+  - display_name: short name shown to the user (e.g., "PostgreSQL", "MySQL")
+- Extract items directly from the user's comparison targets (e.g. A vs B vs C).
+- Default to 2 to 4 items max for focused comparison.
 
 Example:
 "comparison_items": [
-  { "slug": "obsidian-markdown", "display_name": "obsidian-markdown" },
-  { "slug": "json-canvas", "display_name": "json-canvas" },
-  { "slug": "obsidian-bases", "display_name": "obsidian-bases" }
+  { "slug": "postgresql", "display_name": "PostgreSQL" },
+  { "slug": "mysql", "display_name": "MySQL" }
 ]
 
 ---

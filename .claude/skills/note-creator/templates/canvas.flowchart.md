@@ -1,79 +1,69 @@
 # Canvas Flowchart Generation Template
 
+## Purpose
+Create a **procedural flowchart** showing step-by-step logic, decision branching, and state transitions for a process or algorithm.
+
+---
+
 ## Standard Layout Coordinates
 
-### Main Flow (Center Line)
-- Center X: 350
-- Node width: 300
-- Vertical spacing: 150px
+### Main Flow (Top-Down or Left-to-Right)
+- Center X: `350` (for vertical flow)
+- Node width: `260 ~ 300`, height: `80 ~ 110`
+- Vertical gap: `60 ~ 80px` between consecutive steps
 
-```
-Input Node:        y=0
-Classification:     y=170 (gap 170)
-Path Computation:   y=380 (gap 210, larger node)
-File Generation:    y=580 (gap 200)
-Output:             y=920 (gap 340, includes sub-nodes)
-```
-
-### File Generation Section (Group)
-- Group bounds: x=100 to 900, y=550 to 870
-- Note node: x=130, y=590
-- Meta node: x=130, y=730
-- Canvas node: x=400, y=590
-- Base node: x=670, y=590
-- Routing node: x=400, y=730
-
-### Color Scheme
-- Input: color 6 (purple)
-- Processing: color 3 (yellow)
-- Critical: color 1 (red)
-- Required output: color 4 (green)
-- Optional output: color 2 (orange) or 3 (yellow)
-- Final output: color 5 (cyan)
-
-## Standard Node IDs
-
-Always use these IDs for consistency:
-- node-input
-- node-classify
-- node-paths
-- node-note
-- node-meta
-- node-canvas
-- node-base
-- node-routing
-- node-output
-- group-generation
-
-## Edge Connection Pattern
-
-Vertical flow:
-```
-node-input → node-classify → node-paths → node-routing
-node-routing → node-note
-node-routing → node-canvas (conditional)
-node-routing → node-base (conditional)
-node-note → node-meta
-node-meta → node-output
-node-base → node-output
+```text
+1. Trigger / Start:       y = 0
+2. Pre-check / Input:     y = 150
+3. Decision / Branch:     y = 300
+   ├── Branch A (Yes/True):   x = 100, y = 450
+   └── Branch B (No/False):  x = 600, y = 450
+4. Processing / Action:   y = 620
+5. Terminal / Outcome:    y = 780
 ```
 
-## Text Template
+### Color Scheme (Obsidian Canvas Color Codes)
+- **Start / Input**: `color: "6"` (Purple)
+- **Processing Steps**: `color: "3"` (Yellow)
+- **Decision / Gate**: `color: "2"` (Orange)
+- **Success / Positive Outcome**: `color: "4"` (Green)
+- **Failure / Abort**: `color: "1"` (Red)
+- **Neutral / Informational**: `color: "5"` (Cyan)
 
+---
+
+## Semantic Node IDs
+
+Name nodes according to their actual procedural role in the user's domain:
+- `step-01-start`
+- `step-02-<action>`
+- `decision-<condition>`
+- `branch-<outcome-a>`
+- `branch-<outcome-b>`
+- `step-final-<success/failure>`
+
+Node text formatting:
 ```markdown
-## [Title]
-
-[Content with bold for key terms]
-
-- Bullet point 1
-- Bullet point 2
+### [Step Title]
+Short explanation of the action or check
+- Detail or condition
 ```
 
-## Reproducibility Checklist
+---
 
-- [ ] Use fixed X coordinates (not calculated)
-- [ ] Use consistent node IDs
-- [ ] Use consistent color codes
-- [ ] Use standard spacing (150-200px)
-- [ ] Center main flow at X=350
-- [ ] Side branches at X=130, 400, 670
+## Edge Connection Patterns
+
+- Vertical flow for sequential steps:
+  `fromNode: "step-01"`, `toNode: "step-02"`, `fromSide: "bottom"`, `toSide: "top"`
+- Decision branching:
+  - Yes branch: `fromSide: "left"`, `toSide: "top"`, `label: "Yes / 符合条件"`
+  - No branch: `fromSide: "right"`, `toSide: "top"`, `label: "No / 异常或跳过"`
+- Reconvergence: Branch nodes connect into the downstream action or terminal node.
+
+---
+
+## Canvas Constraints
+
+- Text nodes MUST use `{"type": "text", "text": "..."}`. Never use `"label"` on text nodes.
+- Edges MUST use `"fromNode"` and `"toNode"` (never `"from"` or `"to"`).
+- Keep layout balanced and legible without overlapping lines.
