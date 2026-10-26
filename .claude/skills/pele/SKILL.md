@@ -1,20 +1,26 @@
 ---
 name: pele
-description: Render Mermaid source (.mmd, .mermaid, or code blocks) as SVG with Pele. Prefer this skill for routine Mermaid SVG output.
+description: Render Mermaid diagrams as SVG with Pele. Use its JavaScript API for custom rendering, theming and browser integration.
 ---
 
 # Pele
 
-Save the Mermaid source beside its SVG. Run once:
+Use the official JavaScript API from the current local Pele installation. Do not pin a release.
+
+Save the Mermaid source beside its SVG. Read, render and write in one Node invocation. For standalone use on this machine, the package is installed in `~/.local/share/pele`; run inline Node there with absolute input and output paths:
 
 ```sh
-pele input.mmd output.svg
+cd ~/.local/share/pele && node --input-type=module - /absolute/input.mmd /absolute/output.svg <<'JS'
+import { readFileSync, writeFileSync } from 'node:fs';
+import { render } from 'pele';
+
+const [input, output] = process.argv.slice(2);
+writeFileSync(output, render(readFileSync(input, 'utf8')).svg);
+JS
 ```
 
-Return links to both files after the command succeeds. Use `--theme dark` only when requested. The default theme is light.
+Pass `RenderOptions` when the task needs custom layout, fonts, padding, diagram configuration, icons or math. Use CSS variables for theming. For browser integration, use `mount()` for container sizing, zoom and updates. Consult the installed types or official [API](https://pele.run/api) and [theming](https://pele.run/theming) docs only when needed.
 
-Do not query the version, parse XML separately, open a browser, or create a preview page by default. Preview only when requested or when a layout problem needs inspection. The command reports its version and output dimensions.
+Return links to the source and SVG after success. Do not query versions, fetch documentation, parse XML separately or create browser previews by default. Preview only when requested or when a layout problem needs inspection.
 
-If `pele` is absent from PATH, try `~/.local/bin/pele`. This command is a local wrapper. The upstream npm package does not provide a CLI.
-
-Preserve diagram content. Report errors or known limitations without silently changing renderers. Pele 1.6.0 ignores `state.curve`.
+Preserve diagram content. Report errors or limitations without silently changing renderers. State diagrams use `flowchart.curve` for transitions.
