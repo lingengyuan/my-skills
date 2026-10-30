@@ -11,6 +11,7 @@ Skills for technical writing, knowledge management, and development. Each direct
 | Skill | Purpose |
 |---|---|
 | [brief-output](.claude/skills/brief-output/SKILL.md) | Write concise, professional content |
+| [google-go-style](.claude/skills/google-go-style/SKILL.md) | Write and review Go code following Google Go Style |
 | [insight-collector](.claude/skills/insight-collector/SKILL.md) | Archive reusable insights |
 | [json-canvas](.claude/skills/json-canvas/SKILL.md) | Create and edit JSON Canvas files |
 | [md2wechat](.claude/skills/md2wechat/SKILL.md) | Format WeChat articles and publish drafts |
@@ -47,6 +48,7 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 | Skill | 用途 |
 |---|---|
 | [brief-output](.claude/skills/brief-output/SKILL.md) | 精炼专业表达 |
+| [google-go-style](.claude/skills/google-go-style/SKILL.md) | 按 Google Go Style 编写和审查 Go 代码 |
 | [insight-collector](.claude/skills/insight-collector/SKILL.md) | 归档可复用洞察 |
 | [json-canvas](.claude/skills/json-canvas/SKILL.md) | 创建和编辑 JSON Canvas |
 | [md2wechat](.claude/skills/md2wechat/SKILL.md) | 排版微信文章并发布草稿 |

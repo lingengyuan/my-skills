@@ -1,0 +1,4 @@
+interface:
+  display_name: "Google Go Style"
+  short_description: "按 Google Go 规范编写和审查代码，关注清晰性、简单性、接口与可维护性"
+  default_prompt: "使用 $google-go-style 按 Google Go 规范检查当前修改，给出具体修改建议。"
