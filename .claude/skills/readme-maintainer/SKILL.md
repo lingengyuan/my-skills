@@ -32,6 +32,7 @@ Generate and maintain clear, verified README files directly from repository sour
      ```bash
      bash "<skill-dir>/scripts/check_bilingual_readme.sh" README.md
      ```
+     The script accepts one file with `## English` / `## 简体中文` sections, or `README.md` plus a companion `README.<lang>.md`; either file works as the argument. It compares heading counts, so keep the section structure identical across languages. A single-language README exits 0.
 7. **Verify & report**: Test links, verify command syntax, and report material changes outside the README.
 
 ## Guidelines
