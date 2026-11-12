@@ -25,7 +25,7 @@ Codex 没有内置的 insights 报告命令。内置的会话入口是 `codex ag
 ### 1. 采集
 
 ```bash
-python3 -I /Users/hughlin/.claude/skills/insights-report/scripts/collect.py --agent all --days 30
+python3 -I /Users/hughlin/.claude/skills/insights-report/scripts/collect.py --agent auto --days 30
 ```
 
 默认输出到 `/Users/hughlin/.claude/usage-data/insights-skill/`：
@@ -35,7 +35,7 @@ python3 -I /Users/hughlin/.claude/skills/insights-report/scripts/collect.py --ag
 
 参数：
 
-- `--agent all|claude,codex,omp,pi`：要扫描的 agent，可逗号分隔。默认 `all`。
+- `--agent auto|all|claude,codex,omp,pi`：要扫描的 agent，可逗号分隔。`auto` 根据当前进程判断调用方 agent；判断不出时退回 `all`。默认 `auto`。
 - `--days N`：只分析最近 N 天有更新的会话，`0` 表示全部。默认 30。
 - `--max-sessions N`：最多分析多少个会话。默认 500。
 - `--out DIR`：输出目录。
@@ -55,7 +55,8 @@ python3 -I /Users/hughlin/.claude/skills/insights-report/scripts/collect.py --ag
 - 用第二人称 "你"。
 - 每条结论都能在 `digest.md` 中找到证据。
 - 不要编造统计数字。
-- 涉及多个 agent 时，写 "agent" 或具体名称，不要默认写成 "Claude"。
+- 报告范围由 `--agent` 决定。单一 agent 的报告只写该 agent；跨 agent 报告要按 `Agent breakdown` 分别归因，不要默认写成 "Claude"。
+- 建议里的命令、目录、配置文件必须属于报告范围内的 agent：Codex 用 `~/.codex/`、`AGENTS.md`、`codex exec`；Claude Code 用 `.claude/`、`CLAUDE.md`、`claude -p`。
 - `at_a_glance` 最后写，内容来自前面 7 个 section。
 
 ### 4. 渲染
@@ -88,6 +89,7 @@ Claude Code 的 `/insights` 会在 `~/.claude/usage-data/facets/` 留下缓存�
 
 - Claude Code：工具名、文件路径、语言、增删行数最完整。
 - Codex：走 app-server 时能拿到 `commandExecution`、`mcpToolCall`、`fileChange`、`webSearch`、`imageView`，指标较完整。回退到 rollout 文件时，`exec` 是 JS 编排工具，内部具体命令和文件路径不会全部暴露，工具计数偏向 `exec`。
+- Codex 恢复会话会产生多个共用 session id 的 rollout；采集时只保留消息最多的一份，避免同一会话重复计数。
 - pi：`bash`、`edit`、`write`、`read` 能提取命令和路径，指标较完整。
 - 工具错误：Claude 用 `is_error`，pi 用 `isError`，Codex 用 `exitCode` 或输出模式判断。
 

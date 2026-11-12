@@ -29,6 +29,19 @@ DEFAULT_OUT = CLAUDE_DIR / "usage-data" / "insights-skill"
 
 AGENT_LABELS = {"claude": "Claude Code", "codex": "Codex", "omp": "omp", "pi": "pi"}
 
+
+def detect_current_agent():
+    """Return the agent this process runs under, so the report matches the caller."""
+    if os.environ.get("CLAUDECODE"):
+        return "claude"
+    if os.environ.get("CODEX_THREAD_ID") or os.environ.get("CODEX_SESSION_ID"):
+        return "codex"
+    if os.environ.get("PI_SESSION_ID") or os.environ.get("PI_SESSION"):
+        return "pi"
+    if os.environ.get("OMP_SESSION_ID") or os.environ.get("OMP_SESSION"):
+        return "omp"
+    return None
+
 LANGUAGE_BY_EXT = {
     ".ts": "TypeScript", ".tsx": "TypeScript", ".js": "JavaScript",
     ".jsx": "JavaScript", ".py": "Python", ".rb": "Ruby", ".go": "Go",
@@ -1004,12 +1017,29 @@ def aggregate(sessions, facets, scanned):
         "messages_per_day": 0,
         "message_hours": [],
         "multi_clauding": {"overlap_events": 0, "sessions_involved": 0, "user_messages_during": 0},
+        "by_agent": {},
     }
 
     starts = []
     hours = []
     response_times = []
     for meta in sessions:
+        agent_stat = stats["by_agent"].setdefault(meta["agent"], {
+            "sessions": 0, "messages": 0, "hours": 0.0,
+            "tools": {}, "goals": {}, "friction": {},
+            "interruptions": 0, "tool_errors": 0,
+            "task_agent_sessions": 0, "mcp_sessions": 0,
+        })
+        agent_stat["sessions"] += 1
+        agent_stat["messages"] += meta["user_message_count"]
+        agent_stat["hours"] += meta["duration_minutes"] / 60
+        agent_stat["interruptions"] += meta["user_interruptions"]
+        agent_stat["tool_errors"] += meta["tool_errors"]
+        agent_stat["task_agent_sessions"] += 1 if meta["uses_task_agent"] else 0
+        agent_stat["mcp_sessions"] += 1 if meta["uses_mcp"] else 0
+        for key, value in (meta["tool_counts"] or {}).items():
+            agent_stat["tools"][key] = agent_stat["tools"].get(key, 0) + value
+
         stats["total_messages"] += meta["user_message_count"]
         stats["total_duration_hours"] += meta["duration_minutes"] / 60
         stats["total_input_tokens"] += meta["input_tokens"]
@@ -1047,6 +1077,7 @@ def aggregate(sessions, facets, scanned):
             for key, value in (facet.get("goal_categories") or {}).items():
                 if value and value > 0:
                     stats["goal_categories"][key] = stats["goal_categories"].get(key, 0) + value
+                    agent_stat["goals"][key] = agent_stat["goals"].get(key, 0) + value
             outcome = facet.get("outcome")
             if outcome:
                 stats["outcomes"][outcome] = stats["outcomes"].get(outcome, 0) + 1
@@ -1062,6 +1093,7 @@ def aggregate(sessions, facets, scanned):
             for key, value in (facet.get("friction_counts") or {}).items():
                 if value and value > 0:
                     stats["friction"][key] = stats["friction"].get(key, 0) + value
+                    agent_stat["friction"][key] = agent_stat["friction"].get(key, 0) + value
             success = facet.get("primary_success")
             if success and success != "none":
                 stats["success"][success] = stats["success"].get(success, 0) + 1
@@ -1127,6 +1159,20 @@ def build_digest(stats):
                  f" | Median response: {stats['median_response_time']:.0f}s")
     lines.append("")
 
+    by_agent = stats.get("by_agent") or {}
+    if by_agent:
+        lines.append("## Agent breakdown")
+        for agent, item in sorted(by_agent.items(), key=lambda kv: -kv[1]["sessions"]):
+            lines.append(
+                f"- **{agent}**: {item['sessions']} sessions | {item['messages']} messages"
+                f" | {item['hours']:.1f}h | tools: {top(item['tools'], 5)}"
+            )
+            lines.append(
+                f"  goals: {top(item['goals'], 5)} | friction: {top(item['friction'], 5)}"
+                f" | interruptions: {item['interruptions']} | tool errors: {item['tool_errors']}"
+            )
+        lines.append("")
+
     lines.append("## Session summaries")
     for item in stats["session_summaries"]:
         summary = (item["summary"] or "").replace("\n", " ").strip()
@@ -1140,13 +1186,15 @@ def build_digest(stats):
     return "\n".join(lines) + "\n"
 
 
-def build_facet_digest(facets):
+def build_facet_digest(facets, agent_by_session=None):
+    agent_by_session = agent_by_session or {}
     lines = []
     friction_details = []
-    for facet in facets.values():
+    for session_id, facet in facets.items():
         detail = (facet.get("friction_detail") or "").strip()
         if detail:
-            friction_details.append(f"- {detail}")
+            agent = agent_by_session.get(session_id)
+            friction_details.append(f"- [{agent}] {detail}" if agent else f"- {detail}")
     if friction_details:
         lines.append("## Friction details")
         lines.extend(friction_details[:20])
@@ -1156,7 +1204,7 @@ def build_facet_digest(facets):
     for facet in facets.values():
         instructions.extend(facet.get("user_instructions_to_claude") or [])
     if instructions:
-        lines.append("## User instructions to Claude")
+        lines.append("## User instructions to the agent")
         lines.extend(f"- {item}" for item in instructions[:15])
         lines.append("")
     return "\n".join(lines) + "\n"
@@ -1213,8 +1261,9 @@ def emit_facets(sessions, facets, out_dir, limit, paths):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--agent", default="all",
-                        help="claude, codex, omp, pi, or all. Comma-separated. Default: all.")
+    parser.add_argument("--agent", default="auto",
+                        help="claude, codex, omp, pi, all, or auto. Comma-separated. "
+                             "auto detects the calling agent, else all.")
     parser.add_argument("--days", type=int, default=30, help="Only sessions updated within N days. 0 = all.")
     parser.add_argument("--max-sessions", type=int, default=500, help="Maximum sessions to analyze.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="Output directory.")
@@ -1227,6 +1276,10 @@ def main():
     args = parser.parse_args()
 
     requested = [item.strip() for item in args.agent.split(",") if item.strip()]
+    if requested == ["auto"]:
+        detected = detect_current_agent()
+        requested = [detected] if detected else list(AGENT_LABELS)
+        print(f"agent scope: {', '.join(requested)}", file=sys.stderr)
     if "all" in requested:
         requested = list(AGENT_LABELS)
     unknown = [item for item in requested if item not in AGENT_LABELS]
@@ -1286,6 +1339,17 @@ def main():
         session_paths[(meta["agent"], meta["session_id"])] = path
 
     sessions.sort(key=lambda meta: meta.get("transcript_mtime") or 0, reverse=True)
+    deduped = {}
+    for meta in sessions:
+        key = (meta["agent"], meta["session_id"])
+        previous = deduped.get(key)
+        if previous is None or meta["user_message_count"] > previous["user_message_count"]:
+            deduped[key] = meta
+    if len(deduped) != len(sessions):
+        print(f"dedupe: {len(sessions) - len(deduped)} resumed-session duplicates removed",
+              file=sys.stderr)
+    sessions = list(deduped.values())
+    sessions.sort(key=lambda meta: meta.get("transcript_mtime") or 0, reverse=True)
     sessions = sessions[:args.max_sessions]
 
     selected = [s for s in sessions
@@ -1303,7 +1367,8 @@ def main():
     (out_dir / "stats.json").write_text(
         json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    digest = build_digest(stats) + build_facet_digest(facets)
+    agent_by_session = {meta["session_id"]: meta["agent"] for meta in selected}
+    digest = build_digest(stats) + build_facet_digest(facets, agent_by_session)
     (out_dir / "digest.md").write_text(digest, encoding="utf-8")
 
     print(f"stats:  {out_dir / 'stats.json'}")

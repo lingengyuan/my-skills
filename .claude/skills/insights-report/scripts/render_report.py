@@ -214,15 +214,23 @@ def render(stats, analysis):
         for item in friction.get("categories") or []
     ) or '<p class="empty">No friction categories generated</p>'
 
-    claude_md = "".join(
+    additions = suggestions.get("instruction_additions") or suggestions.get("claude_md_additions") or []
+    instruction_files = {"claude": "CLAUDE.md", "codex": "AGENTS.md"}
+    if len(agent_counts) == 1:
+        only_agent = next(iter(agent_counts))
+        instruction_title = f"Suggested {instruction_files.get(only_agent, 'Project Instruction File')} Additions"
+    else:
+        instruction_title = "Suggested Project Instruction Additions"
+
+    instruction_md = "".join(
         '<div class="claude-md-item">'
         f'<code class="cmd-code">{esc(item.get("addition"))}</code>'
         f'<div class="cmd-why">{rich(item.get("why"))}</div></div>'
-        for item in suggestions.get("claude_md_additions") or []
+        for item in additions
     )
     claude_md_html = (
-        '<div class="claude-md-section"><h3>Suggested CLAUDE.md Additions</h3>'
-        + (claude_md or '<p class="empty">None suggested</p>')
+        f'<div class="claude-md-section"><h3>{instruction_title}</h3>'
+        + (instruction_md or '<p class="empty">None suggested</p>')
         + "</div>"
     )
 

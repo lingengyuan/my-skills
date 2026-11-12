@@ -2,7 +2,7 @@
 
 这些 prompt 从 Claude Code 2.1.322 的 `/insights` 实现中提取。宿主 agent 读取 `digest.md` 后，按下面的 schema 生成 `analysis.json`。
 
-数据可能来自 Claude Code、Codex 或 pi。涉及具体工具时写 agent 名称；泛指时写 "agent"，不要默认写 "Claude"。
+数据可能来自 Claude Code、Codex、pi 或 omp。先看 digest 的 `Agents:` 和 `Agent breakdown`，确认本次分析范围。涉及具体工具时写 agent 名称；泛指时写 "agent"，不要默认写 "Claude"。单一 agent 的报告只能写该 agent 的能力和命令。
 
 ## 输出总 schema
 
@@ -30,7 +30,7 @@
     ]
   },
   "suggestions": {
-    "claude_md_additions": [
+    "instruction_additions": [
       {"addition": "Line or block", "why": "1 sentence", "prompt_scaffold": "Where to add it"}
     ],
     "features_to_try": [
@@ -123,31 +123,36 @@ Include 3 friction categories with 2 examples each.
 ```text
 Analyze this coding agent usage data and suggest improvements.
 
-## AGENT FEATURES REFERENCE (pick from these for features_to_try):
+## AGENT FEATURES REFERENCE (pick only features of the agents that appear in the digest):
 1. **MCP Servers**: Connect the agent to external tools, databases, and APIs via Model Context Protocol.
-   - How to use: Run `claude mcp add <server-name> -- <command>`
+   - Claude Code: `claude mcp add <server-name> -- <command>`
+   - Codex: `codex mcp add <server-name> -- <command>`
    - Good for: database queries, Slack integration, GitHub issue lookup, connecting to internal APIs
 
-2. **Custom Skills**: Reusable prompts you define as markdown files that run with a single /command.
-   - How to use: Create `.claude/skills/commit/SKILL.md` with instructions. Then type `/commit` to run it.
-   - Good for: repetitive workflows - /commit, /review, /test, /deploy, /pr, or complex multi-step workflows
+2. **Custom Skills**: Reusable prompts you define as markdown files.
+   - Claude Code: create `.claude/skills/<name>/SKILL.md`, then run `/<name>`.
+   - Codex: create `~/.codex/skills/<name>/SKILL.md`; invoke it by name.
+   - pi / omp: create the matching skill file under the agent's own skills directory.
+   - Good for: repetitive workflows - commit, review, test, deploy, PR, or multi-step checks
 
-3. **Hooks**: Shell commands that auto-run at specific lifecycle events.
-   - How to use: Add to `.claude/settings.json` under "hooks" key.
+3. **Lifecycle Hooks**: Shell commands that run automatically at defined events.
+   - Claude Code: add hooks under `hooks` in `.claude/settings.json`.
+   - Codex: use the `notify` setting in `~/.codex/config.toml`; do not describe Claude hooks.
    - Good for: auto-formatting code, running type checks, enforcing conventions
 
 4. **Headless Mode**: Run the agent non-interactively from scripts and CI/CD.
-   - How to use: `claude -p "fix lint errors" --allowedTools "Edit,Read,Bash"`
+   - Claude Code: `claude -p "fix lint errors" --allowedTools "Edit,Read,Bash"`
+   - Codex: `codex exec "fix lint errors"`
    - Good for: CI/CD integration, batch code fixes, automated reviews
 
 5. **Task Agents**: The agent spawns focused subagents for complex exploration or parallel work.
-   - How to use: The agent auto-invokes when helpful, or ask "use an agent to explore X"
-   - Good for: codebase exploration, understanding complex systems
+   - How to use: ask the agent to delegate exploration or verification to subagents.
+   - Good for: codebase exploration, understanding complex systems, parallel checks
 
 RESPOND WITH ONLY A VALID JSON OBJECT:
 {
-  "claude_md_additions": [
-    {"addition": "A specific line or block to add to CLAUDE.md based on workflow patterns. E.g., 'Always run tests after modifying auth-related files'", "why": "1 sentence explaining why this would help based on actual sessions", "prompt_scaffold": "Instructions for where to add this in CLAUDE.md. E.g., 'Add under ## Testing section'"}
+  "instruction_additions": [
+    {"addition": "A specific line or block to add to the project instruction file (AGENTS.md for Codex, CLAUDE.md for Claude Code) based on workflow patterns. E.g., 'Always run tests after modifying auth-related files'", "why": "1 sentence explaining why this would help based on actual sessions", "prompt_scaffold": "Where to add it, e.g. 'Add under ## Testing section'"}
   ],
   "features_to_try": [
     {"feature": "Feature name from AGENT FEATURES REFERENCE above", "one_liner": "What it does", "why_for_you": "Why this would help YOU based on your sessions", "example_code": "Actual command or config to copy"}
@@ -157,9 +162,9 @@ RESPOND WITH ONLY A VALID JSON OBJECT:
   ]
 }
 
-IMPORTANT for claude_md_additions: PRIORITIZE instructions that appear MULTIPLE TIMES in the user data. If user told the agent the same thing in 2+ sessions (e.g., 'always run tests', 'use TypeScript'), that's a PRIME candidate - they shouldn't have to repeat themselves.
+IMPORTANT for instruction_additions: use the instruction file of the agent(s) in scope (Codex -> AGENTS.md, Claude Code -> CLAUDE.md, mixed -> describe the location per agent). PRIORITIZE instructions that appear MULTIPLE TIMES in the user data. If the user said the same thing in 2+ sessions (e.g., 'always run tests', 'use TypeScript'), that's a PRIME candidate - they shouldn't have to repeat themselves.
 
-IMPORTANT for features_to_try: Pick 2-3 from the AGENT FEATURES REFERENCE above. Include 2-3 items for each category.
+IMPORTANT for features_to_try: Pick 2-3 from the AGENT FEATURES REFERENCE above. Every command, path, and config key must belong to an agent that appears in the digest. Never give Claude Code commands in a Codex-only report, or the reverse.
 ```
 
 ## 6. on_the_horizon
