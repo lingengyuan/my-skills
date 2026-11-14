@@ -4,7 +4,7 @@
 
 ## English
 
-Skills for technical writing, knowledge management, and development. Each directory under `.claude/skills/` includes its instructions and supporting resources. Three directories are copies of [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) and remain under its license — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Skills for technical writing, knowledge management, and development. Each directory under `.claude/skills/` includes its instructions and supporting resources. Three directories are copies of [obsidianmd/obsidian-skills](https://github.com/obsidianmd/obsidian-skills) and remain under its license — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ### Skills
 
@@ -44,7 +44,7 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 
 ## 简体中文
 
-用于技术写作、知识管理和开发的 Claude/Codex Skills。每个 Skill 的说明与配套资源位于 `.claude/skills/`。其中三个目录复制自 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills)，仍适用其许可证——见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+用于技术写作、知识管理和开发的 Claude/Codex Skills。每个 Skill 的说明与配套资源位于 `.claude/skills/`。其中三个目录复制自 [obsidianmd/obsidian-skills](https://github.com/obsidianmd/obsidian-skills)，仍适用其许可证——见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ### Skill 目录
 
