@@ -3,50 +3,13 @@ name: readme-maintainer
 description: Maintain, update, and rewrite concise, publication-ready repository README files grounded in codebase facts. Use when updating README.md, refreshing installation and usage guides, verifying CLI commands, or aligning bilingual documentation.
 ---
 
-# README Maintainer Skill
+# README Maintainer
 
-Generate and maintain clear, verified README files directly from repository source code, build manifests, and runtime configuration. Standard Markdown is assumed knowledge.
-
-## Workflow
-
-1. **Locate README and files**: Identify repository root and existing `README.md`. Read the current content.
-2. **Collect repository facts**: Inspect `package.json`, `Cargo.toml`, `pyproject.toml`, CLI help outputs, and configuration files. For repository-wide updates, run:
+1. **Collect & Verify Facts**: Inspect manifests (`package.json`, `Cargo.toml`, `pyproject.toml`), CLI help, and configs (or run `bash "<skill-dir>/scripts/collect_repo_facts.sh" "<repo-path>"`). Never invent compatibility, benchmarks, or features; delete stale claims.
+2. **Keep It Concise**: Cover only what a user needs to start—Overview (one sentence), Prerequisites & Installation, minimal Quick Start, essential Configuration, and links to deeper docs instead of duplicating them. Remove meta-discourse and duplicate definitions.
+3. **Align Bilingual READMEs**: Keep identical section structure across languages and verify parity with:
    ```bash
-   bash "<skill-dir>/scripts/collect_repo_facts.sh" "<repo-path>"
+   bash "<skill-dir>/scripts/check_bilingual_readme.sh" README.md
    ```
-3. **Verify claims against code**: Verify installation steps, prerequisites, environment variables, and CLI commands against actual repository source code. Delete stale claims and unverified statements.
-4. **Structure the document**:
-   - **Project Overview**: One concise sentence describing what the project does.
-   - **Prerequisites & Installation**: Exact runtime versions, package managers, and setup commands.
-   - **Quick Start / Basic Usage**: Minimal runnable command or code example with realistic input and output.
-   - **Configuration / Key Options**: Essential configuration table or common operations.
-   - **Documentation Links**: Link detailed architectural guides, API references, and development procedures to existing files instead of duplicating them.
-5. **Apply publication pass**:
-   - Delete meta-discourse, author reflections, and review commentary.
-   - State product features and constraints directly in active voice.
-   - Define each technical fact in one authoritative place.
-   - Keep only sections the reader needs. A README is an entry point, not an exhaustive encyclopedia.
-6. **Align bilingual documentation (if applicable)**:
-   - Match the existing language convention.
-   - If bilingual READMEs exist, ensure semantic parity across sections. Run:
-     ```bash
-     bash "<skill-dir>/scripts/check_bilingual_readme.sh" README.md
-     ```
-     The script accepts one file with `## English` / `## 简体中文` sections, or `README.md` plus a companion `README.<lang>.md`; either file works as the argument. It compares heading counts, so keep the section structure identical across languages. A single-language README exits 0.
-7. **Verify & report**: Test links, verify command syntax, and report material changes outside the README.
-
-## Guidelines
-
-- **Grounding**: Never invent compatibility guarantees, benchmarks, test coverage stats, or feature lists.
-- **Single source of truth**: Link to specialized documentation (architecture, full API, contributing guides) rather than duplicating large sections.
-- **Brevity with completeness**: Delete conversational filler, but keep essential setup commands, parameter definitions, and failure recovery notes.
-
-## Verification Checklist
-
-Before completing the task, verify:
-
-1. All installation and run commands match repository build tools.
-2. Code examples and CLI flags reflect current implementations.
-3. All internal links and relative file paths resolve correctly.
-4. If bilingual, both language sections cover identical concepts without drift.
-5. Output contains no internal editing chatter or temporary task notes.
+   (Accepts `## English` / `## 简体中文` in one file or `README.md` + `README.<lang>.md`; single-language README exits 0.)
+4. **Verify**: Confirm install/run commands match build tools, CLI flags match code, and all relative links resolve.

@@ -22,7 +22,6 @@ Skills for technical writing, knowledge management, and development. Each direct
 | [pele](.claude/skills/pele/SKILL.md) | Render and preview Mermaid diagrams as SVG |
 | [portpilot-assistant](.claude/skills/portpilot-assistant/SKILL.md) | Inspect and manage development ports |
 | [publication-ready-docs](.claude/skills/publication-ready-docs/SKILL.md) | Prepare technical documents for publication |
-| [publication-ready-docs-jev](.claude/skills/publication-ready-docs-jev/SKILL.md) | Prepare technical documents with optional Jev-assisted review |
 | [readme-maintainer](.claude/skills/readme-maintainer/SKILL.md) | Maintain concise READMEs from repository facts |
 | [sync-to-github](.claude/skills/sync-to-github/SKILL.md) | Commit and push within the requested scope |
 | [tech-article](.claude/skills/tech-article/SKILL.md) | Write Chinese technical articles |
@@ -62,7 +61,6 @@ Open the repository in Claude Code, or copy the entire selected Skill directory 
 | [pele](.claude/skills/pele/SKILL.md) | 将 Mermaid 图渲染为 SVG 并预览 |
 | [portpilot-assistant](.claude/skills/portpilot-assistant/SKILL.md) | 检查和管理开发端口 |
 | [publication-ready-docs](.claude/skills/publication-ready-docs/SKILL.md) | 整理可交付的正式技术文档 |
-| [publication-ready-docs-jev](.claude/skills/publication-ready-docs-jev/SKILL.md) | 整理正式技术文档并支持 Jev 预审 |
 | [readme-maintainer](.claude/skills/readme-maintainer/SKILL.md) | 基于仓库事实维护精简 README |
 | [sync-to-github](.claude/skills/sync-to-github/SKILL.md) | 按授权范围提交和推送 |
 | [tech-article](.claude/skills/tech-article/SKILL.md) | 撰写中文技术文章 |
